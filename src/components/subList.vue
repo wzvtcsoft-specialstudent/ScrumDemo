@@ -86,6 +86,9 @@ span {
   height: 45px;
   color: #888;
   line-height: 45px;
+  min-width: 300px;
+  max-width: 1000px;
+  max-lines: 1;
   border: 1px solid #ddd;
   border-radius: 5px;
   padding: 0 8px;
