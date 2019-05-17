@@ -1,7 +1,7 @@
 <template>
     <ul>
         <li v-for="(item, i) in list" :key="i">
-            <span>{{ item.title }}</span>
+            <span @mouseover="onFocus(i)" @mouseout="onBlur(i)"  ref="span" class="span">{{ item.title }}</span>
             <sub-list v-if="status" :list="item.nodes"></sub-list>
         </li>
     </ul>
@@ -18,8 +18,28 @@ export default {
     props: {
         list: Array
     },
+    methods: {
+      onFocus(i) {
+        let ele = this.$refs.span[i].parentNode;
+        ele = this.getParentNode(ele);
+        while(this.getParentNode(ele).id !== "tree" ){
+          ele.firstChild.style.border = '1.5px dashed orange';   
+          ele = this.getParentNode(ele);
+        }
+      },
+      onBlur(i) {
+        let ele = this.$refs.span[i].parentNode;
+        ele = this.getParentNode(ele);
+        while(this.getParentNode(ele).id !== "tree" ){
+          ele.firstChild.style.removeProperty('border')
+          ele = this.getParentNode(ele);
+        }
+      },
+      getParentNode(node) {
+          return node.parentNode.parentNode;
+      }
+    },
     created() {
-        // console.log(typeof this.list);
        if(this.list === 'undefined') {
            this.status = false;
        }
@@ -89,7 +109,7 @@ span {
   min-width: 300px;
   max-width: 1000px;
   max-lines: 1;
-  border: 1px solid #ddd;
+  border: 1.5px solid #ddd;
   border-radius: 5px;
   padding: 0 8px;
   font-size: 1.5em;
