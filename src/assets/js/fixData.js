@@ -37,6 +37,7 @@ function merge(index) {
   let obj = {};
   let context = data[index - 1].title;
   obj.title = context;
+  obj.day = "未设置";
   if(data[index - 1].assignees.nodes.length !== 0) {
     obj.assignees = [];
     data[index -1].assignees.nodes.forEach( item => {
@@ -46,7 +47,7 @@ function merge(index) {
   if(data[index - 1].labels.totalCount != 0) {
     let lab = [];
     data[index - 1].labels.nodes.forEach( item => {
-      if(isNaN(item.name)) lab.unshift(item.name)
+      if(!isNaN(item.name)) obj.day = item.name;
       else lab.push(item.name)
     })
     obj.labels = lab;

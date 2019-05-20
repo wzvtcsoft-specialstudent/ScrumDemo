@@ -1,14 +1,15 @@
 <template>
   <ul>
     <li v-for="(item, i) in list" :key="i">
-      <label class="timeLabel" title="完成天数">{{ item.labels | showDay}}</label>
+      <label class="timeLabel" title="完成天数">{{ item.day}}</label>
       <span @mouseover="onFocus(i)" @mouseout="onBlur(i)" ref="span" class="span">{{ item.title }}</span>
       <label
-        v-for="(name, i) in item.assignees"
-        :key="i"
+        v-for="(name, name_i) in item.assignees"
+        :key="name_i"
         class="assignLabel"
         :title="name"
       >{{ name }}</label>
+      <label v-for="(label, label_i) in item.labels" :key="label_i+'label'" :class="[label,'label']">{{ label }}</label>
       <sub-list v-if="status" :list="item.nodes"></sub-list>
     </li>
   </ul>
@@ -30,7 +31,7 @@ export default {
       let ele = this.$refs.span[i].parentNode;
       ele = this.getParentNode(ele);
       while (this.getParentNode(ele).id !== "tree") {
-        ele.firstChild.style.border = "1.5px dashed orange";
+        ele.children[1].style.border = "1.5px solid orange";
         ele = this.getParentNode(ele);
       }
     },
@@ -38,7 +39,7 @@ export default {
       let ele = this.$refs.span[i].parentNode;
       ele = this.getParentNode(ele);
       while (this.getParentNode(ele).id !== "tree") {
-        ele.firstChild.style.removeProperty("border");
+        ele.children[1].style.removeProperty("border");
         ele = this.getParentNode(ele);
       }
     },
@@ -48,7 +49,11 @@ export default {
   },
   filters: {
     showDay(value) {
-      return typeof value === "undefined" ? "未设置" : value[0];
+      // for(let i in value) {
+      //   if(!isNaN(value[i])) return value[i];
+      // }
+      return "未设置";
+      // return typeof value === "undefined" ? "未设置" : value[0];
     }
   },
   created() {
@@ -131,9 +136,9 @@ span {
 
 .timeLabel {
   display: block;
-  height: 45px;
-  max-height: 45px;
-  line-height: 45px;
+  height: 40px;
+  max-height: 40px;
+  line-height: 40px;
   border-radius: 5px;
   float: left;
   padding: 0 8px;
@@ -160,9 +165,33 @@ span {
   border: 1.5px solid #ddd;
   background-color: rgb(14, 166, 226);
 }
+
+.label {
+   display: inline-block;
+  /* 防止在 display:inline-block 下，元素不对齐 */
+  vertical-align: middle;
+  height: 25px;
+  max-height: 25px;
+  line-height: 25px;
+  max-width: 130px;
+  /* 过长的文字用 ... 省略 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 5px;
+  font-size: 1em;
+  color: #ddd;
+  border: 1.5px solid #ddd;
+}
+.bug {
+  background-color: red;
+}
+.good {
+  background-color: #7057ff;
+}
 /* 获得焦点改变背景色 */
-#tree span:hover,
-#tree span:hover + ul span {
+/* #tree span:hover + ul span , */
+#tree span:hover{
   color: #fff;
   background-color: deepskyblue;
 }
