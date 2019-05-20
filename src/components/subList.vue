@@ -2,10 +2,13 @@
   <ul>
     <li v-for="(item, i) in list" :key="i">
       <label class="timeLabel" title="完成天数">{{ item.labels | showDay}}</label>
-      <span @mouseover="onFocus(i)" @mouseout="onBlur(i)" ref="span" class="span">
-        {{ item.title }}
-      </span>
-      <label v-for="(name, i) in item.assignees" :key="i" class="assignLabel" :title="name">{{ name }}</label> 
+      <span @mouseover="onFocus(i)" @mouseout="onBlur(i)" ref="span" class="span">{{ item.title }}</span>
+      <label
+        v-for="(name, i) in item.assignees"
+        :key="i"
+        class="assignLabel"
+        :title="name"
+      >{{ name }}</label>
       <sub-list v-if="status" :list="item.nodes"></sub-list>
     </li>
   </ul>
@@ -45,7 +48,7 @@ export default {
   },
   filters: {
     showDay(value) {
-      return typeof value === 'undefined'?'未设置':value[0]
+      return typeof value === "undefined" ? "未设置" : value[0];
     }
   },
   created() {
@@ -141,9 +144,16 @@ span {
 
 .assignLabel {
   display: inline-block;
+  /* 防止在 display:inline-block 下，元素不对齐 */
+  vertical-align: bottom; 
   height: 45px;
   max-height: 45px;
   line-height: 45px;
+  max-width: 100px;
+  /* 过长的文字用 ... 省略 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   border-radius: 5px;
   font-size: 1.5em;
   color: #ddd;
