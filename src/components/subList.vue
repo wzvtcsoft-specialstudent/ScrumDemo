@@ -1,15 +1,15 @@
 <template>
   <ul>
     <li v-for="(item, i) in list" :key="i">
-      <label class="timeLabel" title="完成天数">{{ item.day}}</label>
+      <label class="timeLabel" title="完成天数" :style="'backgroundColor:#' + item.day.color">{{ item.day.name }}</label>
       <span @mouseover="onFocus(i)" @mouseout="onBlur(i)" ref="span" class="span">{{ item.title }}</span>
-      <label
+      <div
         v-for="(name, name_i) in item.assignees"
         :key="name_i"
         class="assignLabel"
-        :title="name"
-      >{{ name }}</label>
-      <label v-for="(label, label_i) in item.labels" :key="label_i+'label'" :class="[label,'label']">{{ label }}</label>
+        :title="name.name"
+      ><img :src="name.img" width="30" height="30"></div>
+      <label v-for="(label, label_i) in item.labels" :key="label_i+'label'" :class="['label']" :style="'backgroundColor:#' + label.color">{{ label.name }}</label>
       <sub-list v-if="status" :list="item.nodes"></sub-list>
     </li>
   </ul>
@@ -60,6 +60,7 @@ export default {
     if (this.list === "undefined") {
       this.status = false;
     }
+    
   }
 };
 </script>
@@ -150,20 +151,21 @@ span {
 .assignLabel {
   display: inline-block;
   /* 防止在 display:inline-block 下，元素不对齐 */
-  vertical-align: bottom; 
-  height: 45px;
+  vertical-align: middle; 
+  height: 30px;
+  /* height: 45px;
   max-height: 45px;
-  line-height: 45px;
-  max-width: 100px;
+  line-height: 45px; */
+  /* max-width: 100px; */
   /* 过长的文字用 ... 省略 */
-  overflow: hidden;
+  /* overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   border-radius: 5px;
   font-size: 1.5em;
-  color: #ddd;
+  color: #ddd; */
   border: 1.5px solid #ddd;
-  background-color: rgb(14, 166, 226);
+  /* background-color: rgb(14, 166, 226); */
 }
 
 .label {

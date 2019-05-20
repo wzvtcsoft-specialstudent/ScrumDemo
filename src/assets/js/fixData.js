@@ -41,14 +41,15 @@ function merge(index) {
   if(data[index - 1].assignees.nodes.length !== 0) {
     obj.assignees = [];
     data[index -1].assignees.nodes.forEach( item => {
-      obj.assignees.push(item.name)
+      obj.assignees.push({name:item.name, img:item.avatarUrl})
     })
   }
+  /* 标签 */
   if(data[index - 1].labels.totalCount != 0) {
     let lab = [];
     data[index - 1].labels.nodes.forEach( item => {
-      if(!isNaN(item.name)) obj.day = item.name;
-      else lab.push(item.name)
+      if(!isNaN(item.name)) obj.day = {name:item.name, color:item.color};
+      else lab.push({name:item.name, color:item.color})
     })
     obj.labels = lab;
   }
