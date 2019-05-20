@@ -49,11 +49,7 @@ export default {
   },
   filters: {
     showDay(value) {
-      // for(let i in value) {
-      //   if(!isNaN(value[i])) return value[i];
-      // }
-      return "未设置";
-      // return typeof value === "undefined" ? "未设置" : value[0];
+      return typeof value === 'undefined'?"未设置":value
     }
   },
   created() {
