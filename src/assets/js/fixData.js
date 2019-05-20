@@ -37,6 +37,20 @@ function merge(index) {
   let obj = {};
   let context = data[index - 1].title;
   obj.title = context;
+  if(data[index - 1].assignees.nodes.length !== 0) {
+    obj.assignees = [];
+    data[index -1].assignees.nodes.forEach( item => {
+      obj.assignees.push(item.name)
+    })
+  }
+  if(data[index - 1].labels.totalCount != 0) {
+    let lab = [];
+    data[index - 1].labels.nodes.forEach( item => {
+      if(isNaN(item.name)) lab.unshift(item.name)
+      else lab.push(item.name)
+    })
+    obj.labels = lab;
+  }
   if (data[index - 1].timelineItems.nodes.length === 0) return obj;
   obj.nodes = [];
   data[index - 1].timelineItems.nodes.forEach(item => {
