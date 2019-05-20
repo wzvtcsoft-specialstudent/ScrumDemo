@@ -1,7 +1,9 @@
 <template>
     <ul>
         <li v-for="(item, i) in list" :key="i">
+            <label v-show="status" class="timeLabel" title="完成天数">2</label>
             <span @mouseover="onFocus(i)" @mouseout="onBlur(i)"  ref="span" class="span">{{ item.title }}</span>
+            <label v-show="status" class="assignLabel" title="负责人">Mike</label> 
             <sub-list v-if="status" :list="item.nodes"></sub-list>
         </li>
     </ul>
@@ -112,10 +114,33 @@ span {
   border: 1.5px solid #ddd;
   border-radius: 5px;
   padding: 0 8px;
+ 
   font-size: 1.5em;
   cursor: pointer;
 }
 
+.timeLabel {
+  display: inline-block;
+
+  line-height: 45px;
+  border-radius: 5px;
+  padding: 0 8px;
+  font-size: 1.5em;
+  color: #ddd;
+  border: 2px solid #ddd;
+  background-color: rgb(14, 166, 226);
+  cursor: pointer;
+
+}
+
+.assignLabel {
+  display: inline-block;
+  border-radius: 5px;
+  font-size: 1.5em;
+  color: #ddd;
+  border: 2px solid #ddd;
+  background-color: rgb(14, 166, 226);
+}
 /* 获得焦点改变背景色 */
 #tree span:hover,
 #tree span:hover + ul span {
