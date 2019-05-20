@@ -1,52 +1,54 @@
 <template>
-    <ul>
-        <li v-for="(item, i) in list" :key="i">
-            <label v-show="status" class="timeLabel" title="完成天数">2</label>
-            <span @mouseover="onFocus(i)" @mouseout="onBlur(i)"  ref="span" class="span">{{ item.title }}</span>
-            <label v-show="status" class="assignLabel" title="负责人">Mike</label> 
-            <sub-list v-if="status" :list="item.nodes"></sub-list>
-        </li>
-    </ul>
+  <ul>
+    <li v-for="(item, i) in list" :key="i">
+      <label v-show="status" class="timeLabel" title="完成天数">2</label>
+      <span @mouseover="onFocus(i)" @mouseout="onBlur(i)" ref="span" class="span">
+        {{ item.title }}
+      </span>
+      <label v-show="status" class="assignLabel" title="负责人">Mike</label> 
+      <sub-list v-if="status" :list="item.nodes"></sub-list>
+    </li>
+  </ul>
 </template>
 
 <script>
 export default {
-    name: 'subList',
-    data () {
-        return {
-            status: true
-        }
-    },
-    props: {
-        list: Array
-    },
-    methods: {
-      onFocus(i) {
-        let ele = this.$refs.span[i].parentNode;
+  name: "subList",
+  data() {
+    return {
+      status: true
+    };
+  },
+  props: {
+    list: Array
+  },
+  methods: {
+    onFocus(i) {
+      let ele = this.$refs.span[i].parentNode;
+      ele = this.getParentNode(ele);
+      while (this.getParentNode(ele).id !== "tree") {
+        ele.firstChild.style.border = "1.5px dashed orange";
         ele = this.getParentNode(ele);
-        while(this.getParentNode(ele).id !== "tree" ){
-          ele.firstChild.style.border = '1.5px dashed orange';   
-          ele = this.getParentNode(ele);
-        }
-      },
-      onBlur(i) {
-        let ele = this.$refs.span[i].parentNode;
-        ele = this.getParentNode(ele);
-        while(this.getParentNode(ele).id !== "tree" ){
-          ele.firstChild.style.removeProperty('border')
-          ele = this.getParentNode(ele);
-        }
-      },
-      getParentNode(node) {
-          return node.parentNode.parentNode;
       }
     },
-    created() {
-       if(this.list === 'undefined') {
-           this.status = false;
-       }
+    onBlur(i) {
+      let ele = this.$refs.span[i].parentNode;
+      ele = this.getParentNode(ele);
+      while (this.getParentNode(ele).id !== "tree") {
+        ele.firstChild.style.removeProperty("border");
+        ele = this.getParentNode(ele);
+      }
     },
-}
+    getParentNode(node) {
+      return node.parentNode.parentNode;
+    }
+  },
+  created() {
+    if (this.list === "undefined") {
+      this.status = false;
+    }
+  }
+};
 </script>
 
 <style scoped>
@@ -104,41 +106,43 @@ ul {
 }
 span {
   display: inline-block;
-  text-align: center;
+  text-align: left;
   height: 45px;
   color: #888;
   line-height: 45px;
-  min-width: 300px;
+  min-width: 100px;
   max-width: 1000px;
   max-lines: 1;
   border: 1.5px solid #ddd;
   border-radius: 5px;
   padding: 0 8px;
- 
+
   font-size: 1.5em;
   cursor: pointer;
 }
 
 .timeLabel {
   display: inline-block;
-
+  height: 45px;
+  max-height: 45px;
   line-height: 45px;
   border-radius: 5px;
   padding: 0 8px;
   font-size: 1.5em;
   color: #ddd;
-  border: 2px solid #ddd;
-  background-color: rgb(14, 166, 226);
+  border: 1.5px solid #ddd;
   cursor: pointer;
-
 }
 
 .assignLabel {
   display: inline-block;
+  height: 45px;
+  max-height: 45px;
+  line-height: 45px;
   border-radius: 5px;
   font-size: 1.5em;
   color: #ddd;
-  border: 2px solid #ddd;
+  border: 1.5px solid #ddd;
   background-color: rgb(14, 166, 226);
 }
 /* 获得焦点改变背景色 */
@@ -149,9 +153,9 @@ span {
 }
 /* 获得焦点改变边框和连线的颜色 */
 #tree span:hover,
-#tree span:hover + ul span,
-#tree span:hover + ul li:before,
-#tree span:hover + ul li:after {
+#tree span:hover ~ ul span,
+#tree span:hover ~ ul li:before,
+#tree span:hover ~ ul li:after {
   border-color: blue;
 }
 </style>

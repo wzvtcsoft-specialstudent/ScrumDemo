@@ -23,7 +23,7 @@
               </li>
             </ul>
           </li>
-        </ul> -->
+        </ul>-->
       </li>
     </ul>
   </div>
@@ -31,12 +31,12 @@
 
 <script>
 import { getIssue } from "@/api/getIssue";
-import { fixData } from '@/assets/js/fixData'
-import subList from './subList'
+import { fixData } from "@/assets/js/fixData";
+import subList from "./subList";
 export default {
   data() {
     return {
-      title: '',
+      title: "",
       data: null
     };
   },
@@ -49,11 +49,11 @@ export default {
       // ScrumDemo
       var req = {
         query:
-          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){id name issues(first:100){ totalCount nodes{ title  number  body  timelineItems(first:10){   nodes{  ...on CrossReferencedEvent{    source{  ...on Issue{    number  }  }target{  ...on Issue{    number  } }}} }}}}}}'
+          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){ id name issues(first:100){  totalCount nodes{  title number body assignees(first:100){ nodes{   name} }labels(first:100){totalCount nodes{  name} } timelineItems(first:2,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name  } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
       getIssue(req).then(res => {
         this.title = res.data.data.organization.repository.name;
-        this.data = fixData(res.data.data.organization.repository.issues.nodes)
+        this.data = fixData(res.data.data.organization.repository.issues.nodes);
       });
     }
   },

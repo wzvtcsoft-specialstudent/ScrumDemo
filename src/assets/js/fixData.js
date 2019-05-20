@@ -1,3 +1,5 @@
+import { isNumber } from "util";
+
 var have = [], // 临时存放非根Issue
   epic = [], // 存放根Issue
   res = []; // 整理好的数据
@@ -14,7 +16,7 @@ function init() {
     //  if(item.timelineItems.nodes[key].source === 'undefined')
     //     have.push(item.timelineItems.nodes[key].source.number)
       
-    // }
+    // }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
     item.timelineItems.nodes.forEach( i => {
         //console.log(i);
         if(typeof i.source !== 'undefined') {
