@@ -9,7 +9,7 @@
         class="assignLabel"
         :title="name.name"
       ><img :src="name.img" width="30" height="30"></div>
-      <label v-for="(label, label_i) in item.labels" :key="label_i+'label'" :class="['label']" :style="'backgroundColor:#' + label.color">{{ label.name }}</label>
+      <label v-for="(label, label_i) in item.labels" :key="label_i+'label'" class="label" :style="'backgroundColor:#' + label.color">{{ label.name }}</label>
       <sub-list v-if="status" :list="item.nodes"></sub-list>
     </li>
   </ul>
@@ -103,9 +103,9 @@ export default {
 #tree ul > li:last-child:before {
   content: " ";
   position: absolute;
-  top: 0;
+  top: -5px;
   left: -45px;
-  height: 30px;
+  height: 35px;
   border: none;
   border-left: 1px solid #ddd;
 }
@@ -132,12 +132,12 @@ span {
 }
 
 .timeLabel {
-  display: block;
-  height: 40px;
-  max-height: 40px;
-  line-height: 40px;
+  display: inline-block;
+  vertical-align: middle;
+  height: 30px;
+  max-height: 30px;
+  line-height: 30px;
   border-radius: 5px;
-  float: left;
   padding: 0 8px;
   font-size: 1em;
   color: #ddd;
@@ -180,12 +180,6 @@ span {
   font-size: 1em;
   color: #ddd;
   border: 1.5px solid #ddd;
-}
-.bug {
-  background-color: red;
-}
-.good {
-  background-color: #7057ff;
 }
 /* 获得焦点改变背景色 */
 /* #tree span:hover + ul span , */
