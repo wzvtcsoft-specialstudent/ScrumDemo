@@ -1,7 +1,7 @@
 <template>
   <ul>
     <li v-for="(item, i) in list" :key="i">
-      <label class="timeLabel" title="完成天数" :style="'backgroundColor:#' + item.day.color">{{ item.day.name }}</label>
+      <label class="timeLabel" title="完成天数" :style="'backgroundColor:#' + item.day.color">{{ item.day.name | showDay}}</label>
       <span @mouseover="onFocus(i)" @mouseout="onBlur(i)" ref="span" class="span">{{ item.title }}</span>
       <div
         v-for="(name, name_i) in item.assignees"
