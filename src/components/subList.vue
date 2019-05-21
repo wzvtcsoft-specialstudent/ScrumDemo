@@ -7,9 +7,9 @@
         v-for="(name, name_i) in item.assignees"
         :key="name_i"
         class="assignLabel"
-        :style="'border:1.5px solid ' + name.color"
+        :style="'marginLeft:3px; border:1.5px solid ' + name.color"
         :title="name.name"
-      ><img class="img" :src="name.img" width="30" height="30" :alt="name.name" ></div>
+      ><img class="img" :src="name.img" width="30" height="30" :alt="name.name"></div>
       <label v-for="(label, label_i) in item.labels" :key="label_i+'label'" class="label" :style="'backgroundColor:#' + label.bgcolor + ';color:' + label.ftcolor">{{ label.name }}</label>
       <sub-list v-if="status" :list="item.nodes"></sub-list>
     </li>

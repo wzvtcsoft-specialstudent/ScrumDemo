@@ -3,7 +3,7 @@
     <ul>
       <li>
         <span>{{ title }} 需求地图</span>
-        <sub-list :list="data"></sub-list>
+          <sub-list :list="data"></sub-list>
         <!-- <ul>
           <li v-for="(epic, epic_i) in data" :key="epic_i">
             <span>{{ epic.title }}</span>
@@ -64,6 +64,23 @@ export default {
 </script>
 
 <style scoped>
+.v-enter,
+.v-leave-to {
+  opacity: 0;
+  transform: translateX(100px);
+}
+.v-enter-active,
+.v-leave-active {
+  transition: all 1s ease;
+}
+/* 固定写法,配合使用实现列表的平稳动画 */
+.v-move {
+  transition: all 1s ease;
+}
+.v-leave-active {
+  position: absolute;
+}
+
 #tree {
   display: block;
   position: relative;

@@ -60,7 +60,6 @@ function merge(index) {
   if(data[index - 1].assignees.nodes.length !== 0) {
     obj.assignees = [];
     data[index -1].assignees.nodes.forEach( item => {
-      console.log(userColor[item.name]);
       obj.assignees.push({name:item.name, img:item.avatarUrl, color: userColor[item.name]})
     })
   }
