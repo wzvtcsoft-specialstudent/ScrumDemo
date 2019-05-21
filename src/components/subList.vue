@@ -7,6 +7,7 @@
         v-for="(name, name_i) in item.assignees"
         :key="name_i"
         class="assignLabel"
+        :style="'border:1.5px solid ' + name.color"
         :title="name.name"
       ><img class="img" :src="name.img" width="30" height="30" :alt="name.name" ></div>
       <label v-for="(label, label_i) in item.labels" :key="label_i+'label'" class="label" :style="'backgroundColor:#' + label.bgcolor + ';color:' + label.ftcolor">{{ label.name }}</label>
@@ -158,7 +159,6 @@ span {
   border-radius: 5px;
   font-size: 1.5em;
   color: #ddd; */
-  border: 1.5px solid #ccc;
   /* background-color: rgb(14, 166, 226); */
 }
 

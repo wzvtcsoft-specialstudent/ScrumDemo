@@ -4,7 +4,15 @@ var have = [], // 临时存放非根Issue
   epic = [], // 存放根Issue
   res = []; // 整理好的数据
 var data = null; // 存放原始数据
-
+var userColor = [];
+    userColor['youlik'] = 'orange';
+    userColor['诸葛康亮我最帅'] = 'lightgreen';
+    userColor['Shimizu'] ='red';
+    userColor['SprWu'] = 'deepskyblue';
+    userColor['Lieatfhy'] = 'yellow';
+    userColor['动感超人'] = 'blue';
+    userColor['Salexal'] = 'green';
+    userColor['刘笑锋'] = 'black';
 
 /* 初始化 */
 function init() {
@@ -52,7 +60,8 @@ function merge(index) {
   if(data[index - 1].assignees.nodes.length !== 0) {
     obj.assignees = [];
     data[index -1].assignees.nodes.forEach( item => {
-      obj.assignees.push({name:item.name, img:item.avatarUrl})
+      console.log(userColor[item.name]);
+      obj.assignees.push({name:item.name, img:item.avatarUrl, color: userColor[item.name]})
     })
   }
   /* 标签 */
