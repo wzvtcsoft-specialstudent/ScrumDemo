@@ -89,6 +89,5 @@ export function fixData(oldData) {
   epic.forEach(i => {
     res.push(merge(i));
   });
-  console.log(res);
   return res;
 }

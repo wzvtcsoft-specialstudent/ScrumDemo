@@ -1,16 +1,36 @@
 <template>
   <ul>
     <li v-for="(item, i) in list" :key="i">
-      <label class="timeLabel" title="完成天数" :style="'backgroundColor:#' + item.day.color">{{ item.day.name | showDay}}</label>
+      <label
+        class="timeLabel"
+        title="完成天数"
+        :style="'backgroundColor:#' + item.day.color"
+      >{{ item.day.name | showDay}}</label>
       <span @mouseover="onFocus(i)" @mouseout="onBlur(i)" ref="span" class="span">{{ item.title }}</span>
       <div
         v-for="(name, name_i) in item.assignees"
         :key="name_i"
         class="assignLabel"
-        :style="'marginLeft:3px; border:1.5px solid ' + name.color"
+        style="marginLeft:3px"
         :title="name.name"
-      ><img class="img" :src="name.img" width="30" height="30" :alt="name.name"></div>
-      <label v-for="(label, label_i) in item.labels" :key="label_i+'label'" class="label" :style="'backgroundColor:#' + label.bgcolor + ';color:' + label.ftcolor">{{ label.name }}</label>
+      >
+        <img
+          class="img"
+          :src="name.img"
+          width="30"
+          height="30"
+          :style="'border:1.5px solid ' + name.color"
+          :alt="name.name"
+          onload="this.style.display = 'block'"
+          onerror="this.style.display = 'block'"
+        >
+      </div>
+      <label
+        v-for="(label, label_i) in item.labels"
+        :key="label_i+'label'"
+        class="label"
+        :style="'backgroundColor:#' + label.bgcolor + ';color:' + label.ftcolor"
+      >{{ label.name }}</label>
       <sub-list v-if="status" :list="item.nodes"></sub-list>
     </li>
   </ul>
@@ -50,14 +70,14 @@ export default {
   },
   filters: {
     showDay(value) {
-      return typeof value === 'undefined'?"未设置":value
+      return typeof value === "undefined" ? "未设置" : value;
     }
   },
   created() {
     if (this.list === "undefined") {
       this.status = false;
     }
-  },
+  }
 };
 </script>
 
@@ -146,7 +166,7 @@ span {
 .assignLabel {
   display: inline-block;
   /* 防止在 display:inline-block 下，元素不对齐 */
-  vertical-align: middle; 
+  vertical-align: middle;
   height: 30px;
   /* height: 45px;
   max-height: 45px;
@@ -163,7 +183,7 @@ span {
 }
 
 .label {
-   display: inline-block;
+  display: inline-block;
   /* 防止在 display:inline-block 下，元素不对齐 */
   vertical-align: middle;
   height: 25px;
@@ -183,11 +203,12 @@ span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: none;
 }
 
 /* 获得焦点改变背景色 */
 /* #tree span:hover + ul span , */
-#tree span:hover{
+#tree span:hover {
   color: #fff;
   background-color: deepskyblue;
 }
