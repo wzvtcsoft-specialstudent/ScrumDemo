@@ -11,7 +11,7 @@
         v-for="(name, name_i) in item.assignees"
         :key="name_i"
         class="assignLabel"
-        style="marginLeft:3px"
+        :style="'marginLeft:3px; border:1.5px solid ' + name.color"
         :title="name.name"
       >
         <img
@@ -19,7 +19,6 @@
           :src="name.img"
           width="30"
           height="30"
-          :style="'border:1.5px solid ' + name.color"
           :alt="name.name"
           onload="this.style.display = 'block'"
           onerror="this.style.display = 'block'"
