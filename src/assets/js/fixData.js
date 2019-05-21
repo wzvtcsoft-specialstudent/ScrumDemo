@@ -32,6 +32,17 @@ function init() {
   })
 }
 
+/* 颜色十六进制转rgb */
+function changeToRgb(oldVal) {
+  let rgbArr = [];
+  let sum = 0;
+  for(let i=0;i<6;i+=2) {
+    rgbArr.push(parseInt("0x" + oldVal.slice(i, i+2)))
+  }
+  sum = rgbArr[0]*0.299 + rgbArr[1]*0.578 + rgbArr[2]*0.114;
+  return sum > 192?'black':'white'; // 深色背景，白色文字；浅色背景，黑色文字
+}
+
 /* 递归遍历(深度)，连接Issue */
 function merge(index) {
   let obj = {};
@@ -49,7 +60,7 @@ function merge(index) {
     let lab = [];
     data[index - 1].labels.nodes.forEach( item => {
       if(!isNaN(item.name)) obj.day = {name:item.name, color:item.color};
-      else lab.push({name:item.name, color:item.color})
+      else lab.push({name:item.name, bgcolor:item.color,ftcolor: changeToRgb(item.color)})
     })
     obj.labels = lab;
   }

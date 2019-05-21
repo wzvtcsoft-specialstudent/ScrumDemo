@@ -8,8 +8,8 @@
         :key="name_i"
         class="assignLabel"
         :title="name.name"
-      ><img :src="name.img" width="30" height="30" :alt="name.name" ></div>
-      <label v-for="(label, label_i) in item.labels" :key="label_i+'label'" class="label" :style="'backgroundColor:#' + label.color">{{ label.name }}</label>
+      ><img class="img" :src="name.img" width="30" height="30" :alt="name.name" ></div>
+      <label v-for="(label, label_i) in item.labels" :key="label_i+'label'" class="label" :style="'backgroundColor:#' + label.bgcolor + ';color:' + label.ftcolor">{{ label.name }}</label>
       <sub-list v-if="status" :list="item.nodes"></sub-list>
     </li>
   </ul>
@@ -56,8 +56,7 @@ export default {
     if (this.list === "undefined") {
       this.status = false;
     }
-    
-  }
+  },
 };
 </script>
 
@@ -118,12 +117,11 @@ span {
   display: inline-block;
   text-align: left;
   height: 45px;
-  color: #888;
+  color: #24292e;
   line-height: 45px;
-  min-width: 100px;
   max-width: 1000px;
   max-lines: 1;
-  border: 1.5px solid #ddd;
+  border: 1.5px solid #bbb;
   border-radius: 5px;
   padding: 0 8px;
 
@@ -140,8 +138,8 @@ span {
   border-radius: 5px;
   padding: 0 8px;
   font-size: 1em;
-  color: #ddd;
-  border: 1.5px solid #ddd;
+  color: #ccc;
+  border: 1.5px solid #ccc;
 }
 
 .assignLabel {
@@ -160,7 +158,7 @@ span {
   border-radius: 5px;
   font-size: 1.5em;
   color: #ddd; */
-  border: 1.5px solid #ddd;
+  border: 1.5px solid #ccc;
   /* background-color: rgb(14, 166, 226); */
 }
 
@@ -178,9 +176,15 @@ span {
   white-space: nowrap;
   border-radius: 5px;
   font-size: 1em;
-  color: #ddd;
-  border: 1.5px solid #ddd;
+  border: 1.5px solid #ccc;
 }
+.img {
+  max-width: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* 获得焦点改变背景色 */
 /* #tree span:hover + ul span , */
 #tree span:hover{
