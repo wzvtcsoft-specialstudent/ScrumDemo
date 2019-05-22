@@ -11,7 +11,7 @@
         v-for="(name, name_i) in item.assignees"
         :key="name_i"
         class="assignLabel"
-        :style="'marginLeft:3px; border:1.5px solid ' + name.color"
+        :style="'border:1.5px solid ' + name.color"
         :title="name.name"
       >
         <img
@@ -159,7 +159,7 @@ span {
   padding: 0 8px;
   font-size: 1em;
   color: #ccc;
-  border: 1.5px solid #ccc;
+  border: 1px solid #ccc;
 }
 
 .assignLabel {
@@ -167,6 +167,8 @@ span {
   /* 防止在 display:inline-block 下，元素不对齐 */
   vertical-align: middle;
   height: 30px;
+  margin-left: 3px;
+  border-radius: 3px;
   /* height: 45px;
   max-height: 45px;
   line-height: 45px; */
@@ -189,13 +191,15 @@ span {
   max-height: 25px;
   line-height: 25px;
   max-width: 130px;
+  margin-left: 1px;
   /* 过长的文字用 ... 省略 */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   border-radius: 5px;
   font-size: 1em;
-  border: 1.5px solid #ccc;
+  border: 1px solid #ccc;
+  box-shadow: 
 }
 .img {
   max-width: 50px;
