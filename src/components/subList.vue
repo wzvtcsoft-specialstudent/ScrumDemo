@@ -6,7 +6,10 @@
         title="完成天数"
         :style="'backgroundColor:#' + item.day.color"
       >{{ item.day.name | showDay}}</label>
-      <span @mouseover="onFocus(i)" @mouseout="onBlur(i)" ref="span" class="span">{{ item.title }}</span>
+      <label class="timeLabel">
+        {{"#"+item.number}}
+      </label>
+      <span @mouseover="onFocus(i)" @mouseout="onBlur(i)" ref="span" class="span"><a :href="item.baseurl">{{ item.title }}</a></span>
       <div
         v-for="(name, name_i) in item.assignees"
         :key="name_i"
@@ -132,6 +135,9 @@ export default {
 ul {
   list-style-type: none;
   text-align: left;
+}
+a{
+  text-decoration :none;
 }
 span {
   display: inline-block;

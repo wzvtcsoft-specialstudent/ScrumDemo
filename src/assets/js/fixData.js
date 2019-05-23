@@ -55,6 +55,10 @@ function changeToRgb(oldVal) {
 function merge(index) {
   let obj = {};
   let context = data[index - 1].title;
+  let context1 = data[index - 1].number;
+  let Url=data[index-1].url;
+  obj.number=context1;
+  obj.baseurl=Url;
   obj.title = context;
   obj.day = "未设置";
   if(data[index - 1].assignees.nodes.length !== 0) {
