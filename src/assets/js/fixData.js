@@ -56,7 +56,10 @@ function merge(index) {
   let obj = {};
   let context = data[index - 1].title;
   obj.title = context;
+  obj.number = data[index - 1].number;
+  obj.issueUrl = data[index - 1].url
   obj.day = "未设置";
+  obj.nodes = [];
   if(data[index - 1].assignees.nodes.length !== 0) {
     obj.assignees = [];
     data[index -1].assignees.nodes.forEach( item => {
@@ -72,8 +75,10 @@ function merge(index) {
     })
     obj.labels = lab;
   }
-  if (data[index - 1].timelineItems.nodes.length === 0) return obj;
-  obj.nodes = [];
+  if (data[index - 1].timelineItems.nodes.length === 0) {
+    obj.nodes.push({nodes:null});
+    return obj;
+  }
   data[index - 1].timelineItems.nodes.forEach(item => {
     if(typeof item.source !== 'undefined') {
         obj.nodes.push(merge(item.source.number))
