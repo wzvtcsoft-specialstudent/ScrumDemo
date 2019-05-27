@@ -6,6 +6,7 @@
           <sub-list :list="data"></sub-list>
           <pre>
     <code v-html="data"></code>
+    
   </pre>
         <!-- <ul>
           <li v-for="(epic, epic_i) in data" :key="epic_i">
