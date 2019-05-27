@@ -76,7 +76,7 @@ export default {
     getissue() {
       let params = {
         query:
-          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){ id name issues(first:100){  totalCount nodes{  title number url body assignees(first:100){ nodes{  name avatarUrl} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
+          'query{organization(login:"qcteams"){repository(name:"HuaAn"){ id name issues(first:100){  totalCount nodes{  title number url body assignees(first:100){ nodes{  name avatarUrl} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
       getIssue(params).then( res => {
         this.data = fixData(res.data.data.organization.repository.issues.nodes)
@@ -92,7 +92,13 @@ export default {
         this.$refs.epic.style.height = '150px'
         // this.$refs.epic.style.position = 'relative'
       }
-      
+      if(index > 6) {
+        let temp = this.data[index];
+        this.data.splice(index, 1);
+        this.data.unshift(temp);
+        this.epici = 0; // 因为选中项的位置变为0，所以选中值也要变为0
+        
+      }
      
       // }
     },
