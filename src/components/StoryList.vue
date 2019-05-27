@@ -76,7 +76,7 @@ export default {
     getissue() {
       let params = {
         query:
-          'query{organization(login:"qcteams"){repository(name:"HuaAn"){ id name issues(first:100){  totalCount nodes{  title number url body assignees(first:100){ nodes{  name avatarUrl} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
+          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){ id name issues(first:100){  totalCount nodes{  title number url body assignees(first:100){ nodes{  name avatarUrl} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
       getIssue(params).then( res => {
         this.data = fixData(res.data.data.organization.repository.issues.nodes)
@@ -106,7 +106,7 @@ export default {
       this.storyi = index;
     },
     addEpic() {
-      this.$refs.epic.style.height = this.$refs.epic.style.height == 'auto'?'150px':'auto'
+      this.$refs.epic.style.height = this.$refs.epic.style.height == 'auto'?'151px':'auto'
       // this.$refs.epic.style.position = this.$refs.epic.style.position == 'absolute'?'relative':'absolute'
     }
   },
@@ -129,7 +129,7 @@ export default {
   background-color: #eee;
   .epic-container {
     width: 1300px;
-    height: 150px;
+    height: 151px;
     min-height: 150px;
     overflow: hidden;
     padding: 2px;
@@ -225,6 +225,7 @@ export default {
 a {
   text-decoration: none;
   font-weight: bold;
+  color: blue;
 }
 </style>
 
