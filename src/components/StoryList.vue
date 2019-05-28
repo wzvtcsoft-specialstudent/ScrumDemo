@@ -1,65 +1,46 @@
 <template>
-  <div class="main-container" v-if="data">
-    <!-- epic -->
-    <div class="epic-container" ref="epic">
-      <div v-for="(epic, epic_i) in data"  :key="epic_i" :class="{'selected':epic_i==epici,'require':true}" @click.self="selEpic(epic_i)">
-        <div class="context-container">
-          <span><a :href="epic.issueUrl" target="view_window">#{{ epic.number }}</a>{{ epic.title }}</span>
-        </div>
-        <div class="label-container">
-          <label
-            v-for="(lab, lab_i) in epic.labels"
-            :key="lab_i"
-            :style="'backgroundColor:#' + lab.bgcolor + ';color:#' + lab.ftcolor"
-          >{{ lab.name }}</label>
-        </div>
-      </div>
-      <span class="add" @click="addEpic">+</span>
+  <div class="main-contaienr" v-if="data">
+    <div class="container epic">
+      <sticker 
+      v-for="(epic, epic_i) in data" 
+      :class="{'sticker':true,'selected':epic_i === epici}" 
+      :key="epic_i" 
+      :list="epic"
+      @click.native="selEpic(epic_i)"></sticker>
     </div>
-    <hr>
-    <!-- story -->
-    <div class="userstory-container">
-      <div
-        v-for="(story, story_i) in data[epici].nodes"
-        v-show="typeof story.title != 'undefined'"
+    <div class="container userstory">
+      <sticker
+        v-for="(story, story_i) in data[epici].nodes"     
+        v-show="typeof story.title !== 'undefined'"   
+        :class="{'sticker':true,'selected':story_i === userstoryi}"
         :key="story_i"
-        :class="{'selected':story_i==storyi,'require':true}"
-        @click.self="selStory(story_i)"
-      >
-        <div class="context-container">
-          <span><a :href="story.issueUrl" target="view_window">#{{ story.number }}</a>{{ story.title }}</span>
-        </div>
-        <div class="label-container">
-          <label v-for="(lab, lab_i) in story.assignees" :key="lab_i">
-            <img :src="lab.img" alt width="30" height="30">
-          </label>
-        </div>
-      </div>
+        :list="story"
+        @click.native="selStory(story_i)"
+      ></sticker>
     </div>
-    <hr>
-    <!-- task -->
-    <div class="task-container">
-      <div
-        v-for="(task, task_i) in data[epici].nodes[storyi].nodes"
-       v-show="typeof task.title != 'undefined'"
-        :key="task_i"
-        class="require"
-      >
-        <div class="context-container">
-          <span><a :href="task.issueUrl" target="view_window">#{{ task.number }}</a>{{ task.title }}</span>
-
-        </div>
-        <div class="label-container">
-          <label v-for="(lab, lab_i) in task.assignees" :key="lab_i">
-            <img :src="lab.img" alt width="30" height="30">
-          </label>
-        </div>
-      </div>
+    <div class="container task">
+      <sticker
+      v-for="(task, task_i) in data[epici].nodes[userstoryi].nodes"
+      v-show="typeof task.title !== 'undefined'"
+      :key="task_i"
+      :class="{'sticker':true, 'selected':task_i === taski}"
+      :list="task"
+      @click.native="selTask(task_i)"
+      ></sticker>
+    </div>
+    <div class="container extend" v-if="judge()">
+      <sticker
+      v-for="(extend, extend_i) in data[epici].nodes[userstoryi].nodes[taski].nodes"
+      v-show="typeof extend.title !== 'undefined'"
+      :key="extend_i"
+      class="sticker"
+      :list="extend"></sticker>
     </div>
   </div>
 </template>
 
 <script>
+import sticker from "./sticker";
 import { getIssue } from "@/api/getIssue";
 import { fixData } from "@/assets/js/fixData";
 
@@ -68,52 +49,43 @@ export default {
     return {
       data: null,
       epici: 0,
-      storyi:0,
-      storyShow: true
+      userstoryi: 0,
+      taski: 0
     };
   },
   methods: {
     getissue() {
+      // wzvtcsoft-specialstudent ScrumDemo
+      // qcteams HuaAn
       let params = {
         query:
-          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){ id name issues(first:100){  totalCount nodes{  title number url body assignees(first:100){ nodes{  name avatarUrl} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
+          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){ id name issues(first:100){  totalCount nodes{  title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
-      getIssue(params).then( res => {
-        this.data = fixData(res.data.data.organization.repository.issues.nodes)
-      })
+      getIssue(params).then(res => {
+        this.data = fixData(res.data.data.organization.repository.issues.nodes);
+      });
     },
     selEpic(index) {
-      // if(typeof this.data[index].nodes === 'undefined') {
-      //   this.epici = this.len-1;
-      // } else {
-         this.epici = index;
-      this.storyi = 0;// 重置storyi
-      if(this.$refs.epic.style.height = 'auto') {
-        this.$refs.epic.style.height = '150px'
-        // this.$refs.epic.style.position = 'relative'
-      }
-      if(index > 6) {
-        let temp = this.data[index];
-        this.data.splice(index, 1);
-        this.data.unshift(temp);
-        this.epici = 0; // 因为选中项的位置变为0，所以选中值也要变为0
-        
-      }
-     
-      // }
+      this.epici = index;
+      this.userstoryi = 0;
     },
     selStory(index) {
-      this.storyi = index;
+      this.userstoryi = index;
+      this.taski = 0;
     },
-    addEpic() {
-      this.$refs.epic.style.height = this.$refs.epic.style.height == 'auto'?'151px':'auto'
-      // this.$refs.epic.style.position = this.$refs.epic.style.position == 'absolute'?'relative':'absolute'
+    selTask(index) {
+      this.taski = index;
+    },
+    judge() {
+      /* 判断 extend 是否显示 */
+      if(this.data[this.epici].nodes[this.userstoryi].nodes === null) return false
+      if(this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes === null) return false
+      if(this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes[0].nodes === null) return false
+      return true
     }
   },
-  filters: {
-    screenTask(val,i) {
-      return typeof val.nodes === "undefined" ? "" : val.nodes[i].title;
-    }
+  components: {
+    sticker
   },
   created() {
     this.getissue();
@@ -122,111 +94,41 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.main-container {
+.main-contaienr {
+  margin: 0 auto;
   width: 1300px;
-  height: 650;
-  border: 1px solid black;
-  background-color: #eee;
-  .epic-container {
-    width: 1300px;
-    height: 151px;
-    min-height: 150px;
-    overflow: hidden;
-    padding: 2px;
-    position: relative;
-    z-index: 2;
-    .epic {
-      flex-grow: 1;
-      flex-shrink: 0;
-      margin-left: 1px;
-      overflow: hidden;
-          min-width: 150px;
-      max-width: 150px;
-      border: 1px solid black;
-      background-color: #fff;
-      cursor: pointer;
-    }
-  }
-  .userstory-container {
-    width: 1300px;
-    display: flex;
-    min-height: 150px;
-    z-index: 1;
-    .userstory {
-      flex-grow: 1;
-      text-align: center;
-      margin-left: 1px;
-      overflow: hidden;
-      max-width: 150px;
-      background-color: #fff;
-      border: 1px solid black;
-      cursor: pointer;
-    }
-  }
-  .task-container {
-    width: 1300px;
-    display: flex;
-    min-height: 150px;
-    z-index: 1;
-    .task {
-      flex-grow: 1;
-      overflow: hidden;
-      margin-left: 1px;
-      max-width: 150px;
-      border: 1px solid black;
-      background-color: #fff;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-  }
+  height: 700px;
 }
 .container {
-  width: 1300px;
-  display: flex;
-  min-height: 150px;
+  width: 1156px;
+  height: 149px;
+  max-height: 149px;
+  overflow: hidden;
+  padding: 14px 60px 14px 60px;
 }
-.require {
-  // flex-grow: 1;
-  // flex-shrink: 10;
-  min-width: 179px;
+.epic {
+  background: rgba(235, 38, 77, 0.06);
+}
+.userstory {
+  background: rgba(38, 128, 235, 0.06);
+}
+.task {
+  background: rgba(38, 235, 203, 0.06);
+}
+.extend {
+  background: rgba(123, 123, 123, 0.06);
+}
+.sticker {
   float: left;
-  display: block;
-  margin-left: 1px;
-  max-width: 150px;
-  min-height: 150px;
-  border: 1.5px solid black;
-  background-color: #fff;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-}
-.require:hover {
-  border: 1.5px solid deepskyblue;
-}
-.label-container {
-  display: inline-block;
-  width: 100%;
-  height: 30px;
+  margin-bottom: 50px;
+  margin-left: 13px;
 }
 .selected {
-  border: 1.5px solid blue;
+  border: 1px dashed deepskyblue;
 }
-.add {
-  z-index: 999;
-  width: 10px;
-  position: absolute;  
-  text-align: center;
-  right: 0;
-  float: right;
-  background-color: orange;
-  cursor: pointer;
-}
-a {
-  text-decoration: none;
-  font-weight: bold;
-  color: blue;
-}
+// .extend {
+//   background-color: #FDFDFD;
+//   opacity: 1;
+// }
 </style>
-
 

@@ -58,19 +58,23 @@ function merge(index) {
   obj.title = context;
   obj.number = data[index - 1].number;
   obj.issueUrl = data[index - 1].url
-  obj.day = "未设置";
   obj.nodes = [];
   if(data[index - 1].assignees.nodes.length !== 0) {
-    obj.assignees = [];
-    data[index -1].assignees.nodes.forEach( item => {
-      obj.assignees.push({name:item.name, img:item.avatarUrl, color: userColor[item.name]})
-    })
+    obj.assignees = {
+      name:data[index -1].assignees.nodes[0].name,
+      img:data[index -1].assignees.nodes[0].avatarUrl,
+      color: userColor[data[index -1].assignees.nodes[0].name],
+      time: data[index -1].assignees.nodes[0].updatedAt
+    };
+    // data[index -1].assignees.nodes.forEach( item => {
+    //   obj.assignees.push({name:item.name, img:item.avatarUrl, color: userColor[item.name]})
+    // })
   }
   /* 标签 */
   if(data[index - 1].labels.totalCount != 0) {
     let lab = [];
     data[index - 1].labels.nodes.forEach( item => {
-      if(!isNaN(item.name)) obj.day = {name:item.name, color:item.color};
+      if(!isNaN(item.name)) lab.unshift({name:item.name, bgcolor:item.color, ftcolor: changeToRgb(item.color)})
       else lab.push({name:item.name, bgcolor:item.color,ftcolor: changeToRgb(item.color)})
     })
     obj.labels = lab;
