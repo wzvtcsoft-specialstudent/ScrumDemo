@@ -1,7 +1,7 @@
 <template>
     <div class="sticker-container">
         <div class="info" v-if="typeof list.assignees !== 'undefined'">
-            <img :src="list.assignees.img" width="29px" height="29px">
+            <img :src="list.assignees.img" width="37px" height="37px">
             <span class="name">{{ list.assignees.name }}</span>
             <span class="time">{{ list.assignees.time | fixTime }}</span>
         </div>
@@ -14,7 +14,9 @@
             class="label" 
             v-for="(lab, lab_i) in list.labels" 
             :key="lab_i"
-            :style="'backgroundColor:#' + lab.bgcolor + ';color:' + lab.ftcolor">{{ lab.name }}</div>
+            :style="'backgroundColor:#' + lab.bgcolor + ';color:' + lab.ftcolor">
+                <span class="label-name">{{ lab.name }}</span>
+            </div>
         </div>
     </div>
 </template>
@@ -42,18 +44,18 @@ export default {
 
 <style lang="scss" scoped>
     .sticker-container {
-        width: 181px;
-        min-height: 114px;
-        max-height: 137px;
+        width: 274px;
+        min-height: 115px;
+        max-height: 132px;
         background-color: white;
         box-shadow:0px 3px 6px rgba(0,0,0,0.16);
         opacity: 1;
         border-radius: 10px;
-        padding: 10px 16px 0 18px;
+        padding: 10px 16px 17px 18px;
         cursor: pointer;
     }
     .info {
-        width: 181px;
+        width: 274px;
         text-align: left;
         float: left;
     }
@@ -64,54 +66,64 @@ export default {
         float: left;
     }
     .name {
-        width: 100px;
-        font-size: 11px;
+        width: 200px;
+        height: 15;
+        font-size: 14px;
         float: left;
         font-weight: 400;
-        line-height: 20px;
+        line-height: 24px;
         margin-left: 8px;
         margin-top: 3px;
         font-family:Source Han Sans CN;
         color: #101010;
     }
     .time {
-        height: 9px;
-        font-size: 9px;
+        width: 200px;
+        height: 10px;
+        font-size: 10px;
         font-weight: 400;
         font-family: Source Han Sans CN;
-        line-height: 15px;
+        line-height: 17px;
         color: #707070;
         margin-left: 8px;
         float: left;
     }
     .context {
-        max-height: 50px;
+        max-height: 60px;
         overflow: hidden;
-        margin-top: 13px;
+        margin-top: 19px;
         float: left;   
         text-align: left; 
-        font-size: 10px;
-        line-height: 17px;
+        font-size: 12px;
+        line-height: 20px;
+        font-weight: 400;
         color: #707070;
-        padding-bottom: 3px;
+        padding-bottom: 22px;
     }
     a {
         color: #2680EB;
         text-decoration: none;
     }
     .labels-container {
-        width: 181px;
+        width: 274px;
+        height: auto;
         float: left;
     }
     .label {
-        min-width: 10px;
-        height: 13px;
+        text-align: center;
+        height: 15px;
         padding: 3px;
-        line-height: 13px;
-        background:rgba(241,136,136,1);
-        border-radius: 14px;
-        font-size: 9px;
+        // background:rgba(241,136,136,1);
+        border-radius: 14px;      
         margin-left: 3px;
         float: left;
+        opacity: 0.8;
+        padding: 3px 12px 3px 12px;
+                line-height: 12px;
+    }
+    .label-name {
+        font-size: 12px;
+        font-family: Source Han Sans CN;
+        font-weight: 400;
     }
 </style>
