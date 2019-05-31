@@ -1,46 +1,64 @@
 <template>
   <div class="main-contaienr" v-if="data">
     <div class="container epic" ref="epic">
-      <sticker 
-      v-for="(epic, epic_i) in data" 
-      :class="{'sticker':true,'selected':epic_i === epici}" 
-      :key="epic_i" 
-      :list="epic"
-      @click.native="selEpic(epic_i)"></sticker>
-      <div class="add" v-show="epicState" @click="addEpic"><span>+</span></div>
+      <transition-group appear mode="out-in" name="sticker">
+        <sticker
+          v-for="(epic, epic_i) in data"
+          :class="{'sticker':true,'selected':epic_i === epici}"
+          :key="epic.number"
+          :list="epic"
+          @click.native="selEpic(epic_i)"
+        ></sticker>
+      </transition-group>
+      <div class="add" v-show="epicState" @click="addEpic">
+        <span>+</span>
+      </div>
     </div>
     <div class="container userstory" ref="story">
-      <sticker
-        v-for="(story, story_i) in data[epici].nodes"     
-        v-show="typeof story.title !== 'undefined'"   
+      <transition-group appear mode="out-in" name="sticker">
+        <sticker
+        v-for="(story, story_i) in data[epici].nodes"
+        v-show="typeof story.title !== 'undefined'"
         :class="{'sticker':true,'selected':story_i === userstoryi}"
-        :key="story_i"
+        :key="story.number + 'story'"
         :list="story"
         @click.native="selStory(story_i)"
       ></sticker>
-      <div class="add" v-show="storyState" @click="addStory"><span>+</span></div>
+      </transition-group>
+      <div class="add" v-show="storyState" @click="addStory">
+        <span>+</span>
+      </div>
     </div>
     <div class="container task" ref="task">
+      <transition-group appear mode="out-in" name="sticker">
       <sticker
-      v-for="(task, task_i) in data[epici].nodes[userstoryi].nodes"
-      v-show="typeof task.title !== 'undefined'"
-      :key="task_i"
-      :class="{'sticker':true, 'selected':task_i === taski}"
-      :list="task"
-      @click.native="selTask(task_i)"
+        v-for="(task, task_i) in data[epici].nodes[userstoryi].nodes"
+        v-show="typeof task.title !== 'undefined'"
+        :key="task.number"
+        :class="{'sticker':true, 'selected':task_i === taski}"
+        :list="task"
+        @click.native="selTask(task_i)"
       ></sticker>
-      <div class="add" v-show="taskState" @click="addTask"><span>+</span></div>
+      </transition-group>
+      <div class="add" v-show="taskState" @click="addTask">
+        <span>+</span>
+      </div>
     </div>
     <div class="container extend" ref="extend">
-      <template  v-if="judge()">
-      <sticker
-      v-for="(extend, extend_i) in data[epici].nodes[userstoryi].nodes[taski].nodes"
-      v-show="typeof extend.title !== 'undefined'"
-      :key="extend_i"
-      class="sticker"
-      :list="extend"
-      @click.native="selExtend"></sticker>
-      <div class="add" v-show="extendState" @click="addExtend"><span>+</span></div>
+      <template v-if="judge()">
+        <transition-group appear mode="out-in" name="sticker">
+          <sticker
+          v-for="extend in data[epici].nodes[userstoryi].nodes[taski].nodes"
+          v-show="typeof extend.title !== 'undefined'"
+          :key="extend.number"
+          class="sticker"
+          :list="extend"
+          @click.native="selExtend"
+        ></sticker>
+        </transition-group>
+        <div class="add" v-show="extendState" @click="addExtend">
+          <span>+</span>
+        </div>
       </template>
     </div>
   </div>
@@ -60,8 +78,8 @@ export default {
       taski: 0,
       epicState: false,
       storyState: false,
-      taskState:false,
-      extendState:false
+      taskState: false,
+      extendState: false
     };
   },
   methods: {
@@ -74,91 +92,134 @@ export default {
       };
       getIssue(params).then(res => {
         this.data = fixData(res.data.data.organization.repository.issues.nodes);
-        if(this.data.length > 4) this.epicState = true
-        if(typeof this.data[this.epici] !== 'undefined' && this.data[this.epici].nodes.length > 4) this.storyState = true;
-        if(typeof this.data[this.epici].nodes[this.userstoryi] !== 'undefined' && this.data[this.epici].nodes[this.userstoryi].nodes.length > 4) this.taskState = true;
-        if(typeof this.data[this.epici].nodes[this.userstoryi].nodes[this.taski] !== 'undefined' &&this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes.length > 4) this.epicState = true;
+        if (this.data.length > 4) this.epicState = true;
+        if (
+          typeof this.data[this.epici] !== "undefined" &&
+          this.data[this.epici].nodes.length > 4
+        )
+          this.storyState = true;
+        if (
+          typeof this.data[this.epici].nodes[this.userstoryi] !== "undefined" &&
+          this.data[this.epici].nodes[this.userstoryi].nodes.length > 4
+        )
+          this.taskState = true;
+        if (
+          typeof this.data[this.epici].nodes[this.userstoryi].nodes[
+            this.taski
+          ] !== "undefined" &&
+          this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes
+            .length > 4
+        )
+          this.epicState = true;
       });
     },
     selEpic(index) {
       this.epici = index;
       this.userstoryi = 0;
-      if(index > 3) {
+      this.taski = 0;
+      if (index > 3) {
         // 注意：spilice() 返回值是数组
-        this.data.unshift(this.data.splice(index, 1)[0])
+        this.data.unshift(this.data.splice(index, 1)[0]);
         this.epici = 0;
       }
-      if(this.$refs.epic.style.overflow == 'unset') {
-        this.$refs.epic.style.overflow = 'hidden'
+      if (this.$refs.epic.style.overflow == "unset") {
+        this.$refs.epic.style.overflow = "hidden";
       }
     },
     selStory(index) {
       this.userstoryi = index;
       this.taski = 0;
-       if(index > 3) {
+      if (index > 3) {
         // 注意：spilice() 返回值是数组
-        this.data[this.epici].nodes.unshift(this.data[this.epici].nodes.splice(index, 1)[0])
+        this.data[this.epici].nodes.unshift(
+          this.data[this.epici].nodes.splice(index, 1)[0]
+        );
         this.storyi = 0;
       }
-      if(this.$refs.story.style.overflow == 'unset') {
-        this.$refs.story.style.overflow = 'hidden'
+      if (this.$refs.story.style.overflow == "unset") {
+        this.$refs.story.style.overflow = "hidden";
       }
     },
     selTask(index) {
       this.taski = index;
-      if(index > 3) {
+      if (index > 3) {
         // 注意：spilice() 返回值是数组
-        this.data[this.epici].nodes[this.userstoryi].nodes.unshift(this.data[this.epici].nodes[this.userstoryi].nodes.splice(index, 1)[0])
+        this.data[this.epici].nodes[this.userstoryi].nodes.unshift(
+          this.data[this.epici].nodes[this.userstoryi].nodes.splice(index, 1)[0]
+        );
       }
-      if(this.$refs.task.style.overflow == 'unset') {
-        this.$refs.task.style.overflow = 'hidden'
+      if (this.$refs.task.style.overflow == "unset") {
+        this.$refs.task.style.overflow = "hidden";
       }
     },
     selExtend() {
-       if(this.$refs.extend.style.overflow == 'unset') {
-        this.$refs.extend.style.overflow = 'hidden'
+      if (this.$refs.extend.style.overflow == "unset") {
+        this.$refs.extend.style.overflow = "hidden";
       }
     },
     judge() {
       /* 判断 extend 是否显示 */
-      if(this.data[this.epici].nodes[this.userstoryi].nodes === null) return false
-      if(this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes === null) return false
-      if(this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes[0].nodes === null) return false
-      return true
+      if (this.data[this.epici].nodes[this.userstoryi].nodes === null)
+        return false;
+      if (
+        this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes ===
+        null
+      )
+        return false;
+      if (
+        this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes[0]
+          .nodes === null
+      )
+        return false;
+      return true;
     },
     addEpic() {
       let ele = this.$refs.epic.style;
-      ele.overflow = ele.overflow == 'unset'?'hidden':'unset';
+      ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
     },
     addStory() {
       let ele = this.$refs.story.style;
-      ele.overflow = ele.overflow == 'unset'?'hidden':'unset';
+      ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
     },
     addTask() {
       let ele = this.$refs.task.style;
-      ele.overflow = ele.overflow == 'unset'?'hidden':'unset';
+      ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
     },
     addExtend() {
       let ele = this.$refs.extend.style;
-      ele.overflow = ele.overflow == 'unset'?'hidden':'unset';
+      ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
     }
   },
   watch: {
     epici: {
       handler: function(val, oldVal) {
-        console.log(this.data[val].nodes);
-        this.storyState = typeof this.data[val] !== 'undefined' && this.data[val].nodes.length > 4
-      },
+        this.storyState =
+          typeof this.data[val] !== "undefined" &&
+          this.data[val].nodes.length > 4;
+      }
     },
     userstoryi: {
       handler: function(val, oldVal) {
-        this.taskState = typeof this.data[this.epici].nodes[val] !== 'undefined' && this.data[this.epici].nodes[val].nodes.length > 4
+        let temp = this.data[this.epici].nodes[val];
+        this.taskState =
+          typeof temp !== "undefined" &&
+          temp.nodes !== null &&
+          temp.nodes.length > 4;
       }
     },
     taski: {
       handler: function(val, oldVal) {
-        let temp = this.data[this.epici].nodes[this.userstoryi];
-        this.extendState = typeof temp.nodes[val] !=='undefined' && temp.nodes[val].nodes.length > 4
+        // let temp = this.data[this.epici].nodes[this.userstoryi].nodes;
+        // this.extendState =
+        //   temp != null &&
+        //   typeof temp[val] !== "undefined" &&
+        //   temp[val].nodes != null &&
+        //   temp[val].nodes.length > 4;
+        try {
+          this.extendState = this.data[this.epici].nodes[this.userstoryi].nodes[val].nodes.length > 4
+        } catch (error) {
+          this.extendState = false;
+        }
       }
     }
   },
@@ -172,6 +233,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.sticker-enter,
+.sticker-leave-to {
+  opacity: 0;
+  transform: translateY(159px);
+}
+.sticker-enter-active,
+.sticker-leave-active {
+  opacity: 1;
+  transition: all 1s ease;
+}
+/* 固定写法,配合使用实现列表的平稳动画 */
+.sticker-move {
+  transition: transform 1s;
+}
+
 .main-contaienr {
   // position: absolute;
   margin: 0 auto;
@@ -181,26 +257,26 @@ export default {
 .container {
   width: 1475px;
   height: 159px;
-  max-height: 159px;
+  // max-height: 159px;
   overflow: hidden;
   padding: 11px 30px 10px 30px;
   position: relative;
 }
 .epic {
-  background: rgba(235,221,38,0.06);
+  background: rgba(235, 221, 38, 0.06);
 }
 .userstory {
-  background: rgba(38,235,203,0.06);
+  background: rgba(38, 235, 203, 0.06);
 }
 .task {
-  background: rgba(169,38,235,0.06);
+  background: rgba(169, 38, 235, 0.06);
 }
 .extend {
-  background: rgba(38,143,235,0.06);
+  background: rgba(38, 143, 235, 0.06);
 }
 .sticker {
   float: left;
-  margin-bottom: 30px;
+  margin-bottom: 45px;
   margin-left: 20px;
 }
 .selected {
