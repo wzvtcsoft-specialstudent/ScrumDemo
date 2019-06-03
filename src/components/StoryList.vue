@@ -61,11 +61,13 @@
         </div>
       </template>
     </div>
+    <add-dialog></add-dialog>
   </div>
 </template>
 
 <script>
 import sticker from "./sticker";
+import addDialog from "./addDialog"
 import { getIssue } from "@/api/getIssue";
 import { fixData } from "@/assets/js/fixData";
 
@@ -211,7 +213,8 @@ export default {
     }
   },
   components: {
-    sticker
+    sticker,
+    addDialog
   },
   created() {
     this.getissue();
