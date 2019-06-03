@@ -1,166 +1,285 @@
 <template>
-  <div id="tree">
-    <ul>
-      <li>
-        <span>{{ title }} 需求地图</span>
-          <sub-list :list="data"></sub-list>
-          <pre>
-    <code v-html="data"></code>
-    
-  </pre>
-        <!-- <ul>
-          <li v-for="(epic, epic_i) in data" :key="epic_i">
-            <span>{{ epic.title }}</span>
-            <ul>
-              <li v-for="(user, user_i) in epic.nodes" :key="user_i">
-                <span>{{ user.title }}</span>
-                <ul>
-                  <li v-for="(task, task_i) in user.nodes" :key="task_i">
-                    <span>{{ task.title }}</span>
-                    <ul>
-                      <li v-for="(tak, tak_i) in task.nodes" :key="tak_i">
-                        <span>{{ tak.title }}</span>
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-        </ul>-->
-      </li>
-    </ul>
+  <div class="main-contaienr" v-if="data">
+    <div class="container epic" ref="epic">
+      <transition-group appear mode="out-in" name="sticker">
+        <sticker
+          v-for="(epic, epic_i) in data"
+          :class="{'sticker':true,'selected':epic_i === epici}"
+          :key="epic.number + 'epic'"
+          :list="epic"
+          @click.native="selEpic(epic_i)"
+        ></sticker>
+      </transition-group>
+      <div class="add" v-show="epicState" @click="addEpic">
+        <span>+</span>
+      </div>
+    </div>
+    <div class="container userstory" ref="story">
+      <transition-group appear mode="out-in" name="sticker">
+        <sticker
+          v-for="(story, story_i) in data[epici].nodes"
+          v-show="typeof story.title !== 'undefined'"
+          :class="{'sticker':true,'selected':story_i === userstoryi}"
+          :key="story.number + 'story'"
+          :list="story"
+          @click.native="selStory(story_i)"
+        ></sticker>
+      </transition-group>
+      <div class="add" v-show="storyState" @click="addStory">
+        <span>+</span>
+      </div>
+    </div>
+    <div class="container task" ref="task">
+      <transition-group appear mode="out-in" name="sticker">
+        <sticker
+          v-for="(task, task_i) in data[epici].nodes[userstoryi].nodes"
+          v-show="typeof task.title !== 'undefined'"
+          :key="task.number + 'task'"
+          :class="{'sticker':true, 'selected':task_i === taski}"
+          :list="task"
+          @click.native="selTask(task_i)"
+        ></sticker>
+      </transition-group>
+      <div class="add" v-show="taskState" @click="addTask">
+        <span>+</span>
+      </div>
+    </div>
+    <div class="container extend" ref="extend">
+      <template v-if="judge()">
+        <transition-group appear mode="out-in" name="sticker">
+          <sticker
+            v-for="extend in data[epici].nodes[userstoryi].nodes[taski].nodes"
+            v-show="typeof extend.title !== 'undefined'"
+            :key="extend.number + 'extend'"
+            class="sticker"
+            :list="extend"
+            @click.native="selExtend"
+          ></sticker>
+        </transition-group>
+        <div class="add" v-show="extendState" @click="addExtend">
+          <span>+</span>
+        </div>
+      </template>
+    </div>
   </div>
 </template>
 
 <script>
+import sticker from "./sticker";
 import { getIssue } from "@/api/getIssue";
 import { fixData } from "@/assets/js/fixData";
-import subList from "./subList";
+
 export default {
   data() {
     return {
-      title: "",
-      data: null
+      data: null,
+      epici: 0,
+      userstoryi: 0,
+      taski: 0,
+      epicState: false,
+      storyState: false,
+      taskState: false,
+      extendState: false
     };
   },
-  components: {
-    subList
-  },
   methods: {
-    init() {
-      // study-checklist
-      // ScrumDemo
-      var req = {
+    getissue() {
+      // wzvtcsoft-specialstudent ScrumDemo
+      // qcteams HuaAn
+      let params = {
         query:
-          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){ id name issues(first:100){  totalCount nodes{  title number url body assignees(first:100){ nodes{  name avatarUrl} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
+          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){ id name issues(first:100){  totalCount nodes{  title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
-      getIssue(req).then(res => {
-        this.title = res.data.data.organization.repository.name;
+      getIssue(params).then(res => {
         this.data = fixData(res.data.data.organization.repository.issues.nodes);
+        if (this.data.length > 4) this.epicState = true;
+        if (
+          typeof this.data[this.epici] !== "undefined" &&
+          this.data[this.epici].nodes.length > 4
+        )
+          this.storyState = true;
+        if (
+          typeof this.data[this.epici].nodes[this.userstoryi] !== "undefined" &&
+          this.data[this.epici].nodes[this.userstoryi].nodes.length > 4
+        )
+          this.taskState = true;
+        if (
+          typeof this.data[this.epici].nodes[this.userstoryi].nodes[
+            this.taski
+          ] !== "undefined" &&
+          this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes
+            .length > 4
+        )
+          this.epicState = true;
       });
+    },
+    selEpic(index) {
+      this.epici = index;
+      this.userstoryi = 0;
+      if (index > 3) {
+        // 注意：spilice() 返回值是数组
+        this.data.unshift(this.data.splice(index, 1)[0]);
+        this.epici = 0;
+      }
+      /* 判断是否显示 [更多]按钮 */
+      this.storyState =
+        typeof this.data[this.epici] !== "undefined" &&
+        this.data[this.epici].nodes.length > 4;
+      if (this.$refs.epic.style.overflow == "unset") {
+        this.$refs.epic.style.overflow = "hidden";
+      }
+    },
+    selStory(index) {
+      this.userstoryi = index;
+      this.taski = 0;
+      if (index > 3) {
+        // 注意：spilice() 返回值是数组
+        this.data[this.epici].nodes.unshift(
+          this.data[this.epici].nodes.splice(index, 1)[0]
+        );
+        this.userstoryi = 0;
+      }
+       /* 判断是否显示 [更多]按钮 */
+      try {
+          this.taskState = this.data[this.epici].nodes[this.userstoryi].nodes.length > 4;
+        } catch (error) {
+          this.taskState = false;
+        }
+      if (this.$refs.story.style.overflow == "unset") {
+        this.$refs.story.style.overflow = "hidden";
+      }
+    },
+    selTask(index) {
+      this.taski = index;
+      if (index > 3) {
+        // 注意：spilice() 返回值是数组
+        this.data[this.epici].nodes[this.userstoryi].nodes.unshift(
+          this.data[this.epici].nodes[this.userstoryi].nodes.splice(index, 1)[0]
+        );
+      }
+       /* 判断是否显示 [更多]按钮 */
+       try {
+          this.extendState =
+            this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes
+              .length > 4;
+        } catch (error) {
+          this.extendState = false;
+        }
+      if (this.$refs.task.style.overflow == "unset") {
+        this.$refs.task.style.overflow = "hidden";
+      }
+    },
+    selExtend() {
+      if (this.$refs.extend.style.overflow == "unset") {
+        this.$refs.extend.style.overflow = "hidden";
+      }
+    },
+    judge() {
+      /* 判断 extend 是否显示 */
+      if (this.data[this.epici].nodes[this.userstoryi].nodes === null)
+        return false;
+      if (
+        this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes ===
+        null
+      )
+        return false;
+      if (
+        this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes[0]
+          .nodes === null
+      )
+        return false;
+      return true;
+    },
+    addEpic() {
+      let ele = this.$refs.epic.style;
+      ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
+    },
+    addStory() {
+      let ele = this.$refs.story.style;
+      ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
+    },
+    addTask() {
+      let ele = this.$refs.task.style;
+      ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
+    },
+    addExtend() {
+      let ele = this.$refs.extend.style;
+      ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
     }
   },
+  components: {
+    sticker
+  },
   created() {
-    this.init();
+    this.getissue();
   }
 };
 </script>
 
-<style scoped>
-.v-enter,
-.v-leave-to {
+<style lang="scss" scoped>
+.sticker-enter,
+.sticker-leave-to {
   opacity: 0;
-  transform: translateX(100px);
+  transform: translateY(159px);
 }
-.v-enter-active,
-.v-leave-active {
+.sticker-enter-active,
+.sticker-leave-active {
+  opacity: 1;
   transition: all 1s ease;
 }
 /* 固定写法,配合使用实现列表的平稳动画 */
-.v-move {
-  transition: all 1s ease;
-}
-.v-leave-active {
-  position: absolute;
+.sticker-move {
+  transition: transform 1s;
 }
 
-#tree {
-  display: block;
+.main-contaienr {
+  // position: absolute;
+  margin: 0 auto;
+  width: 1536px;
+  height: 722px;
+}
+.container {
+  width: 1475px;
+  height: 159px;
+  // max-height: 159px;
+  overflow: hidden;
+  padding: 11px 30px 10px 30px;
   position: relative;
-  padding: 5px 15px;
 }
-#tree ul {
-  position: relative;
-  padding-left: 60px;
-  margin: 0;
+.epic {
+  background: rgba(235, 221, 38, 0.06);
 }
-#tree ul > li {
-  position: relative;
-  padding: 5px 0;
+.userstory {
+  background: rgba(38, 235, 203, 0.06);
 }
-#tree > ul {
-  padding: 0;
-  margin: 0;
+.task {
+  background: rgba(169, 38, 235, 0.06);
 }
-/* 水平线 */
-#tree > ul ul > li:after {
-  content: "  ";
+.extend {
+  background: rgba(38, 143, 235, 0.06);
+}
+.sticker {
+  float: left;
+  margin-bottom: 45px;
+  margin-left: 20px;
+}
+.selected {
+  border: 1px dashed deepskyblue;
+}
+.add {
+  width: 18px;
+  height: 18px;
+  border: 1px solid black;
+  border-radius: 50%;
   position: absolute;
-  top: 30px;
-  left: -45px;
-  width: 45px;
-  border-top: 1px solid #ddd;
-}
-/** 垂直方向连线 */
-#tree ul > li:not(:last-child):before {
-  content: " ";
-  position: absolute;
-  top: 0;
-  left: -45px;
-  height: 100%;
-  border: none;
-  border-left: 1px solid #ddd;
-}
-
-#tree ul > li:last-child:before {
-  content: " ";
-  position: absolute;
-  top: 0;
-  left: -45px;
-  height: 30px;
-  border: none;
-  border-left: 1px solid #ddd;
-}
-
-ul {
-  list-style-type: none;
-  text-align: left;
-}
-span {
-  display: inline-block;
+  right: 10px;
+  top: 10px;
   text-align: center;
-  height: 45px;
-  color: #888;
-  line-height: 45px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 0 8px;
-  font-size: 1.5em;
   cursor: pointer;
 }
-
-/* 获得焦点改变背景色 */
-#tree span:hover,
-#tree span:hover + ul span {
-  color: #fff;
-  background-color: deepskyblue;
-}
-/* 获得焦点改变边框和连线的颜色 */
-#tree span:hover,
-#tree span:hover + ul span,
-#tree span:hover + ul li:before,
-#tree span:hover + ul li:after {
-  border-color: blue;
-}
+// .extend {
+//   background-color: #FDFDFD;
+//   opacity: 1;
+// }
 </style>
+
