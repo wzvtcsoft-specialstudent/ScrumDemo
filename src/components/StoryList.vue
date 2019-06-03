@@ -116,15 +116,18 @@ export default {
     selEpic(index) {
       this.epici = index;
       this.userstoryi = 0;
+      this.taski = 0;
       if (index > 3) {
         // 注意：spilice() 返回值是数组
         this.data.unshift(this.data.splice(index, 1)[0]);
         this.epici = 0;
       }
       /* 判断是否显示 [更多]按钮 */
-      this.storyState =
-        typeof this.data[this.epici] !== "undefined" &&
-        this.data[this.epici].nodes.length > 4;
+      try {
+        this.storyState = this.data[this.epici].nodes.length > 4;
+      } catch (error) {
+        this.storyState = false
+      }
       if (this.$refs.epic.style.overflow == "unset") {
         this.$refs.epic.style.overflow = "hidden";
       }
