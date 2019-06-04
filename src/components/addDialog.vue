@@ -1,25 +1,28 @@
 <template>
   <div class="dialog-container">
     <div class="dialog">
-      <input type="text" class="issue-title" placeholder="Title">
-      <textarea class="issue-body" placeholder="Leave a comment"></textarea>
+      <input type="text" class="issue-title" placeholder="Title" v-model="title">
+      <textarea class="issue-body" placeholder="Leave a comment" v-model="body"></textarea>
       <div class="inform">
         <div class="box">
           <span>负责人:</span>
-          <select>
-            <option v-for="(opt,opt_i) in assignees" :value="opt_i" :key="opt.id">{{ opt.name }}</option>
+          <select v-model="people">
+            <option v-for="(opt,opt_i) in assignees" :value="opt.id" :key="opt_i">{{ opt.name }}</option>
           </select>
         </div>
         <div class="box">
-          <span>标签:</span>
-          <select>
+          <span>标签:+</span>
+          <!-- <select v-model="lab">
             <option
               v-for="(opt,opt_i) in labels"
-              :value="opt_i"
-              :key="opt.id"
+              :value="opt.id"
+              :key="opt_i"
               :style="'backgroundColor:#' + opt.color"
             >{{ opt.name }}</option>
-          </select>
+          </select> -->
+          <el-checkbox-group v-model="lab">
+            
+          </el-checkbox-group>
         </div>
       </div>
       <div class="sub-buttom">
@@ -37,20 +40,30 @@ export default {
   data() {
     return {
       assignees: this.$store.getters.getAssignees,
-      labels: this.$store.getters.getLabels
+      labels: this.$store.getters.getLabels,
+      title: '',
+      body: '',
+      people: '',
+      lab: [] // 需要优化，应该为数组(标签可多选)
     };
   },
   methods: {
     confirm() {
+      if(this.title.trim() == '' || this.body.trim() == '' || this.people == '' || this.lab == '') return
+      var agn = [],
+          lab = [];
+      agn.push(this.people);
+      lab.push(this.lab);
       let params = {
         query:
-          'mutation{createIssue(input:{repositoryId:"MDEwOlJlcG9zaXRvcnkxODcxMTgwMTM=",title:"Test",body:"Test createIssue"}){issue{ body  title}}}'
+          'mutation{createIssue(input:{repositoryId:"MDEwOlJlcG9zaXRvcnkxODcxMTgwMTM=",title:"' + this.title +'",body:"'+ this.body +'",assigneeIds:"'+ agn + '",labelIds:"'+ lab +'"}){issue{ body  title}}}'
       };
-      createIssue(params).then(res=>{
-        if(res.statusText == "OK"){ 
-          this.$emit("state")
-        }
-      })
+      this.$emit("state",true)
+      // createIssue(params).then(res=>{
+      //   console.log(res);
+      //   this.$emit("state")
+        
+      // })
     },
     cancel() {
       this.$emit("state");

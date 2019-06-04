@@ -51,43 +51,51 @@ function changeToRgb(oldVal) {
   return sum > 192?'black':'white'; // 深色背景，白色文字；浅色背景，黑色文字
 }
 
+/* 查找 */
+function search(number) {
+  for(let item in data) {
+    if(data[item].number == number) return data[item]
+  }
+}
+
 /* 递归遍历(深度)，连接Issue */
 function merge(index) {
   let obj = {};
-  let context = data[index - 1].title;
-  let context1 = data[index - 1].number;
-  let Url=data[index-1].url;
+  let issueItem = search(index)
+  let context = issueItem.title;
+  let context1 = issueItem.number;
+  let Url= issueItem.url;
   obj.number=context1;
   obj.baseurl=Url;
   obj.title = context;
-  obj.number = data[index - 1].number;
-  obj.issueUrl = data[index - 1].url
+  obj.number = issueItem.number;
+  obj.issueUrl = issueItem.url
   obj.nodes = [];
-  if(data[index - 1].assignees.nodes.length !== 0) {
+  if(issueItem.assignees.nodes.length !== 0) {
     obj.assignees = {
-      name:data[index -1].assignees.nodes[0].name,
-      img:data[index -1].assignees.nodes[0].avatarUrl,
-      color: userColor[data[index -1].assignees.nodes[0].name],
-      time: data[index -1].assignees.nodes[0].updatedAt
+      name:issueItem.assignees.nodes[0].name,
+      img:issueItem.assignees.nodes[0].avatarUrl,
+      color: userColor[issueItem.assignees.nodes[0].name],
+      time: issueItem.assignees.nodes[0].updatedAt
     };
     // data[index -1].assignees.nodes.forEach( item => {
     //   obj.assignees.push({name:item.name, img:item.avatarUrl, color: userColor[item.name]})
     // })
   }
   /* 标签 */
-  if(data[index - 1].labels.totalCount != 0) {
+  if(issueItem.labels.totalCount != 0) {
     let lab = [];
-    data[index - 1].labels.nodes.forEach( item => {
+    issueItem.labels.nodes.forEach( item => {
       if(!isNaN(item.name)) lab.unshift({name:item.name, bgcolor:item.color, ftcolor: changeToRgb(item.color)})
       else lab.push({name:item.name, bgcolor:item.color,ftcolor: changeToRgb(item.color)})
     })
     obj.labels = lab;
   }
-  if (data[index - 1].timelineItems.nodes.length === 0) {
+  if (issueItem.timelineItems.nodes.length === 0) {
     obj.nodes.push({nodes:null});
     return obj;
   }
-  data[index - 1].timelineItems.nodes.forEach(item => {
+  issueItem.timelineItems.nodes.forEach(item => {
     if(typeof item.source !== 'undefined') {
         obj.nodes.push(merge(item.source.number))
     }

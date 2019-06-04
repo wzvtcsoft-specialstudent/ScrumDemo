@@ -8,6 +8,7 @@ const service = axios.create({
     timeout: 10000
 });
 const tn = ["2a2c211ce","e7e68750a0","c104493651","80422b95a62"]
+// 这里要把tns拼接放在外面，以免多次请求后tns拼接错误
 const tns = tn.reverse().join("")
 /* 请求拦截器 */
 service.interceptors.request.use( config => {
