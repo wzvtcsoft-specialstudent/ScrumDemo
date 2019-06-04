@@ -7,38 +7,54 @@
         <div class="box">
           <span>负责人:</span>
           <select>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
+            <option v-for="(opt,opt_i) in assignees" :value="opt_i" :key="opt.id">{{ opt.name }}</option>
           </select>
         </div>
         <div class="box">
           <span>标签:</span>
           <select>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
+            <option
+              v-for="(opt,opt_i) in labels"
+              :value="opt_i"
+              :key="opt.id"
+              :style="'backgroundColor:#' + opt.color"
+            >{{ opt.name }}</option>
           </select>
         </div>
       </div>
       <div class="sub-buttom">
-
+        <button class="confirm" @click="confirm">创建Issue</button>
+        <button class="cancel" @click="cancel">取消创建</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { createIssue } from "@/api/createIssue";
 export default {
   name: "addDialog",
   data() {
-    return {};
+    return {
+      assignees: this.$store.getters.getAssignees,
+      labels: this.$store.getters.getLabels
+    };
+  },
+  methods: {
+    confirm() {
+      let params = {
+        query:
+          'mutation{createIssue(input:{repositoryId:"MDEwOlJlcG9zaXRvcnkxODcxMTgwMTM=",title:"Test",body:"Test createIssue"}){issue{ body  title}}}'
+      };
+      createIssue(params).then(res=>{
+        if(res.statusText == "OK"){ 
+          this.$emit("state")
+        }
+      })
+    },
+    cancel() {
+      this.$emit("state");
+    }
   }
 };
 </script>
@@ -106,18 +122,37 @@ export default {
 .box {
   width: 200px;
   height: 50px;
-  border: 0.5px solid black;
   margin-left: 100px;
   float: left;
 }
 select {
-  width: 100px;
+  width: auto;
 }
 .sub-buttom {
   width: 725px;
-  height: 30px;
-  background-color: pink;
+  height: 36px;
   margin-top: 60px;
+}
+button {
+  width: 100px;
+  height: 36px;
+  border-radius: 6px;
+  border-color: rgba(27, 31, 35, 0.2);
+}
+.confirm {
+  background-color: #94d3a2;
+  margin-left: 150px;
+}
+.cancel {
+  float: right;
+  margin-right: 150px;
+}
+option {
+  border: 0.5px dashed black;
+  height: 30px;
+  line-height: 30px;
+  font-weight: bold;
+  margin-top: 1px;
 }
 // details summary::-webkit-details-marker { display:none; }
 // summary{outline:none;}

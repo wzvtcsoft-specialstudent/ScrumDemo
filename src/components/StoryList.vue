@@ -10,6 +10,9 @@
           @click.native="selEpic(epic_i)"
         ></sticker>
       </transition-group>
+      <div class="create" @click="create">
+        <span>创建Issue</span>
+      </div>
       <div class="add" v-show="epicState" @click="addEpic">
         <span>+</span>
       </div>
@@ -61,13 +64,13 @@
         </div>
       </template>
     </div>
-    <add-dialog></add-dialog>
+    <add-dialog @state="changeState" v-show="dialogState"></add-dialog>
   </div>
 </template>
 
 <script>
 import sticker from "./sticker";
-import addDialog from "./addDialog"
+import addDialog from "./addDialog";
 import { getIssue } from "@/api/getIssue";
 import { fixData } from "@/assets/js/fixData";
 
@@ -81,7 +84,8 @@ export default {
       epicState: false,
       storyState: false,
       taskState: false,
-      extendState: false
+      extendState: false,
+      dialogState: false
     };
   },
   methods: {
@@ -90,10 +94,12 @@ export default {
       // qcteams HuaAn
       let params = {
         query:
-          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){ id name issues(first:100){  totalCount nodes{  title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
+          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} id name issues(first:100){  totalCount nodes{  title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
       getIssue(params).then(res => {
         this.data = fixData(res.data.data.organization.repository.issues.nodes);
+        this.$store.commit('setAssignees',res.data.data.organization.repository.assignableUsers.nodes);
+        this.$store.commit('setLabels',res.data.data.organization.repository.labels.nodes);
         if (this.data.length > 4) this.epicState = true;
         if (
           typeof this.data[this.epici] !== "undefined" &&
@@ -128,7 +134,7 @@ export default {
       try {
         this.storyState = this.data[this.epici].nodes.length > 4;
       } catch (error) {
-        this.storyState = false
+        this.storyState = false;
       }
       if (this.$refs.epic.style.overflow == "unset") {
         this.$refs.epic.style.overflow = "hidden";
@@ -144,12 +150,13 @@ export default {
         );
         this.userstoryi = 0;
       }
-       /* 判断是否显示 [更多]按钮 */
+      /* 判断是否显示 [更多]按钮 */
       try {
-          this.taskState = this.data[this.epici].nodes[this.userstoryi].nodes.length > 4;
-        } catch (error) {
-          this.taskState = false;
-        }
+        this.taskState =
+          this.data[this.epici].nodes[this.userstoryi].nodes.length > 4;
+      } catch (error) {
+        this.taskState = false;
+      }
       if (this.$refs.story.style.overflow == "unset") {
         this.$refs.story.style.overflow = "hidden";
       }
@@ -162,14 +169,14 @@ export default {
           this.data[this.epici].nodes[this.userstoryi].nodes.splice(index, 1)[0]
         );
       }
-       /* 判断是否显示 [更多]按钮 */
-       try {
-          this.extendState =
-            this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes
-              .length > 4;
-        } catch (error) {
-          this.extendState = false;
-        }
+      /* 判断是否显示 [更多]按钮 */
+      try {
+        this.extendState =
+          this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes
+            .length > 4;
+      } catch (error) {
+        this.extendState = false;
+      }
       if (this.$refs.task.style.overflow == "unset") {
         this.$refs.task.style.overflow = "hidden";
       }
@@ -210,6 +217,12 @@ export default {
     addExtend() {
       let ele = this.$refs.extend.style;
       ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
+    },
+    changeState() {
+      this.dialogState = false;
+    },
+    create() {
+      this.dialogState = true;
     }
   },
   components: {
@@ -237,6 +250,7 @@ export default {
 .sticker-move {
   transition: transform 1s;
 }
+/* 固定写法,配合使用实现列表的平稳动画 */
 
 .main-contaienr {
   // position: absolute;
@@ -278,9 +292,22 @@ export default {
   border: 1px solid black;
   border-radius: 50%;
   position: absolute;
-  right: 10px;
+  right: 30px;
   top: 10px;
   text-align: center;
+  cursor: pointer;
+}
+.create {
+  width: 80px;
+  height: 26px;
+  text-align: center;
+  line-height: 26px;
+  background-color: #94d3a2;
+  border-color: rgba(27, 31, 35, 0.2);
+  border-radius: 5px;
+  position: absolute;
+  top: 10px;
+  right: 60px;
   cursor: pointer;
 }
 // .extend {
