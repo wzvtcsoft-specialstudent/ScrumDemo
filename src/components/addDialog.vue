@@ -11,18 +11,14 @@
           </select>
         </div>
         <div class="box">
-          <span>标签:+</span>
-          <!-- <select v-model="lab">
-            <option
-              v-for="(opt,opt_i) in labels"
-              :value="opt.id"
-              :key="opt_i"
-              :style="'backgroundColor:#' + opt.color"
-            >{{ opt.name }}</option>
-          </select> -->
-          <el-checkbox-group v-model="lab">
-            
-          </el-checkbox-group>
+          <details @blur="blur">
+            <summary>添加标签</summary>
+            <div class="labels">
+            <el-checkbox-group v-model="lab">
+              <el-checkbox class="checkbox" v-for="label in labels" :key="label.id" :label="label.id">{{ label.name }}</el-checkbox>
+            </el-checkbox-group>
+            </div>
+          </details>
         </div>
       </div>
       <div class="sub-buttom">
@@ -41,32 +37,41 @@ export default {
     return {
       assignees: this.$store.getters.getAssignees,
       labels: this.$store.getters.getLabels,
-      title: '',
-      body: '',
-      people: '',
+      title: "",
+      body: "",
+      people: "",
       lab: [] // 需要优化，应该为数组(标签可多选)
     };
   },
   methods: {
     confirm() {
-      if(this.title.trim() == '' || this.body.trim() == '' || this.people == '' || this.lab == '') return
-      var agn = [],
-          lab = [];
-      agn.push(this.people);
-      lab.push(this.lab);
+      if (
+        this.title.trim() == "" ||
+        this.body.trim() == "" 
+      )
+        return;
+      var labelStr = this.lab.map( id => { return '"' + id +'"'}).join(',')
       let params = {
         query:
-          'mutation{createIssue(input:{repositoryId:"MDEwOlJlcG9zaXRvcnkxODcxMTgwMTM=",title:"' + this.title +'",body:"'+ this.body +'",assigneeIds:"'+ agn + '",labelIds:"'+ lab +'"}){issue{ body  title}}}'
+          'mutation{createIssue(input:{repositoryId:"MDEwOlJlcG9zaXRvcnkxODcxMTgwMTM=",title:"' +
+          this.title +
+          '",body:"' +
+          this.body +
+          '",assigneeIds:["' +
+          this.people +
+          '"],labelIds:[' +
+          labelStr +
+          ']}){issue{ body  title}}}'
       };
-      this.$emit("state",true)
-      // createIssue(params).then(res=>{
-      //   console.log(res);
-      //   this.$emit("state")
-        
-      // })
+     createIssue(params).then(res=>{
+        this.$emit("state", res.data.data.createIssue!=null)
+      })
     },
     cancel() {
-      this.$emit("state");
+      this.$emit("state",false);
+    },
+    blur() {
+      console.log('blur');
     }
   }
 };
@@ -167,8 +172,20 @@ option {
   font-weight: bold;
   margin-top: 1px;
 }
+.labels {
+  width: 180px;
+  height: 160px;
+  overflow: auto;
+  overflow-x: hidden;
+}
+.el-checkbox {
+ width: 180px;
+ background-color: rgba(255, 255, 255, 0.6)
+}
 // details summary::-webkit-details-marker { display:none; }
-// summary{outline:none;}
+summary {
+  outline: none;
+}
 </style>
 
 
