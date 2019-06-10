@@ -10,7 +10,7 @@
           @click.native="selEpic(epic_i)"
         ></sticker>
       </transition-group>
-      <div class="create" @click="create">
+      <div class="create" @click="create(0)">
         <span>创建Issue</span>
       </div>
       <div class="add" v-show="epicState" @click="addEpic">
@@ -28,6 +28,9 @@
           @click.native="selStory(story_i)"
         ></sticker>
       </transition-group>
+       <div class="create" @click="create(1)">
+        <span>创建Issue</span>
+      </div>
       <div class="add" v-show="storyState" @click="addStory">
         <span>+</span>
       </div>
@@ -43,15 +46,17 @@
           @click.native="selTask(task_i)"
         ></sticker>
       </transition-group>
+       <div class="create" v-show="data[epici].nodes[userstoryi].number" @click="create(2)">
+        <span>创建Issue</span>
+      </div>
       <div class="add" v-show="taskState" @click="addTask">
         <span>+</span>
       </div>
     </div>
     <div class="container extend" ref="extend">
-      <template v-if="judge()">
         <transition-group appear mode="out-in" name="sticker">
           <sticker
-            v-for="extend in data[epici].nodes[userstoryi].nodes[taski].nodes"
+            v-for="extend in extendData()"
             v-show="typeof extend.title !== 'undefined'"
             :key="extend.number + 'extend'"
             class="sticker"
@@ -59,12 +64,14 @@
             @click.native="selExtend"
           ></sticker>
         </transition-group>
+         <div class="create" v-show="data[epici].nodes[userstoryi].nodes && data[epici].nodes[userstoryi].nodes[0].nodes "  @click="create(3)">
+        <span>创建Issue</span>
+      </div>
         <div class="add" v-show="extendState" @click="addExtend">
           <span>+</span>
         </div>
-      </template>
     </div>
-    <add-dialog @state="changeState" v-show="dialogState"></add-dialog>
+    <add-dialog :connect="connectIssue" @state="changeState" v-show="dialogState"></add-dialog>
   </div>
 </template>
 
@@ -85,10 +92,18 @@ export default {
       storyState: false,
       taskState: false,
       extendState: false,
-      dialogState: false
+      dialogState: false,
+      connectIssue: 0
     };
   },
   methods: {
+    extendData() {
+      try {
+        return this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes
+      } catch (error) {
+        return []
+      }
+    },
     getissue() {
       // wzvtcsoft-specialstudent ScrumDemo
       // qcteams HuaAn
@@ -224,7 +239,21 @@ export default {
         window.location.reload()
       }
     },
-    create() {
+    create(val) {
+      switch(val) {
+        case 0:
+          this.connectIssue = 0
+          break
+        case 1:
+          this.connectIssue = this.data[this.epici].number
+          break
+        case 2:
+          this.connectIssue = this.data[this.epici].nodes[this.userstoryi].number
+          break
+        case 3:
+          this.connectIssue = this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].number
+          break
+      }
       this.dialogState = true;
     }
   },

@@ -5,13 +5,21 @@
       <textarea class="issue-body" placeholder="Leave a comment" v-model="body"></textarea>
       <div class="inform">
         <div class="box">
-          <span>负责人:</span>
+          <!-- <span>负责人:</span>
           <select v-model="people">
             <option v-for="(opt,opt_i) in assignees" :value="opt.id" :key="opt_i">{{ opt.name }}</option>
-          </select>
+          </select> -->
+          <details>
+            <summary>添加负责人</summary>
+            <div class="labels">
+            <el-checkbox-group v-model="people">
+              <el-checkbox class="checkbox" v-for="aign in assignees" :key="aign.id" :label="aign.id">{{ aign.name }}</el-checkbox>
+            </el-checkbox-group>
+            </div>
+          </details>
         </div>
         <div class="box">
-          <details @blur="blur">
+          <details>
             <summary>添加标签</summary>
             <div class="labels">
             <el-checkbox-group v-model="lab">
@@ -39,10 +47,11 @@ export default {
       labels: this.$store.getters.getLabels,
       title: "",
       body: "",
-      people: "",
+      people: [],
       lab: [] // 需要优化，应该为数组(标签可多选)
     };
   },
+  props:['connect'],
   methods: {
     confirm() {
       if (
@@ -50,29 +59,35 @@ export default {
         this.body.trim() == "" 
       )
         return;
-      var labelStr = this.lab.map( id => { return '"' + id +'"'}).join(',')
+      var labelStr = this.lab.map( id => { return '"' + id +'"'}).join(','),
+          assigneesStr = this.people.map( id => { return '"' + id + '"'}).join(','),
+          body = this.body.replace(/#\d/g,'')
+      if(this.connect != 0) {
+        body = body  + ' #' + this.connect
+      }
       let params = {
         query:
           'mutation{createIssue(input:{repositoryId:"MDEwOlJlcG9zaXRvcnkxODcxMTgwMTM=",title:"' +
           this.title +
           '",body:"' +
-          this.body +
-          '",assigneeIds:["' +
-          this.people +
-          '"],labelIds:[' +
+         body +
+          '",assigneeIds:[' +
+          assigneesStr +
+          '],labelIds:[' +
           labelStr +
           ']}){issue{ body  title}}}'
       };
+      this.title = ''
+      this.body = ''
+      console.log(params);
      createIssue(params).then(res=>{
+       console.log(res);
         this.$emit("state", res.data.data.createIssue!=null)
       })
     },
     cancel() {
       this.$emit("state",false);
     },
-    blur() {
-      console.log('blur');
-    }
   }
 };
 </script>
