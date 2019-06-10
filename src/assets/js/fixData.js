@@ -63,7 +63,7 @@ function merge(index) {
   let obj = {};
   let issueItem = search(index)
   if(typeof issueItem === 'undefined'){
-    obj.number = Math.random()*10000
+    obj.number = Math.random()*10000 + 10000
     return obj
   }
   let context = issueItem.title;

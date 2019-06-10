@@ -46,7 +46,7 @@
           @click.native="selTask(task_i)"
         ></sticker>
       </transition-group>
-       <div class="create" v-show="data[epici].nodes[userstoryi].number" @click="create(2)">
+       <div class="create" v-show="data[epici].nodes[userstoryi].number&&data[epici].nodes[userstoryi].number<10000" @click="create(2)">
         <span>创建Issue</span>
       </div>
       <div class="add" v-show="taskState" @click="addTask">
@@ -113,6 +113,7 @@ export default {
       };
       getIssue(params).then(res => {
         this.data = fixData(res.data.data.organization.repository.issues.nodes);
+        console.log(this.data);
         this.$store.commit('setAssignees',res.data.data.organization.repository.assignableUsers.nodes);
         this.$store.commit('setLabels',res.data.data.organization.repository.labels.nodes);
         if (this.data.length > 4) this.epicState = true;
