@@ -6,3 +6,10 @@ export function getInfo(data) {
         data: JSON.stringify(data)
     })
 }
+
+export function getMilesTones(data) {
+    return axios({
+        method: "POST",
+        data: JSON.stringify(data)
+    })
+}

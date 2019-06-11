@@ -1,5 +1,12 @@
 <template>
   <div class="main-contaienr" v-if="data">
+    <details class="switch">
+      <summary></summary>
+      <ul>
+        <router-link to="/" tag="li">需求地图</router-link>
+        <router-link to="/sprint" tag="li">历史sprint</router-link>
+      </ul>
+    </details>
     <div class="container epic" ref="epic">
       <transition-group appear mode="out-in" name="sticker">
         <sticker
@@ -28,7 +35,7 @@
           @click.native="selStory(story_i)"
         ></sticker>
       </transition-group>
-       <div class="create" @click="create(1)">
+      <div class="create" @click="create(1)">
         <span>创建Issue</span>
       </div>
       <div class="add" v-show="storyState" @click="addStory">
@@ -46,7 +53,11 @@
           @click.native="selTask(task_i)"
         ></sticker>
       </transition-group>
-       <div class="create" v-show="data[epici].nodes[userstoryi].number&&data[epici].nodes[userstoryi].number<10000" @click="create(2)">
+      <div
+        class="create"
+        v-show="data[epici].nodes[userstoryi].number&&data[epici].nodes[userstoryi].number<10000"
+        @click="create(2)"
+      >
         <span>创建Issue</span>
       </div>
       <div class="add" v-show="taskState" @click="addTask">
@@ -54,22 +65,26 @@
       </div>
     </div>
     <div class="container extend" ref="extend">
-        <transition-group appear mode="out-in" name="sticker">
-          <sticker
-            v-for="extend in extendData()"
-            v-show="typeof extend.title !== 'undefined'"
-            :key="extend.number + 'extend'"
-            class="sticker"
-            :list="extend"
-            @click.native="selExtend"
-          ></sticker>
-        </transition-group>
-         <div class="create" v-show="data[epici].nodes[userstoryi].nodes && data[epici].nodes[userstoryi].nodes[0].nodes "  @click="create(3)">
+      <transition-group appear mode="out-in" name="sticker">
+        <sticker
+          v-for="extend in extendData()"
+          v-show="typeof extend.title !== 'undefined'"
+          :key="extend.number + 'extend'"
+          class="sticker"
+          :list="extend"
+          @click.native="selExtend"
+        ></sticker>
+      </transition-group>
+      <div
+        class="create"
+        v-show="data[epici].nodes[userstoryi].nodes && data[epici].nodes[userstoryi].nodes[0].nodes "
+        @click="create(3)"
+      >
         <span>创建Issue</span>
       </div>
-        <div class="add" v-show="extendState" @click="addExtend">
-          <span>+</span>
-        </div>
+      <div class="add" v-show="extendState" @click="addExtend">
+        <span>+</span>
+      </div>
     </div>
     <add-dialog :connect="connectIssue" @state="changeState" v-show="dialogState"></add-dialog>
   </div>
@@ -99,9 +114,10 @@ export default {
   methods: {
     extendData() {
       try {
-        return this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes
+        return this.data[this.epici].nodes[this.userstoryi].nodes[this.taski]
+          .nodes;
       } catch (error) {
-        return []
+        return [];
       }
     },
     getissue() {
@@ -112,10 +128,17 @@ export default {
           'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} id name issues(states:[OPEN],first:100){  totalCount nodes{  title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
       getIssue(params).then(res => {
+        console.log(res.data.data.organization.repository.issues.nodes);
         this.data = fixData(res.data.data.organization.repository.issues.nodes);
         console.log(this.data);
-        this.$store.commit('setAssignees',res.data.data.organization.repository.assignableUsers.nodes);
-        this.$store.commit('setLabels',res.data.data.organization.repository.labels.nodes);
+        this.$store.commit(
+          "setAssignees",
+          res.data.data.organization.repository.assignableUsers.nodes
+        );
+        this.$store.commit(
+          "setLabels",
+          res.data.data.organization.repository.labels.nodes
+        );
         if (this.data.length > 4) this.epicState = true;
         if (
           typeof this.data[this.epici] !== "undefined" &&
@@ -236,24 +259,28 @@ export default {
     },
     changeState(val) {
       this.dialogState = false;
-      if(val) {
-        window.location.reload()
+      if (val) {
+        window.location.reload();
       }
     },
     create(val) {
-      switch(val) {
+      switch (val) {
         case 0:
-          this.connectIssue = 0
-          break
+          this.connectIssue = 0;
+          break;
         case 1:
-          this.connectIssue = this.data[this.epici].number
-          break
+          this.connectIssue = this.data[this.epici].number;
+          break;
         case 2:
-          this.connectIssue = this.data[this.epici].nodes[this.userstoryi].number
-          break
+          this.connectIssue = this.data[this.epici].nodes[
+            this.userstoryi
+          ].number;
+          break;
         case 3:
-          this.connectIssue = this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].number
-          break
+          this.connectIssue = this.data[this.epici].nodes[
+            this.userstoryi
+          ].nodes[this.taski].number;
+          break;
       }
       this.dialogState = true;
     }
@@ -283,7 +310,21 @@ export default {
 .sticker-move {
   transition: transform 1s;
 }
+
+.menu-enter,
+.menu-leave-to {
+  opacity: 0;
+  transform: translateX(-100px);
+}
+.menu-enter-active,
+.menu-leave-active {
+  opacity: 1;
+  transition: all 1s ease;
+}
 /* 固定写法,配合使用实现列表的平稳动画 */
+.menu-move {
+  transition: transform 1s;
+}
 
 .main-contaienr {
   // position: absolute;
@@ -294,7 +335,6 @@ export default {
 .container {
   width: 1475px;
   height: 159px;
-  // max-height: 159px;
   overflow: hidden;
   padding: 11px 30px 10px 30px;
   position: relative;
@@ -342,6 +382,56 @@ export default {
   top: 10px;
   right: 60px;
   cursor: pointer;
+}
+.switch {
+  width: 100px;
+  height: 300px;
+  position: absolute;
+  left: 3px;
+  top: 60px;
+  font-size: 20px;
+  z-index: 1;
+}
+ul {
+  width: 100px;
+  height: 300px;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+  border: 1px solid #ccc;
+  padding: 5px 0 0 0;
+  margin: 0;
+  border: 0;
+}
+li {
+  // margin-left: 10px;
+  text-align: center;
+  list-style-type: none;
+  width: 100%;
+  height: 30px;
+  font-size: 16px;
+  line-height: 30px;
+  border-bottom: 1px solid #ccc;
+  // background-color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+}
+li:hover {
+  color: red;
+}
+summary {
+  outline: none;
+}
+details ul {
+  animation: fadeInDown 0.5s linear;
+}
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 // .extend {
 //   background-color: #FDFDFD;
