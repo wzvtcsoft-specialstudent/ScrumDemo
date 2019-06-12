@@ -1,5 +1,5 @@
 <template>
-  <div class="sprint-main-container" v-if="details"> 
+  <div class="sprint-main-container" v-if="details">
     <details class="switch">
       <summary></summary>
       <ul>
@@ -9,7 +9,11 @@
     </details>
     <div class="spint-list">
       <ul>
-        <li class="sprint" v-for="(item,i) in list" :key="i" @click="changeSel(i)">{{ item }}</li>
+        <li class="sprint" v-for="(item,i) in list" :key="i" @click="changeSel(i)">
+          <span class="milestones-name">{{ item.title }}</span>
+          <el-progress :percentage="item.planne" :format="format"></el-progress>
+          <span class="milestones-time">{{ item.createdtime }} — {{ item.closedtime | dueDate }}</span>
+        </li>
       </ul>
     </div>
     <div class="sprint-details">
@@ -20,8 +24,8 @@
 
 <script>
 import { getMilesTones } from "@/api/getInfo";
-import { fixSprintData } from "@/assets/js/sprintDetails"
-import sticker from './sticker'
+import { fixSprintData } from "@/assets/js/sprintDetails";
+import sticker from "./sticker";
 
 export default {
   name: "sprint",
@@ -36,29 +40,46 @@ export default {
     getmilestones() {
       let params = {
         query:
-          'query{ organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){milestones(first:100) {totalCount nodes {title issues(first:30){ totalCount nodes{ title  number  url  body assignees(first:20) {nodes{  name avatarUrl updatedAt}}labels(first:100){totalCount nodes{color name} } } }}} } }}'
+          'query{ organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){milestones(first:100) {totalCount nodes {title createdAt dueOn issues(first:30){ totalCount nodes{ title state number  url  body assignees(first:20) {nodes{  name avatarUrl updatedAt}}labels(first:100){totalCount nodes{color name} } } }}} } }}'
       };
-      getMilesTones(params).then(res=>{
-        let oldList = [],oldDetails = [];
+      getMilesTones(params).then(res => {
+        let oldList = [],
+          oldDetails = [];
         res.data.data.organization.repository.milestones.nodes.forEach(item => {
-          oldList.push(item.title)
-          oldDetails.push(item.issues)
-        })
-        this.list = oldList
-        // console.log(oldDetails);
-        this.details = fixSprintData(oldDetails)
-        // console.log(this.details);
-      })
+          var count = 0;
+          item.issues.nodes.forEach(i => {
+            if (i.state == "CLOSED") count++;
+          });
+          oldList.push({
+            title: item.title,
+            createdtime: item.createdAt.substr(0, 10),
+            closedtime: item.dueOn,
+            planne: (count / item.issues.totalCount) * 100
+          });
+          oldDetails.push(item.issues);
+        });
+        this.list = oldList;
+        this.details = fixSprintData(oldDetails);
+      });
     },
     changeSel(index) {
-      this.selIndex = index
+      this.selIndex = index;
+    },
+    format(percentage) {
+      return `${percentage.toFixed(1)}%`;
+    }
+  },
+  filters: {
+    dueDate(val) {
+      if (val == null) return "";
+      return val.substr(0, 10);
     }
   },
   components: {
-    sticker,
+    sticker
   },
   created() {
-    this.getmilestones()
+    this.getmilestones();
   }
 };
 </script>
@@ -67,11 +88,11 @@ export default {
 .sprint-main-container {
   margin: 0 auto;
   width: 1480px;
-  height: 720px;
+  height: 690px;
 }
 .spint-list {
   width: 170px;
-  height: 700px;
+  height: 690px;
   max-height: 700px;
   overflow: hidden;
   float: left;
@@ -81,7 +102,7 @@ export default {
 }
 .sprint-details {
   width: 1270px;
-  height: 700px;
+  height: 690px;
   margin-left: 6px;
   float: left;
   padding: 5px 3px 10px 5px;
@@ -97,13 +118,24 @@ ul {
   list-style-type: none;
   background-color: white;
   width: 100%;
-  height: 30px;
-  line-height: 30px;
+  height: 60px;
   border-bottom: 1px solid #ccc;
+  cursor: pointer;
+}
+.milestones-name {
+  display: block;
+  width: 100%;
   font-weight: 500;
   font-size: 20px;
   margin-top: 10px;
-  cursor: pointer;
+  height: 30;
+}
+.milestones-time {
+  font-size: 12px;
+  color: #707070;
+  width: 100%;
+  height: 10px;
+  line-height: 10px;
 }
 .sprint:hover {
   color: red;
@@ -114,8 +146,8 @@ ul {
   margin-left: 20px;
 }
 .switch {
-  width: 100px;
-  height: 300px;
+  width: 20px;
+  height: 20px;
   position: absolute;
   left: 3px;
   top: 60px;

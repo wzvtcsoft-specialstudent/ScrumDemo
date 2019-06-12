@@ -98,7 +98,7 @@ export default {
         line-height: 20px;
         font-weight: 400;
         color: #707070;
-        padding-bottom: 22px;
+        padding-bottom: 30px;
     }
     a {
         color: #2680EB;
@@ -111,15 +111,14 @@ export default {
     }
     .label {
         text-align: center;
-        height: 15px;
-        padding: 3px;
+        height: 13px;
         // background:rgba(241,136,136,1);
         border-radius: 14px;      
         margin-left: 3px;
         float: left;
         opacity: 0.8;
-        padding: 3px 12px 3px 12px;
-                line-height: 12px;
+        padding: 1px 12px 3px 12px;
+        line-height: 12px;
     }
     .label-name {
         font-size: 12px;

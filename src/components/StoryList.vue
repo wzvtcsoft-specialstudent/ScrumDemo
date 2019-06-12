@@ -8,7 +8,7 @@
       </ul>
     </details>
     <div class="container epic" ref="epic">
-      <transition-group appear mode="out-in" name="sticker">
+        <transition-group appear mode="out-in" name="sticker">
         <sticker
           v-for="(epic, epic_i) in data"
           :class="{'sticker':true,'selected':epic_i === epici}"
@@ -99,6 +99,7 @@ import { fixData } from "@/assets/js/fixData";
 export default {
   data() {
     return {
+      state: false,
       data: null,
       epici: 0,
       userstoryi: 0,
@@ -128,9 +129,8 @@ export default {
           'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} id name issues(states:[OPEN],first:100){  totalCount nodes{  title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
       getIssue(params).then(res => {
-        console.log(res.data.data.organization.repository.issues.nodes);
         this.data = fixData(res.data.data.organization.repository.issues.nodes);
-        console.log(this.data);
+        this.state = true;
         this.$store.commit(
           "setAssignees",
           res.data.data.organization.repository.assignableUsers.nodes
@@ -384,8 +384,8 @@ export default {
   cursor: pointer;
 }
 .switch {
-  width: 100px;
-  height: 300px;
+  width: 20px;
+  height: 20px;
   position: absolute;
   left: 3px;
   top: 60px;
