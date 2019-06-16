@@ -1,14 +1,34 @@
 <template>
   <div class="main-contaienr" v-if="data">
-    <details class="switch">
-      <summary></summary>
-      <ul>
-        <router-link to="/" tag="li">需求地图</router-link>
-        <router-link to="/sprint" tag="li">历史sprint</router-link>
-      </ul>
-    </details>
+    <div class="header">
+      <div class="menu" @click="clickMenu">
+        <img src="@/assets/img/menu.png">
+        <div class="menu-item" v-show="menuState" @mouseleave="menuState = false">
+          <span class="link-item">Home</span>
+          <span class="link-item">Story Map</span>
+          <span class="link-item">History Sprint</span>
+        </div>
+      </div>
+      <div class="add" @click="clickAdd">
+        <div class="addIssue">
+          <div class="addIssue-title">New issue</div>
+          <img src="@/assets/img/drop.png" class="drop">
+        </div>
+        <!-- 不论鼠标指针离开被选元素还是任何子元素，都会触发 mouseout 事件。
+
+        只有在鼠标指针离开被选元素时，才会触发 mouseleave 事件。-->
+        <div class="add-item" v-show="addState" @mouseleave="addState = false">
+          <span>Epic</span>
+          <span>User Story</span>
+          <span>Task</span>
+        </div>
+      </div>
+    </div>
     <div class="container epic" ref="epic">
-        <transition-group appear mode="out-in" name="sticker">
+      <div class="line-label">
+        <span>Epic</span>
+      </div>
+      <transition-group appear mode="out-in" name="sticker">
         <sticker
           v-for="(epic, epic_i) in data"
           :class="{'sticker':true,'selected':epic_i === epici}"
@@ -17,14 +37,12 @@
           @click.native="selEpic(epic_i)"
         ></sticker>
       </transition-group>
-      <div class="create" @click="create(0)">
-        <span>创建Issue</span>
-      </div>
-      <div class="add" v-show="epicState" @click="addEpic">
-        <span>+</span>
-      </div>
+      <img v-show="epicState" src="@/assets/img/open.png" class="open" @click="addEpic">
     </div>
     <div class="container userstory" ref="story">
+      <div class="line-label">
+        <div class="special">User Story</div>
+      </div>
       <transition-group appear mode="out-in" name="sticker">
         <sticker
           v-for="(story, story_i) in data[epici].nodes"
@@ -35,14 +53,15 @@
           @click.native="selStory(story_i)"
         ></sticker>
       </transition-group>
-      <div class="create" @click="create(1)">
-        <span>创建Issue</span>
-      </div>
-      <div class="add" v-show="storyState" @click="addStory">
-        <span>+</span>
-      </div>
+      <img v-show="storyState" src="@/assets/img/open.png" class="open" @click="addStory">
     </div>
     <div class="container task" ref="task">
+      <div class="line-label">
+        <span>Task</span>
+      </div>
+      <div class="line-label" v-show="titleState">
+        <div class="special">User Story</div>
+      </div>
       <transition-group appear mode="out-in" name="sticker">
         <sticker
           v-for="(task, task_i) in data[epici].nodes[userstoryi].nodes"
@@ -53,18 +72,12 @@
           @click.native="selTask(task_i)"
         ></sticker>
       </transition-group>
-      <div
-        class="create"
-        v-show="data[epici].nodes[userstoryi].number&&data[epici].nodes[userstoryi].number<10000"
-        @click="create(2)"
-      >
-        <span>创建Issue</span>
-      </div>
-      <div class="add" v-show="taskState" @click="addTask">
-        <span>+</span>
-      </div>
+      <img v-show="taskState" src="@/assets/img/open.png" class="open" @click="addTask">
     </div>
     <div class="container extend" ref="extend">
+      <div class="line-label" v-show="titleState">
+        <span>Task</span>
+      </div>
       <transition-group appear mode="out-in" name="sticker">
         <sticker
           v-for="extend in extendData()"
@@ -75,16 +88,7 @@
           @click.native="selExtend"
         ></sticker>
       </transition-group>
-      <div
-        class="create"
-        v-show="data[epici].nodes[userstoryi].nodes && data[epici].nodes[userstoryi].nodes[0].nodes "
-        @click="create(3)"
-      >
-        <span>创建Issue</span>
-      </div>
-      <div class="add" v-show="extendState" @click="addExtend">
-        <span>+</span>
-      </div>
+      <img v-show="extendState" src="@/assets/img/open.png" class="open" @click="addExtend">
     </div>
     <add-dialog :connect="connectIssue" @state="changeState" v-show="dialogState"></add-dialog>
   </div>
@@ -99,7 +103,9 @@ import { fixData } from "@/assets/js/fixData";
 export default {
   data() {
     return {
-      state: false,
+      menuState: false,
+      addState: false,
+      titleState: false, //显示 userStory 还是 Task
       data: null,
       epici: 0,
       userstoryi: 0,
@@ -113,11 +119,15 @@ export default {
     };
   },
   methods: {
+    /* 判断extends行 是否有issue */
     extendData() {
       try {
-        return this.data[this.epici].nodes[this.userstoryi].nodes[this.taski]
+        let arr = this.data[this.epici].nodes[this.userstoryi].nodes[this.taski]
           .nodes;
+        this.titleState = arr == null ? false : true;
+        return arr;
       } catch (error) {
+        this.titleState = false;
         return [];
       }
     },
@@ -177,6 +187,7 @@ export default {
       }
       if (this.$refs.epic.style.overflow == "unset") {
         this.$refs.epic.style.overflow = "hidden";
+        this.$refs.epic.style.height = "180px";
       }
     },
     selStory(index) {
@@ -198,6 +209,7 @@ export default {
       }
       if (this.$refs.story.style.overflow == "unset") {
         this.$refs.story.style.overflow = "hidden";
+        this.$refs.story.style.height = "180px";
       }
     },
     selTask(index) {
@@ -218,11 +230,13 @@ export default {
       }
       if (this.$refs.task.style.overflow == "unset") {
         this.$refs.task.style.overflow = "hidden";
+        this.$refs.task.style.height = "180px";
       }
     },
     selExtend() {
       if (this.$refs.extend.style.overflow == "unset") {
         this.$refs.extend.style.overflow = "hidden";
+        this.$refs.extend.style.height = "180px";
       }
     },
     judge() {
@@ -244,24 +258,35 @@ export default {
     addEpic() {
       let ele = this.$refs.epic.style;
       ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
+      ele.height = ele.height == "auto" ? "180px" : "auto";
     },
     addStory() {
       let ele = this.$refs.story.style;
       ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
+      ele.height = ele.height == "auto" ? "180px" : "auto";
     },
     addTask() {
       let ele = this.$refs.task.style;
       ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
+      ele.height = ele.height == "auto" ? "180px" : "auto";
     },
     addExtend() {
       let ele = this.$refs.extend.style;
       ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
+      ele.height = ele.height == "auto" ? "180px" : "auto";
     },
     changeState(val) {
       this.dialogState = false;
       if (val) {
         window.location.reload();
       }
+    },
+    /* Menu */
+    clickMenu() {
+      this.menuState = !this.menuState;
+    },
+    clickAdd() {
+      this.addState = !this.addState;
     },
     create(val) {
       switch (val) {
@@ -296,6 +321,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+* {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
 .sticker-enter,
 .sticker-leave-to {
   opacity: 0;
@@ -327,16 +357,22 @@ export default {
 }
 
 .main-contaienr {
-  // position: absolute;
-  margin: 0 auto;
-  width: 1536px;
-  height: 722px;
+  /* 1600px 1536px */
+  width: 100%;
+  /* 757px 722px */
+  height: 757px;
+}
+.header {
+  width: 100%;
+  height: 50px;
+  max-height: 50px;
 }
 .container {
-  width: 1475px;
-  height: 159px;
+  display: inline-block;
+  width: 90.81%;
+  height: 180px;
   overflow: hidden;
-  padding: 11px 30px 10px 30px;
+  padding: 11px 0 10px 9.19%;
   position: relative;
 }
 .epic {
@@ -354,75 +390,161 @@ export default {
 .sticker {
   float: left;
   margin-bottom: 45px;
-  margin-left: 20px;
+  margin-left: 1.25%;
+}
+.open {
+  width: 2.81%;
+  height: 45px;
+  position: absolute;
+  top: 86px;
+  right: 2%;
+  cursor: pointer;
 }
 .selected {
   border: 1px dashed deepskyblue;
 }
-.add {
-  width: 18px;
-  height: 18px;
-  border: 1px solid black;
+
+.line-label {
+  width: 5%;
+  height: 80px;
+  position: absolute;
   border-radius: 50%;
-  position: absolute;
-  right: 30px;
-  top: 10px;
+  background: rgba(242, 242, 234, 1);
+  left: 1.56%;
+  top: 31.8%;
   text-align: center;
-  cursor: pointer;
 }
-.create {
-  width: 80px;
-  height: 26px;
-  text-align: center;
-  line-height: 26px;
-  background-color: #94d3a2;
-  border-color: rgba(27, 31, 35, 0.2);
-  border-radius: 5px;
-  position: absolute;
-  top: 10px;
-  right: 60px;
-  cursor: pointer;
-}
-.switch {
-  width: 20px;
+.line-label span {
+  width: 36px;
   height: 20px;
-  position: absolute;
-  left: 3px;
-  top: 60px;
-  font-size: 20px;
-  z-index: 1;
+  font-size: 18px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  line-height: 80px;
+  color: rgba(112, 112, 112, 1);
 }
-ul {
-  width: 100px;
-  height: 300px;
-  background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
-  border: 1px solid #ccc;
-  padding: 5px 0 0 0;
-  margin: 0;
-  border: 0;
-}
-li {
-  // margin-left: 10px;
+.special {
+  width: 60%;
+  height: 20px;
   text-align: center;
-  list-style-type: none;
-  width: 100%;
-  height: 30px;
+  font-size: 18px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  color: rgba(112, 112, 112, 1);
+  margin: 20% 0 0 21.75%;
+}
+
+.menu {
+  margin: 1.19% 0 0.92% 0.94%;
+  cursor: pointer;
+  float: left;
+}
+.menu-item {
+  width: 8.5%;
+  height: 102px;
+  position: absolute;
+  left: 0;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+  z-index: 999;
+}
+.link-item {
+  display: block;
+  width: auto;
+  height: 16px;
   font-size: 16px;
-  line-height: 30px;
-  border-bottom: 1px solid #ccc;
-  // background-color: rgba(255, 255, 255, 0.9);
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  line-height: 27px;
+  color: rgba(112, 112, 112, 1);
+  opacity: 1;
+  margin: 12px 0 0 8.82%;
+}
+.link-item:hover {
+  color: #2680eb;
+}
+.add {
+  width: 118px;
+  float: left;
+  margin: 1.19% 0px 0px 7%;
   cursor: pointer;
 }
-li:hover {
-  color: red;
+.addIssue {
+  width: 118px;
+  height: 35px;
+  background: rgba(38, 128, 235, 1);
+  color: white;
+  border-radius: 5px;
 }
-summary {
-  outline: none;
+.addIssue-title {
+  width: 65px;
+  font-size: 13px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  margin: 9px 0 0 14px;
+  float: left;
 }
-details ul {
-  animation: fadeInDown 0.5s linear;
+.drop {
+  width: 16px;
+  height: 16px;
+  float: left;
+  margin: 8px 0 0 12px;
 }
+.add-item {
+  width: 118px;
+  height: 100px;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+  margin-top: 2px;
+  position: absolute;
+  z-index: 999;
+}
+.add-item span {
+  display: block;
+  width: auto;
+  height: 18px;
+  margin: 10px 0 0 12px;
+  font-size: 16px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  line-height: 27px;
+  color: rgba(112, 112, 112, 1);
+  opacity: 1;
+}
+.add-item span:hover {
+  color: #2680eb;
+}
+// ul {
+//   width: 100px;
+//   height: 300px;
+//   background-color: rgba(255, 255, 255, 0.9);
+//   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+//   border: 1px solid #ccc;
+//   padding: 5px 0 0 0;
+//   margin: 0;
+//   border: 0;
+// }
+// li {
+//   // margin-left: 10px;
+//   text-align: center;
+//   list-style-type: none;
+//   width: 100%;
+//   height: 30px;
+//   font-size: 16px;
+//   line-height: 30px;
+//   border-bottom: 1px solid #ccc;
+//   // background-color: rgba(255, 255, 255, 0.9);
+//   cursor: pointer;
+// }
+// li:hover {
+//   color: red;
+// }
+// summary {
+//   outline: none;
+// }
+// details ul {
+//   animation: fadeInDown 0.5s linear;
+// }
 @keyframes fadeInDown {
   0% {
     opacity: 0;

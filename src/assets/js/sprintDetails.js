@@ -18,6 +18,7 @@ export function fixSprintData(data) {
       obj.title = issue.title;
       obj.number = issue.number;
       obj.issueUrl = issue.url;
+      obj.labels = [];
       if (issue.assignees.nodes.length != 0) {
         obj.assignees = {
           name: issue.assignees.nodes[0].name,

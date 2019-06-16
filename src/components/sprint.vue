@@ -17,7 +17,13 @@
       </ul>
     </div>
     <div class="sprint-details">
-      <sticker v-for="issue in details[selIndex]" :key="issue.number" :list="issue" class="sticker"></sticker>
+      <sticker
+        v-for="issue in details[selIndex]"
+        :key="issue.number"
+        :list="issue"
+        class="sticker"
+        v-show="screen(issue)"
+      ></sticker>
     </div>
   </div>
 </template>
@@ -67,6 +73,19 @@ export default {
     },
     format(percentage) {
       return `${percentage.toFixed(1)}%`;
+    },
+    /* 筛选 */
+    screen(issue) {
+      return true
+
+
+      /* Labels筛选 */
+      // return issue.labels.some(lab => {
+      //   return lab.name == "bug";
+      // });
+
+      /* Assignees筛选 */
+      // return typeof issue.assignees !== 'undefined'&&issue.assignees.name == "SprWu"
     }
   },
   filters: {
