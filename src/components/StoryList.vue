@@ -4,9 +4,9 @@
       <div class="menu" @click="clickMenu">
         <img src="@/assets/img/menu.png">
         <div class="menu-item" v-show="menuState" @mouseleave="menuState = false">
-          <span class="link-item">Home</span>
-          <span class="link-item">Story Map</span>
-          <span class="link-item">History Sprint</span>
+          <router-link to="/" tag="span" class="link-item">Home</router-link>
+          <router-link to="/storyList" tag="span" class="link-item">Story Map</router-link>
+          <router-link to="/" tag="span" class="link-item">History Sprint</router-link>
         </div>
       </div>
       <div class="add" @click="clickAdd">
@@ -514,50 +514,5 @@ export default {
 .add-item span:hover {
   color: #2680eb;
 }
-// ul {
-//   width: 100px;
-//   height: 300px;
-//   background-color: rgba(255, 255, 255, 0.9);
-//   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
-//   border: 1px solid #ccc;
-//   padding: 5px 0 0 0;
-//   margin: 0;
-//   border: 0;
-// }
-// li {
-//   // margin-left: 10px;
-//   text-align: center;
-//   list-style-type: none;
-//   width: 100%;
-//   height: 30px;
-//   font-size: 16px;
-//   line-height: 30px;
-//   border-bottom: 1px solid #ccc;
-//   // background-color: rgba(255, 255, 255, 0.9);
-//   cursor: pointer;
-// }
-// li:hover {
-//   color: red;
-// }
-// summary {
-//   outline: none;
-// }
-// details ul {
-//   animation: fadeInDown 0.5s linear;
-// }
-@keyframes fadeInDown {
-  0% {
-    opacity: 0;
-    transform: translateX(-100px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-// .extend {
-//   background-color: #FDFDFD;
-//   opacity: 1;
-// }
 </style>
 
