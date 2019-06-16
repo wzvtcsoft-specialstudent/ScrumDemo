@@ -18,9 +18,9 @@
 
         只有在鼠标指针离开被选元素时，才会触发 mouseleave 事件。-->
         <div class="add-item" v-show="addState" @mouseleave="addState = false">
-          <span>Epic</span>
-          <span>User Story</span>
-          <span>Task</span>
+          <span @click="create(0)">Epic</span>
+          <span @click="create(1)">User Story</span>
+          <span @click="create(2)">Task</span>
         </div>
       </div>
     </div>
@@ -37,7 +37,7 @@
           @click.native="selEpic(epic_i)"
         ></sticker>
       </transition-group>
-      <img v-show="epicState" src="@/assets/img/open.png" class="open" @click="addEpic">
+      <img v-show="epicState" src="@/assets/img/open.png" ref="imgepic" class="open" @click="addEpic">
     </div>
     <div class="container userstory" ref="story">
       <div class="line-label">
@@ -53,7 +53,7 @@
           @click.native="selStory(story_i)"
         ></sticker>
       </transition-group>
-      <img v-show="storyState" src="@/assets/img/open.png" class="open" @click="addStory">
+      <img v-show="storyState" src="@/assets/img/open.png" ref="imgstory" class="open" @click="addStory">
     </div>
     <div class="container task" ref="task">
       <div class="line-label">
@@ -72,7 +72,7 @@
           @click.native="selTask(task_i)"
         ></sticker>
       </transition-group>
-      <img v-show="taskState" src="@/assets/img/open.png" class="open" @click="addTask">
+      <img v-show="taskState" src="@/assets/img/open.png" ref="imgtask" class="open" @click="addTask">
     </div>
     <div class="container extend" ref="extend">
       <div class="line-label" v-show="titleState">
@@ -88,7 +88,7 @@
           @click.native="selExtend"
         ></sticker>
       </transition-group>
-      <img v-show="extendState" src="@/assets/img/open.png" class="open" @click="addExtend">
+      <img v-show="extendState" src="@/assets/img/open.png" ref="imgextend" class="open" @click="addExtend">
     </div>
     <add-dialog :connect="connectIssue" @state="changeState" v-show="dialogState"></add-dialog>
   </div>
@@ -115,7 +115,8 @@ export default {
       taskState: false,
       extendState: false,
       dialogState: false,
-      connectIssue: 0
+      connectIssue: 0, // 创建issue所关联的issue
+      issueType: "Epic" //创建的issue的类型
     };
   },
   methods: {
@@ -188,6 +189,7 @@ export default {
       if (this.$refs.epic.style.overflow == "unset") {
         this.$refs.epic.style.overflow = "hidden";
         this.$refs.epic.style.height = "180px";
+        this.$refs.imgepic.style.transform = '';
       }
     },
     selStory(index) {
@@ -210,6 +212,7 @@ export default {
       if (this.$refs.story.style.overflow == "unset") {
         this.$refs.story.style.overflow = "hidden";
         this.$refs.story.style.height = "180px";
+        this.$refs.imgstory.style.transform = '';
       }
     },
     selTask(index) {
@@ -231,12 +234,14 @@ export default {
       if (this.$refs.task.style.overflow == "unset") {
         this.$refs.task.style.overflow = "hidden";
         this.$refs.task.style.height = "180px";
+        this.$refs.imgtask.style.transform = '';
       }
     },
     selExtend() {
       if (this.$refs.extend.style.overflow == "unset") {
         this.$refs.extend.style.overflow = "hidden";
         this.$refs.extend.style.height = "180px";
+        this.$refs.imgextend.style.transform = '';
       }
     },
     judge() {
@@ -257,23 +262,31 @@ export default {
     },
     addEpic() {
       let ele = this.$refs.epic.style;
+      let img = this.$refs.imgepic.style;
       ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
       ele.height = ele.height == "auto" ? "180px" : "auto";
+      img.transform = img.transform == ''?"rotate(180deg)":'';
     },
     addStory() {
       let ele = this.$refs.story.style;
+      let img = this.$refs.imgstory.style;
       ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
       ele.height = ele.height == "auto" ? "180px" : "auto";
+      img.transform = img.transform == ''?"rotate(180deg)":'';
     },
     addTask() {
       let ele = this.$refs.task.style;
+      let img = this.$refs.imgtask.style;
       ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
       ele.height = ele.height == "auto" ? "180px" : "auto";
+      img.transform = img.transform == ''?"rotate(180deg)":'';
     },
     addExtend() {
       let ele = this.$refs.extend.style;
+      let img = this.$refs.imgextend.style;
       ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
       ele.height = ele.height == "auto" ? "180px" : "auto";
+      img.transform = img.transform == ''?"rotate(180deg)":'';
     },
     changeState(val) {
       this.dialogState = false;
@@ -292,14 +305,17 @@ export default {
       switch (val) {
         case 0:
           this.connectIssue = 0;
+          this.issueType = "Epic";
           break;
         case 1:
           this.connectIssue = this.data[this.epici].number;
+          this.issueType = "Uster Story";
           break;
         case 2:
           this.connectIssue = this.data[this.epici].nodes[
             this.userstoryi
           ].number;
+          this.issueType = "Task";
           break;
         case 3:
           this.connectIssue = this.data[this.epici].nodes[
