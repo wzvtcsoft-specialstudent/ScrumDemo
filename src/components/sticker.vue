@@ -44,9 +44,11 @@ export default {
 
 <style lang="scss" scoped>
     .sticker-container {
-        width: 274px;
-        min-height: 115px;
-        max-height: 132px;
+        width: 19.25%;
+        min-width: 200px;
+        height: 150px;
+        // min-height: 115px;
+        // max-height: 132px;
         background-color: white;
         box-shadow:0px 3px 6px rgba(0,0,0,0.16);
         opacity: 1;

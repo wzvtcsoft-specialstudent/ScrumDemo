@@ -3,9 +3,14 @@
     <details class="switch" v-if="details">
       <summary></summary>
       <ul>
+<<<<<<< HEAD
         <router-link to="/" tag="li">需求地图</router-link>
         <router-link to="/sprint" tag="li">历史sprint</router-link>
         <router-link to="/board" tag="li">看板</router-link>
+=======
+        <router-link to="/storyList" tag="li">需求地图</router-link>
+        <router-link to="/" tag="li">历史sprint</router-link>
+>>>>>>> 001b07695126b32a6f4d21c062a3389610e91e74
       </ul>
     </details>
     <div class="spint-list">
@@ -18,7 +23,13 @@
       </ul>
     </div>
     <div class="sprint-details">
-      <sticker v-for="issue in details[selIndex]" :key="issue.number" :list="issue" class="sticker"></sticker>
+      <sticker
+        v-for="issue in details[selIndex]"
+        :key="issue.number"
+        :list="issue"
+        class="sticker"
+        v-show="screen(issue)"
+      ></sticker>
     </div>
   </div>
 </template>
@@ -68,6 +79,19 @@ export default {
     },
     format(percentage) {
       return `${percentage.toFixed(1)}%`;
+    },
+    /* 筛选 */
+    screen(issue) {
+      return true
+
+
+      /* Labels筛选 */
+      // return issue.labels.some(lab => {
+      //   return lab.name == "bug";
+      // });
+
+      /* Assignees筛选 */
+      // return typeof issue.assignees !== 'undefined'&&issue.assignees.name == "SprWu"
     }
   },
   filters: {

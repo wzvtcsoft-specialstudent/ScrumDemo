@@ -10,16 +10,17 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'StoryList',
-      component: StoryList
-    },{
-      path: '/sprint',
       name: 'sprint',
       component: Sprint
     },{
       path:'/board',
       name:'board',
       component:Board
+    },
+{
+      path: '/storyList',
+      name: 'storyList',
+      component: StoryList
     }
   ]
 })
