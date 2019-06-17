@@ -3,14 +3,10 @@
     <details class="switch" v-if="details">
       <summary></summary>
       <ul>
-<<<<<<< HEAD
+
         <router-link to="/" tag="li">需求地图</router-link>
         <router-link to="/sprint" tag="li">历史sprint</router-link>
         <router-link to="/board" tag="li">看板</router-link>
-=======
-        <router-link to="/storyList" tag="li">需求地图</router-link>
-        <router-link to="/" tag="li">历史sprint</router-link>
->>>>>>> 001b07695126b32a6f4d21c062a3389610e91e74
       </ul>
     </details>
     <div class="spint-list">

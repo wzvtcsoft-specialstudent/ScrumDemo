@@ -13,11 +13,13 @@ export default new Router({
       name: 'sprint',
       component: Sprint
     },{
+
       path:'/board',
       name:'board',
       component:Board
     },
 {
+
       path: '/storyList',
       name: 'storyList',
       component: StoryList
