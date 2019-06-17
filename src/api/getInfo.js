@@ -13,3 +13,9 @@ export function getMilesTones(data) {
         data: JSON.stringify(data)
     })
 }
+export function getTasks(data) {
+    return axios({
+        method: "POST",
+        data: JSON.stringify(data)
+    })
+}
