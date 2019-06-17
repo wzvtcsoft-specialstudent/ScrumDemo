@@ -399,7 +399,7 @@ textarea::-webkit-input-placeholder {
   border-radius: 6px;
   position: absolute;
   top: 594px;
-  left: 523px;
+  left: 50.88%;
   font-size: 16px;
   font-family: Source Han Sans CN;
   font-weight: 400;
@@ -417,7 +417,7 @@ textarea::-webkit-input-placeholder {
   border-radius: 6px;
   position: absolute;
   top: 594px;
-  left: 381px;
+  left: 37.06%;
   font-size: 16px;
   font-family: Source Han Sans CN;
   font-weight: 400;

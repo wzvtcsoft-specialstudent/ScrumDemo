@@ -411,6 +411,7 @@ export default {
   width: 100%;
   /* 757px 722px */
   height: 757px;
+  
 }
 .header {
   width: 100%;
@@ -424,6 +425,7 @@ export default {
   overflow: hidden;
   padding: 11px 0 10px 9.19%;
   position: relative;
+  margin-bottom: -5px;
 }
 .epic {
   background: rgba(235, 221, 38, 0.06);
@@ -465,15 +467,18 @@ export default {
   text-align: center;
 }
 .line-label span {
+  display: block;
   width: 36px;
   height: 20px;
   font-size: 18px;
   font-family: Source Han Sans CN;
   font-weight: 400;
-  line-height: 80px;
+  margin: 30px 0 0 27.5%;
+  // line-height: 80px;
   color: rgba(112, 112, 112, 1);
 }
 .special {
+  display: block;
   width: 60%;
   height: 20px;
   text-align: center;
@@ -481,7 +486,7 @@ export default {
   font-family: Source Han Sans CN;
   font-weight: 400;
   color: rgba(112, 112, 112, 1);
-  margin: 20% 0 0 21.75%;
+  margin: 16px 0 0 21.75%;
 }
 
 .menu {
