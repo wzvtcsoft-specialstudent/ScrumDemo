@@ -3,30 +3,40 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 const state = {
-    assignees: [],
-    labels: []
+  assignees: [],
+  estimate: [],
+  labels: []
 };
 const getters = {
-    getAssignees(state) {
-        return state.assignees
-    },
-    getLabels(state) {
-        return state.labels
-    }
+  getAssignees(state) {
+    return state.assignees
+  },
+  getLabels(state) {
+    return state.labels
+  },
+  getEstimate(state) {
+    return state.estimate
+  }
 };
 const mutations = {
-    setAssignees(state, params) {
-        state.assignees = params
-    },
-    setLabels(state, params) {
-        state.labels = params
-    }
+  setAssignees(state, params) {
+    state.assignees = params
+  },
+  setLabels(state, params) {
+    params.forEach(item => {
+      if (isNaN(item.name)) {
+        state.labels.push(item)
+      } else {
+        state.estimate.push(item)
+      }
+    })
+  }
 }
 
 const store = new Vuex.Store({
-    state,
-    mutations,
-    getters
+  state,
+  mutations,
+  getters
 })
 
 export default store;

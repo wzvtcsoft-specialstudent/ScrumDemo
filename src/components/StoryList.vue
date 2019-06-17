@@ -20,6 +20,7 @@
         <div class="add-item" v-show="addState" @mouseleave="addState = false">
           <span @click="create(0)">Epic</span>
           <span @click="create(1)">User Story</span>
+          <span @click="create(3)" v-show="titleState">user story</span>
           <span @click="create(2)">Task</span>
         </div>
       </div>
@@ -37,7 +38,13 @@
           @click.native="selEpic(epic_i)"
         ></sticker>
       </transition-group>
-      <img v-show="epicState" src="@/assets/img/open.png" ref="imgepic" class="open" @click="addEpic">
+      <img
+        v-show="epicState"
+        src="@/assets/img/open.png"
+        ref="imgepic"
+        class="open"
+        @click="addEpic"
+      >
     </div>
     <div class="container userstory" ref="story">
       <div class="line-label">
@@ -53,14 +60,20 @@
           @click.native="selStory(story_i)"
         ></sticker>
       </transition-group>
-      <img v-show="storyState" src="@/assets/img/open.png" ref="imgstory" class="open" @click="addStory">
+      <img
+        v-show="storyState"
+        src="@/assets/img/open.png"
+        ref="imgstory"
+        class="open"
+        @click="addStory"
+      >
     </div>
     <div class="container task" ref="task">
       <div class="line-label">
         <span>Task</span>
       </div>
       <div class="line-label" v-show="titleState">
-        <div class="special">User Story</div>
+        <div class="special">user story</div>
       </div>
       <transition-group appear mode="out-in" name="sticker">
         <sticker
@@ -72,7 +85,13 @@
           @click.native="selTask(task_i)"
         ></sticker>
       </transition-group>
-      <img v-show="taskState" src="@/assets/img/open.png" ref="imgtask" class="open" @click="addTask">
+      <img
+        v-show="taskState"
+        src="@/assets/img/open.png"
+        ref="imgtask"
+        class="open"
+        @click="addTask"
+      >
     </div>
     <div class="container extend" ref="extend">
       <div class="line-label" v-show="titleState">
@@ -88,9 +107,15 @@
           @click.native="selExtend"
         ></sticker>
       </transition-group>
-      <img v-show="extendState" src="@/assets/img/open.png" ref="imgextend" class="open" @click="addExtend">
+      <img
+        v-show="extendState"
+        src="@/assets/img/open.png"
+        ref="imgextend"
+        class="open"
+        @click="addExtend"
+      >
     </div>
-    <add-dialog :connect="connectIssue" @state="changeState" v-show="dialogState"></add-dialog>
+    <add-dialog :connect="connectIssue" :type="issueType" @state="changeState" v-show="dialogState"></add-dialog>
   </div>
 </template>
 
@@ -189,7 +214,7 @@ export default {
       if (this.$refs.epic.style.overflow == "unset") {
         this.$refs.epic.style.overflow = "hidden";
         this.$refs.epic.style.height = "180px";
-        this.$refs.imgepic.style.transform = '';
+        this.$refs.imgepic.style.transform = "";
       }
     },
     selStory(index) {
@@ -212,7 +237,7 @@ export default {
       if (this.$refs.story.style.overflow == "unset") {
         this.$refs.story.style.overflow = "hidden";
         this.$refs.story.style.height = "180px";
-        this.$refs.imgstory.style.transform = '';
+        this.$refs.imgstory.style.transform = "";
       }
     },
     selTask(index) {
@@ -234,14 +259,14 @@ export default {
       if (this.$refs.task.style.overflow == "unset") {
         this.$refs.task.style.overflow = "hidden";
         this.$refs.task.style.height = "180px";
-        this.$refs.imgtask.style.transform = '';
+        this.$refs.imgtask.style.transform = "";
       }
     },
     selExtend() {
       if (this.$refs.extend.style.overflow == "unset") {
         this.$refs.extend.style.overflow = "hidden";
         this.$refs.extend.style.height = "180px";
-        this.$refs.imgextend.style.transform = '';
+        this.$refs.imgextend.style.transform = "";
       }
     },
     judge() {
@@ -265,28 +290,28 @@ export default {
       let img = this.$refs.imgepic.style;
       ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
       ele.height = ele.height == "auto" ? "180px" : "auto";
-      img.transform = img.transform == ''?"rotate(180deg)":'';
+      img.transform = img.transform == "" ? "rotate(180deg)" : "";
     },
     addStory() {
       let ele = this.$refs.story.style;
       let img = this.$refs.imgstory.style;
       ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
       ele.height = ele.height == "auto" ? "180px" : "auto";
-      img.transform = img.transform == ''?"rotate(180deg)":'';
+      img.transform = img.transform == "" ? "rotate(180deg)" : "";
     },
     addTask() {
       let ele = this.$refs.task.style;
       let img = this.$refs.imgtask.style;
       ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
       ele.height = ele.height == "auto" ? "180px" : "auto";
-      img.transform = img.transform == ''?"rotate(180deg)":'';
+      img.transform = img.transform == "" ? "rotate(180deg)" : "";
     },
     addExtend() {
       let ele = this.$refs.extend.style;
       let img = this.$refs.imgextend.style;
       ele.overflow = ele.overflow == "unset" ? "hidden" : "unset";
       ele.height = ele.height == "auto" ? "180px" : "auto";
-      img.transform = img.transform == ''?"rotate(180deg)":'';
+      img.transform = img.transform == "" ? "rotate(180deg)" : "";
     },
     changeState(val) {
       this.dialogState = false;
@@ -312,18 +337,27 @@ export default {
           this.issueType = "Uster Story";
           break;
         case 2:
-          this.connectIssue = this.data[this.epici].nodes[
-            this.userstoryi
-          ].number;
+          if (this.titleState) {
+            this.connectIssue = this.data[this.epici].nodes[
+              this.userstoryi
+            ].nodes[this.taski].number;
+          } else {
+            this.connectIssue = this.data[this.epici].nodes[
+              this.userstoryi
+            ].number;
+          }
           this.issueType = "Task";
           break;
         case 3:
           this.connectIssue = this.data[this.epici].nodes[
             this.userstoryi
-          ].nodes[this.taski].number;
+          ].number;
+          this.issueType = "user story";
           break;
       }
-      this.dialogState = true;
+      if(this.connectIssue<1000 && typeof this.connectIssue != 'undefined') {
+        this.dialogState = true;
+      }
     }
   },
   components: {
@@ -508,7 +542,9 @@ export default {
 }
 .add-item {
   width: 118px;
-  height: 100px;
+  min-height: 82px;
+  max-height: 108px;
+  padding-bottom: 18px;
   background: rgba(255, 255, 255, 1);
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
   margin-top: 2px;

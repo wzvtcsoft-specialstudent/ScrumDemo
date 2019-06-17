@@ -1,10 +1,10 @@
 <template>
   <div class="dialog-container">
     <div class="dialog">
-      <span class="title">Epic</span>
+      <span class="title">{{ type }}</span>
       <div class="line"></div>
       <div class="info">
-        <div class="conatiner">
+        <div class="container">
           <div class="info-sub" @click="labelsState = true">
             <div>Labels</div>
             <img src="@/assets/img/infodrop.png">
@@ -12,29 +12,64 @@
           <div class="list" v-show="labelsState" @mouseleave="labelsState = false">
             <ul>
               <li v-for="(lab,i) in labels" :key="i">
-                <img
-                  src="@/assets/img/select.png"
-                  class="select"
-                  @click="selLab($event,i)"
-                >
+                <img src="@/assets/img/select.png" class="select" @click="selLab($event,i)">
                 <div class="list-name">{{ lab.name }}</div>
               </li>
             </ul>
           </div>
         </div>
-        <div class="info-sub">
-          <div>Estimate</div>
-          <img src="@/assets/img/infodrop.png">
+        <div class="container">
+          <div class="info-sub" @click="estimateState = true">
+            <div>Estimate</div>
+            <img src="@/assets/img/infodrop.png">
+          </div>
+          <div class="list" v-show="estimateState" @mouseleave="estimateState = false">
+            <ul>
+              <li v-for="(esti,i) in estimations" :key="i">
+                <img src="@/assets/img/select.png" class="select" @click="selEsti($event,i)">
+                <div class="list-name">{{ esti.name }}</div>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div class="info-sub">
-          <div>Assignees</div>
-          <img src="@/assets/img/infodrop.png">
+        <div class="container">
+          <div class="info-sub" @click="assigneesState = true">
+            <div>Assignees</div>
+            <img src="@/assets/img/infodrop.png">
+          </div>
+          <div class="list" v-show="assigneesState" @mouseleave="assigneesState = false">
+            <ul>
+              <li v-for="(assi,i) in assignees" :key="i">
+                <img src="@/assets/img/select.png" class="select" @click="selAssi($event,i)">
+                <div class="list-name">{{ assi.name }}</div>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
-      <input type="text" placeholder="Title" class="issue-title">
-      <textarea class="issue-body" placeholder="Leave a comment"></textarea>
-      <div class="cancel">Cancel</div>
-      <div class="confirm">Created</div>
+      <input type="text" v-model="title" placeholder="Title" class="issue-title">
+      <textarea class="issue-body" v-model="body" :placeholder="connect!=0?'Leave a comment,This Issue is related to #' + connect:'Leave a comment,This Issue is Epic'"></textarea>
+      <div class="selLabels">
+        <div
+          class="selLabels-item"
+          v-for="(esti, i) in estimations"
+          v-show="estiSel[i]"
+          :key="i+'esti'"
+          :style="'backgroundColor:#' + esti.color + ';color:' + changeToRgb(esti.color)"
+        >{{ esti.name }}</div>
+        <div
+          class="selLabels-item"
+          v-for="(lab, i) in labels"
+          v-show="labSel[i]"
+          :key="i+'lab'"
+          :style="'backgroundColor:#' + lab.color + ';color:' + changeToRgb(lab.color)"
+        >{{ lab.name }}</div>
+      </div>
+      <div class="selAssignees">
+        <div class="selAssignees-item" v-for="(assi,i) in assignees" :key="i+'assi'" v-show="assiSel[i]">{{ assi.name }}</div>
+      </div>
+      <div class="cancel" @click="cancel">Cancel</div>
+      <div class="confirm" @click="confirm">Created</div>
     </div>
   </div>
 </template>
@@ -47,6 +82,7 @@ export default {
     return {
       assignees: this.$store.getters.getAssignees,
       labels: this.$store.getters.getLabels,
+      estimations: this.$store.getters.getEstimate,
       labelsState: false, // list显示/隐藏
       estimateState: false,
       assigneesState: false,
@@ -54,29 +90,38 @@ export default {
       estiSel: [],
       assiSel: [],
       title: "",
-      body: "",
-      people: [],
-      lab: [] // 需要优化，应该为数组(标签可多选)
+      body: ""
     };
   },
-  props: ["connect"],
+  props: ["connect","type"],
   methods: {
     confirm() {
       if (this.title.trim() == "" || this.body.trim() == "") return;
-      var labelStr = this.lab
-          .map(id => {
-            return '"' + id + '"';
+      var labelStr = [],assigneesStr = [],body;
+      this.labSel.forEach((state,i) => {
+            if(state) {
+              labelStr.push('"' + this.labels[i].id + '"')
+            }
           })
-          .join(","),
-        assigneesStr = this.people
-          .map(id => {
-            return '"' + id + '"';
-          })
-          .join(","),
-        body = this.body.replace(/#\d/g, "");
-      if (this.connect != 0) {
+      this.estiSel.forEach((state,i) => {
+        if(state) {
+          labelStr.push('"' + this.estimations[i].id + '"')
+        }
+      })
+      labelStr = labelStr.join(',')
+
+      this.assiSel.forEach((state,i) => {
+        if(state) {
+          assigneesStr.push('"' + this.assignees[i].id + '"')
+        }
+      })
+      assigneesStr = assigneesStr.join(',')
+    
+      body = this.body.replace(/#\d/g, "");
+      if (this.connect != 0 && typeof this.connect != 'undefined' && this.connect < 10000) {
         body = body + " #" + this.connect;
       }
+      
       let params = {
         query:
           'mutation{createIssue(input:{repositoryId:"MDEwOlJlcG9zaXRvcnkxODcxMTgwMTM=",title:"' +
@@ -91,9 +136,9 @@ export default {
       };
       this.title = "";
       this.body = "";
-      console.log(params);
+      // console.log(params);
       createIssue(params).then(res => {
-        console.log(res);
+        // console.log(res);
         this.$emit("state", res.data.data.createIssue != null);
       });
     },
@@ -101,21 +146,58 @@ export default {
       this.$emit("state", false);
     },
     /* 标签 */
-    selLab(e,index) {
-      console.log(index);
+    selLab(e, index) {
       if (this.labSel[index]) {
-        e.currentTarget.src = require('@/assets/img/select.png')
+        e.currentTarget.src = require("@/assets/img/select.png");
         this.labSel[index] = false;
       } else {
-        e.currentTarget.src = require('@/assets/img/selected.png')
+        e.currentTarget.src = require("@/assets/img/selected.png");
         this.labSel[index] = true;
       }
+    },
+    /* 故事点 */
+    selEsti(e, index) {
+      if (this.estiSel[index]) {
+        e.currentTarget.src = require("@/assets/img/select.png");
+        this.estiSel[index] = false;
+      } else {
+        e.currentTarget.src = require("@/assets/img/selected.png");
+        this.estiSel[index] = true;
+      }
+    },
+    /* 负责人 */
+    selAssi(e, index) {
+      if (this.assiSel[index]) {
+        e.currentTarget.src = require("@/assets/img/select.png");
+        this.assiSel[index] = false;
+      } else {
+        e.currentTarget.src = require("@/assets/img/selected.png");
+        this.assiSel[index] = true;
+      }
+    },
+    /* 字体颜色 */
+    changeToRgb(oldVal) {
+      let rgbArr = [];
+      let sum = 0;
+      for (let i = 0; i < 6; i += 2) {
+        rgbArr.push(parseInt("0x" + oldVal.slice(i, i + 2)));
+      }
+      sum = rgbArr[0] * 0.299 + rgbArr[1] * 0.578 + rgbArr[2] * 0.114;
+      return sum > 192 ? "#707070" : "#FFFFFF"; // 深色背景，白色文字；浅色背景，黑色文字
     }
   },
   mounted() {
-    var lens = this.labels.length;
-    for (let i = 0; i < lens; i++) {
+    var labLens = this.labels.length,
+    estiLens = this.estimations.length,
+     assiLens = this.assignees.length;
+    for (let i = 0; i < labLens; i++) {
       this.labSel[i] = false;
+    }
+    for(let j = 0; j < assiLens; j++) {
+      this.assiSel[j] = false;
+    }
+    for(let k = 0; k< estiLens; k++) {
+      this.estiSel[k] = false;
     }
   }
 };
@@ -154,7 +236,7 @@ li {
 }
 .title {
   position: absolute;
-  width: 39px;
+  width: auto;
   height: 23px;
   font-size: 20px;
   font-family: Source Han Sans CN;
@@ -179,10 +261,11 @@ li {
   height: 32px;
   margin-top: 77px;
 }
-.conatiner {
+.container {
   width: 118px;
   float: left;
   position: relative;
+  margin-right: 12px;
 }
 .info-sub {
   width: 118px;
@@ -277,6 +360,36 @@ textarea::-webkit-input-placeholder {
   box-shadow: inset 0 1px 2px rgba(27, 31, 35, 0.075),
     0 0 0 0.2em rgba(3, 102, 214, 0.3);
   outline: none;
+}
+.selLabels {
+  width: 100%;
+  height: 20px;
+  margin-top: 14px;
+}
+.selLabels-item {
+  display: block;
+  height: 18px;
+  line-height: 18px;
+  float: left;
+  padding: 1px 11px 1px 12px;
+  border-radius: 14px;
+  border: 0.5px solid rgba(214, 218, 222, 1);
+  margin-right: 6px;
+}
+.selAssignees {
+  width: 100%;
+  height: 32px;
+  margin-top: 12px;
+}
+.selAssignees-item {
+  display: block;
+  height: 12px;
+  line-height: 12px;
+  border:1px solid rgba(214,218,222,1);
+  border-radius: 16px;
+  padding: 10px 12px 10px 11px;
+  margin-right: 6px;
+  float: left;
 }
 .confirm {
   width: 125px;
