@@ -15,7 +15,7 @@
           <div>Labels</div>
           <img src="@/assets/img/infodrop.png">
         </div>
-        <div class="list" v-show="labelsState" @mouseleave="labelsState = false">
+        <div class="list" v-show="labelsState" @mouseleave="labelScreen">
           <ul>
             <li v-for="(lab,i) in labels" :key="i">
               <img src="@/assets/img/select.png" class="select" @click="selLab($event,i)">
@@ -29,7 +29,7 @@
           <div>Assignees</div>
           <img src="@/assets/img/infodrop.png">
         </div>
-        <div class="list" v-show="assigneesState" @mouseleave="assigneesState = false">
+        <div class="list" v-show="assigneesState" @mouseleave="assiScreen">
           <ul>
             <li v-for="(assi,i) in assignees" :key="i">
               <img src="@/assets/img/select.png" class="select" @click="selAssi($event,i)">
@@ -86,8 +86,8 @@
           ></sticker>
         </div>
       </div>
+      <add-dialog :connect="'0'" :type="'Task'" @state="changeState" v-if="dialogState"></add-dialog>
     </div>
-    <add-dialog :connect="'0'" :type="'Task'" @state="changeState" v-show="dialogState"></add-dialog>
   </div>
 </template>
 
@@ -96,6 +96,13 @@ import sticker from "./sticker";
 import addDialog from './addDialog'
 import { getIssue } from "@/api/getIssue";
 import { fixBoradData } from "@/assets/js/fixBoradData";
+
+function judge(obj, val) {
+    for(let key in obj) {
+      if(obj[key].id == val) return false
+    }
+    return true;
+  }
 
 export default {
   name: "board",
@@ -106,12 +113,14 @@ export default {
       labels: this.$store.getters.getLabels,
       boxInfo: [], // 总列表的信息
       boxIssue: [], // 所有列表的issue集
+      staticIssue: [], // 静态issue集
       labelsState: false,
       assigneesState: false,
       labSel: [], // 选择的labels
       assiSel: [], // 选择的assignees
       dialogState: false,
-      menuState: false
+      menuState: false,
+      noChange: true // 是否显示的是源数据
     };
   },
   components: {
@@ -128,11 +137,11 @@ export default {
         let data = res.data.data.organization.repository;
         this.$store.commit(
           "setAssignees",
-          res.data.data.organization.repository.assignableUsers.nodes
+          data.assignableUsers.nodes
         );
         this.$store.commit(
           "setLabels",
-          res.data.data.organization.repository.labels.nodes
+          data.labels.nodes
         );
         this.assignees = data.assignableUsers.nodes;
         this.labels = data.labels.nodes;
@@ -161,6 +170,7 @@ export default {
           allData.push(subData);
         });
         this.boxIssue = fixBoradData(allData);
+        this.staticIssue = this.boxIssue;
         this.state = true;
       });
     },
@@ -177,6 +187,35 @@ export default {
         this.labSel[index] = true;
       }
     },
+    labelScreen() {
+      this.labelsState = false;
+      let selected = [],result = [],sub = [];
+      this.labSel.forEach( (state,i) => {
+        if(state) {
+          selected.push(this.labels[i].name)
+        }
+      })
+      if(selected.length == 0) {
+        if(!this.noChange) {
+          this.noChange = true;
+          this.boxIssue = this.staticIssue;
+        }
+        return;
+      }
+      this.staticIssue.forEach( line => {
+        let sub = [];
+        line.forEach(item => {
+          item.issue.labels.forEach(lab => {
+            if(selected.indexOf(lab.name) !== -1 && judge(sub,item.id)) {
+              sub.push(item)
+            }
+          })
+        })
+        result.push(sub)
+      })
+      this.noChange = false;
+      this.boxIssue = result;
+    },
     /* 选择assignees标签 */
     selAssi(e, index) {
       if (this.assiSel[index]) {
@@ -186,6 +225,33 @@ export default {
         e.currentTarget.src = require("@/assets/img/selected.png");
         this.assiSel[index] = true;
       }
+    },
+    assiScreen() {
+      this.assigneesState = false;
+      let selected = [],result = [],sub = [];
+      this.assiSel.forEach( (state,i) => {
+        if(state) {
+          selected.push(this.assignees[i].name)
+        }
+      })
+      if(selected.length == 0) {
+        if(!this.noChange) {
+          this.noChange = true;
+          this.boxIssue = this.staticIssue;
+        }
+        return;
+      }
+      this.staticIssue.forEach( line => {
+        let sub = [];
+        line.forEach(item => {
+          if(typeof item.issue.assignees != 'undefined' && selected.indexOf(item.issue.assignees.name) != -1) {
+            sub.push(item)
+          }
+        })
+        result.push(sub)
+      })
+      this.noChange = false;
+      this.boxIssue = result;
     },
     changeState(val) {
       this.dialogState = false;
