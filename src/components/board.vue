@@ -15,7 +15,7 @@
           <div>Labels</div>
           <img src="@/assets/img/infodrop.png">
         </div>
-        <div class="list" v-show="labelsState" @mouseleave="labelScreen">
+        <div class="list" v-show="labelsState" @mouseleave="selComplete(1)">
           <ul>
             <li v-for="(lab,i) in labels" :key="i">
               <img src="@/assets/img/select.png" class="select" @click="selLab($event,i)">
@@ -29,7 +29,7 @@
           <div>Assignees</div>
           <img src="@/assets/img/infodrop.png">
         </div>
-        <div class="list" v-show="assigneesState" @mouseleave="assiScreen">
+        <div class="list" v-show="assigneesState" @mouseleave="selComplete(2)">
           <ul>
             <li v-for="(assi,i) in assignees" :key="i">
               <img src="@/assets/img/select.png" class="select" @click="selAssi($event,i)">
@@ -39,7 +39,13 @@
         </div>
       </div>
       <img src="@/assets/img/sousuo.png" class="icon">
-      <input type="text" class="search" placeholder="Search all tasks">
+      <input
+        type="text"
+        class="search"
+        placeholder="Search all tasks"
+        v-model="word"
+        @keydown.enter="selComplete(3)"
+      >
     </div>
     <div class="board-body" v-show="state">
       <div class="body-container" style="marginLeft:7.25%">
@@ -93,16 +99,16 @@
 
 <script>
 import sticker from "./sticker";
-import addDialog from './addDialog'
+import addDialog from "./addDialog";
 import { getIssue } from "@/api/getIssue";
 import { fixBoradData } from "@/assets/js/fixBoradData";
 
 function judge(obj, val) {
-    for(let key in obj) {
-      if(obj[key].id == val) return false
-    }
-    return true;
+  for (let key in obj) {
+    if (obj[key].id == val) return false;
   }
+  return true;
+}
 
 export default {
   name: "board",
@@ -118,9 +124,12 @@ export default {
       assigneesState: false,
       labSel: [], // 选择的labels
       assiSel: [], // 选择的assignees
+      word: "", // 搜索的内容
       dialogState: false,
       menuState: false,
-      noChange: true // 是否显示的是源数据
+      labChange: false, // 是否显示的是源数据
+      assiChange: false,
+      searchNaN: false // 上次搜索是否没有结果
     };
   },
   components: {
@@ -135,14 +144,8 @@ export default {
       };
       getIssue(params).then(res => {
         let data = res.data.data.organization.repository;
-        this.$store.commit(
-          "setAssignees",
-          data.assignableUsers.nodes
-        );
-        this.$store.commit(
-          "setLabels",
-          data.labels.nodes
-        );
+        this.$store.commit("setAssignees", data.assignableUsers.nodes);
+        this.$store.commit("setLabels", data.labels.nodes);
         this.assignees = data.assignableUsers.nodes;
         this.labels = data.labels.nodes;
         var labLens = this.labels.length,
@@ -189,31 +192,33 @@ export default {
     },
     labelScreen() {
       this.labelsState = false;
-      let selected = [],result = [],sub = [];
-      this.labSel.forEach( (state,i) => {
-        if(state) {
-          selected.push(this.labels[i].name)
+      let selected = [],
+        result = [],
+        sub = [];
+      this.labSel.forEach((state, i) => {
+        if (state) {
+          selected.push(this.labels[i].name);
         }
-      })
-      if(selected.length == 0) {
-        if(!this.noChange) {
-          this.noChange = true;
+      });
+      if (selected.length == 0) {
+        if (this.labChange) {
+          this.labChange = false;
           this.boxIssue = this.staticIssue;
         }
         return;
       }
-      this.staticIssue.forEach( line => {
+      this.boxIssue.forEach(line => {
         let sub = [];
         line.forEach(item => {
           item.issue.labels.forEach(lab => {
-            if(selected.indexOf(lab.name) !== -1 && judge(sub,item.id)) {
-              sub.push(item)
+            if (selected.indexOf(lab.name) !== -1 && judge(sub, item.id)) {
+              sub.push(item);
             }
-          })
-        })
-        result.push(sub)
-      })
-      this.noChange = false;
+          });
+        });
+        result.push(sub);
+      });
+      this.labChange = true;
       this.boxIssue = result;
     },
     /* 选择assignees标签 */
@@ -228,33 +233,79 @@ export default {
     },
     assiScreen() {
       this.assigneesState = false;
-      let selected = [],result = [],sub = [];
-      this.assiSel.forEach( (state,i) => {
-        if(state) {
-          selected.push(this.assignees[i].name)
+      let selected = [],
+        result = [],
+        sub = [];
+      this.assiSel.forEach((state, i) => {
+        if (state) {
+          selected.push(this.assignees[i].name);
         }
-      })
-      if(selected.length == 0) {
-        if(!this.noChange) {
-          this.noChange = true;
+      });
+      if (selected.length == 0) {
+        if (this.assiChange) {
+          this.assiChange = false;
           this.boxIssue = this.staticIssue;
         }
         return;
       }
-      this.staticIssue.forEach( line => {
+      this.boxIssue.forEach(line => {
         let sub = [];
         line.forEach(item => {
-          if(typeof item.issue.assignees != 'undefined' && selected.indexOf(item.issue.assignees.name) != -1) {
-            sub.push(item)
+          if (
+            typeof item.issue.assignees != "undefined" &&
+            selected.indexOf(item.issue.assignees.name) != -1
+          ) {
+            sub.push(item);
           }
-        })
-        result.push(sub)
-      })
-      this.noChange = false;
+        });
+        result.push(sub);
+      });
+      this.assiChange = true;
       this.boxIssue = result;
     },
     changeState(val) {
       this.dialogState = false;
+    },
+    /* 选择完筛选条件后执行 */
+    selComplete(state) {
+      // 通过state来判断两个方法的执行先后顺序
+      switch (state) {
+        case 1:
+        case 3:
+          this.search();
+          this.labelScreen();
+          this.assiScreen();
+          break;
+        case 2:
+          this.search();
+          this.assiScreen();
+          this.labelScreen();
+          break;
+      }
+    },
+    search() {
+      if (this.word == "") {
+        this.boxIssue = this.staticIssue;
+        return;
+      }
+      if (this.searchNaN) this.boxIssue = this.staticIssue;
+      let result = [],
+        nohave = true;
+      this.boxIssue.forEach(line => {
+        let sub = [];
+        line.forEach(item => {
+          if (
+            item.issue.title.indexOf(this.word) != -1 &&
+            judge(sub, item.id)
+          ) {
+            sub.push(item);
+          }
+        });
+        if (sub.length != 0) nohave = false;
+        result.push(sub);
+      });
+      if (nohave) this.searchNaN = true;
+      this.boxIssue = result;
     }
   },
   created() {
@@ -290,7 +341,7 @@ li {
 .board-body {
   width: 100%;
   height: 651px;
-  margin-top: 8px; 
+  margin-top: 8px;
 }
 
 .board-title {
@@ -438,7 +489,7 @@ li {
   height: 635px;
   margin-right: 12px;
   padding-bottom: 15px;
-  float: left; 
+  float: left;
 }
 .issue-container {
   width: 298px;
@@ -465,7 +516,7 @@ li {
 .sticker {
   width: 263px !important;
   margin-bottom: 12px;
-  background:rgba(255,255,255,1);
+  background: rgba(255, 255, 255, 1);
 }
 
 ::-webkit-scrollbar {
