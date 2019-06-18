@@ -5,7 +5,7 @@
       <div class="line"></div>
       <div class="info">
         <div class="container">
-          <div class="info-sub" @click="labelsState = true">
+          <div class="info-sub" @click="labelsState = !labelsState">
             <div>Labels</div>
             <img src="@/assets/img/infodrop.png">
           </div>
@@ -19,7 +19,7 @@
           </div>
         </div>
         <div class="container">
-          <div class="info-sub" @click="estimateState = true">
+          <div class="info-sub" @click="estimateState = !estimateState">
             <div>Estimate</div>
             <img src="@/assets/img/infodrop.png">
           </div>
@@ -33,7 +33,7 @@
           </div>
         </div>
         <div class="container">
-          <div class="info-sub" @click="assigneesState = true">
+          <div class="info-sub" @click="assigneesState = !assigneesState">
             <div>Assignees</div>
             <img src="@/assets/img/infodrop.png">
           </div>

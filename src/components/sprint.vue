@@ -4,8 +4,8 @@
       <summary></summary>
       <ul>
 
-        <router-link to="/" tag="li">需求地图</router-link>
-        <router-link to="/sprint" tag="li">历史sprint</router-link>
+        <router-link to="/storyList" tag="li">需求地图</router-link>
+        <router-link to="/" tag="li">历史sprint</router-link>
         <router-link to="/board" tag="li">看板</router-link>
       </ul>
     </details>

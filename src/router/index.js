@@ -7,19 +7,12 @@ import Board from '@/components/board'
 Vue.use(Router)
 
 export default new Router({
-  routes: [
-    {
+  routes: [{
       path: '/',
-      name: 'sprint',
-      component: Sprint
-    },{
-
-      path:'/board',
-      name:'board',
-      component:Board
+      name: 'board',
+      component: Board
     },
-{
-
+    {
       path: '/storyList',
       name: 'storyList',
       component: StoryList

@@ -34,6 +34,7 @@ export default {
     },
     filters: {
         fixTime(val) {
+            if(typeof val == 'undefined') return "";
             let date = val.substr(0,10);
             let time = val.substr(11,8);
             return `${date} ${time}`;

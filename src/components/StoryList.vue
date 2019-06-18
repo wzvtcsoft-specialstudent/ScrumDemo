@@ -166,7 +166,7 @@ export default {
       };
       getIssue(params).then(res => {
         this.data = fixData(res.data.data.organization.repository.issues.nodes);
-        this.state = true;
+        // this.state = true;
         this.$store.commit(
           "setAssignees",
           res.data.data.organization.repository.assignableUsers.nodes
@@ -388,21 +388,6 @@ export default {
 }
 /* 固定写法,配合使用实现列表的平稳动画 */
 .sticker-move {
-  transition: transform 1s;
-}
-
-.menu-enter,
-.menu-leave-to {
-  opacity: 0;
-  transform: translateX(-100px);
-}
-.menu-enter-active,
-.menu-leave-active {
-  opacity: 1;
-  transition: all 1s ease;
-}
-/* 固定写法,配合使用实现列表的平稳动画 */
-.menu-move {
   transition: transform 1s;
 }
 
