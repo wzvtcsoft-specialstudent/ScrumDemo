@@ -9,7 +9,7 @@
           <router-link to="/" tag="span" class="link-item">History Sprint</router-link>
         </div>
       </div>
-      <div class="add-task">Add Task</div>
+      <div class="add-task" @click="dialogState = true">Add Task</div>
       <div class="container">
         <div class="sub labels" @click="labelsState = !labelsState">
           <div>Labels</div>
@@ -87,11 +87,13 @@
         </div>
       </div>
     </div>
+    <add-dialog :connect="'0'" :type="'Task'" @state="changeState" v-show="dialogState"></add-dialog>
   </div>
 </template>
 
 <script>
 import sticker from "./sticker";
+import addDialog from './addDialog'
 import { getIssue } from "@/api/getIssue";
 import { fixBoradData } from "@/assets/js/fixBoradData";
 
@@ -108,20 +110,30 @@ export default {
       assigneesState: false,
       labSel: [], // 选择的labels
       assiSel: [], // 选择的assignees
+      dialogState: false,
       menuState: false
     };
   },
   components: {
-    sticker
+    sticker,
+    addDialog
   },
   methods: {
     getinfo() {
       let params = {
         query:
-          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo") {assignableUsers(first:20){totalCount nodes {id email name}}labels(first:20){totalCount nodes {color id name}} projects(first:1){ totalCount nodes { columns(first:4){ nodes{id name cards(first:100){ nodes{ id column { id } state content{ ... on Issue{ id title number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
+          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:1){ totalCount nodes { columns(first:4){ nodes{id name cards(first:100){ nodes{ id column { id } state content{ ... on Issue{ id title number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
       };
       getIssue(params).then(res => {
         let data = res.data.data.organization.repository;
+        this.$store.commit(
+          "setAssignees",
+          res.data.data.organization.repository.assignableUsers.nodes
+        );
+        this.$store.commit(
+          "setLabels",
+          res.data.data.organization.repository.labels.nodes
+        );
         this.assignees = data.assignableUsers.nodes;
         this.labels = data.labels.nodes;
         var labLens = this.labels.length,
@@ -150,8 +162,6 @@ export default {
         });
         this.boxIssue = fixBoradData(allData);
         this.state = true;
-        console.log(this.boxIssue);
-        // allData.forEach( i => console.log(i.issue))
       });
     },
     clickMenu() {
@@ -176,6 +186,9 @@ export default {
         e.currentTarget.src = require("@/assets/img/selected.png");
         this.assiSel[index] = true;
       }
+    },
+    changeState(val) {
+      this.dialogState = false;
     }
   },
   created() {
@@ -265,6 +278,7 @@ li {
   background: rgba(38, 128, 235, 1);
   border-radius: 5px;
   float: left;
+  cursor: pointer;
 }
 .container {
   width: 118px;
@@ -399,110 +413,4 @@ li {
   opacity: 1;
   border-radius: 19px;
 }
-// ::-webkit-scrollbar {
-//   width: 2px;
-//   height: 212px;
-//   scrollbar-arrow-color:red;
-// }
-// .search-css {
-//   width: 299px;
-//   height: 32px;
-//   background: rgba(250, 251, 252, 1);
-//   border: 1px solid rgba(214, 218, 222, 1);
-//   opacity: 1;
-//   font-size: 14px;
-//   font-family: Source Han Sans CN;
-//   font-weight: 400;
-//   line-height: 24px;
-//   color: rgba(192, 192, 192, 1);
-// }
-// .todo {
-//   width: 331px;
-//   height: 672px;
-//   border: 1px solid rgba(214, 218, 222, 1);
-//   float: left;
-//   margin-left: 12px;
-// }
-
-// .doing {
-//   width: 331px;
-//   height: 672px;
-//   border: 1px solid rgba(214, 218, 222, 1);
-//   float: left;
-//   margin-left: 12px;
-// }
-
-// .done {
-//   width: 331px;
-//   height: 672px;
-//   border: 1px solid rgba(214, 218, 222, 1);
-//   float: left;
-//   margin-left: 12px;
-// }
-
-// .task {
-//   width: 308px;
-//   height: 141px;
-//   margin-left: 11px;
-//   margin-top: 10px;
-//   background: rgba(255, 255, 255, 1);
-//   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
-//   opacity: 1;
-//   border-radius: 10px;
-// }
-
-// .lab-list {
-//   width: 118px;
-//   height: 32px;
-//   background: rgba(218, 218, 218, 1);
-//   opacity: 1;
-//   font-size: 14px;
-//   font-family: Source Han Sans CN;
-//   font-weight: 400;
-//   line-height: 24px;
-//   color: rgba(112, 112, 112, 1);
-//   opacity: 1;
-// }
-
-// .switch {
-//   width: 20px;
-//   height: 20px;
-//   position: absolute;
-//   left: 3px;
-//   top: 60px;
-//   font-size: 20px;
-//   z-index: 1;
-// }
-
-// .sticker {
-//   float: left;
-//   margin-bottom: 45px;
-//   margin-left: 20px;
-// }
-
-// .switch ul {
-//   width: 100px;
-//   height: 300px;
-//   background-color: rgba(255, 255, 255, 0.9);
-//   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
-//   border: 1px solid #ccc;
-//   padding: 5px 0 0 0;
-//   margin: 0;
-//   border: 0;
-// }
-
-// .switch ul li {
-//   text-align: center;
-//   list-style-type: none;
-//   width: 100%;
-//   height: 30px;
-//   font-size: 16px;
-//   line-height: 30px;
-//   border-bottom: 1px solid #ccc;
-//   cursor: pointer;
-// }
-
-// .switch ul li:hover {
-//   color: red;
-// }
 </style>

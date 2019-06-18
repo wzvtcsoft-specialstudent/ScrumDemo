@@ -5,7 +5,8 @@ Vue.use(Vuex)
 const state = {
   assignees: [],
   estimate: [],
-  labels: []
+  labels: [],
+  allLabels: []
 };
 const getters = {
   getAssignees(state) {
@@ -23,6 +24,7 @@ const mutations = {
     state.assignees = params
   },
   setLabels(state, params) {
+    state.allLabels = params
     params.forEach(item => {
       if (isNaN(item.name)) {
         state.labels.push(item)
