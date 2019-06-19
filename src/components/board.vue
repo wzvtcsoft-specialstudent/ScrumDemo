@@ -55,6 +55,9 @@
             v-for="(card, i) in boxIssue[0]"
             :key="card.id"
             :list="card.issue"
+            draggable="true"
+            @dragstart.native="drop"
+            @dragend.native="dropend($event, card, i, 0)"
             class="sticker"
           ></sticker>
         </div>
@@ -66,6 +69,9 @@
             v-for="(card, i) in boxIssue[1]"
             :key="card.id"
             :list="card.issue"
+            draggable="true"
+            @dragstart.native="drop"
+            @dragend.native="dropend($event, card, i, 1)"
             class="sticker"
           ></sticker>
         </div>
@@ -77,6 +83,9 @@
             v-for="(card, i) in boxIssue[2]"
             :key="card.id"
             :list="card.issue"
+            draggable="true"
+            @dragstart.native="drop"
+            @dragend.native="dropend($event, card, i, 2)"
             class="sticker"
           ></sticker>
         </div>
@@ -88,6 +97,9 @@
             v-for="(card, i) in boxIssue[3]"
             :key="card.id"
             :list="card.issue"
+            draggable="true"
+            @dragstart.native="drop"
+            @dragend.native="dropend($event, card, i, 3)"
             class="sticker"
           ></sticker>
         </div>
@@ -129,7 +141,9 @@ export default {
       menuState: false,
       labChange: false, // 是否显示的是源数据
       assiChange: false,
-      searchNaN: false // 上次搜索是否没有结果
+      searchNaN: false, // 上次搜索是否没有结果
+      clickx: 0,
+      dropIndex: 0,
     };
   },
   components: {
@@ -137,6 +151,21 @@ export default {
     addDialog
   },
   methods: {
+    /* 鼠标拖动 */
+    drop(e) { 
+      this.clickx = e.clientX;
+    },
+    dropend(e, card, i, index) {
+      let diff = e.clientX - this.clickx, num = 0;
+      num = parseInt(diff/300) ;
+      if(diff%300 >= 160) num++;
+      if(num == 0 || index + num > 3) return;
+            console.log(num);
+           let temp = this.staticIssue[index].splice(i, 1)
+      // this.staticIssue[index + num].push(temp)
+
+
+    },
     getinfo() {
       let params = {
         query:
