@@ -47,7 +47,7 @@
         @keydown.enter="selComplete(3)"
       >
     </div>
-    <div class="board-body" v-show="state">
+    <div class="board-body" v-show="state" @dragenter="prev" @dragover="prev">
       <div class="body-container" style="marginLeft:7.25%">
         <span class="title">Future</span>
         <div class="issue-container">
@@ -58,6 +58,7 @@
             draggable="true"
             @dragstart.native="drop"
             @dragend.native="dropend($event, card, i, 0)"
+            @dragenter.native="prev" @dragover.native="prev"
             class="sticker"
           ></sticker>
         </div>
@@ -72,6 +73,7 @@
             draggable="true"
             @dragstart.native="drop"
             @dragend.native="dropend($event, card, i, 1)"
+            @dragenter.native="prev" @dragover.native="prev"
             class="sticker"
           ></sticker>
         </div>
@@ -86,6 +88,7 @@
             draggable="true"
             @dragstart.native="drop"
             @dragend.native="dropend($event, card, i, 2)"
+            @dragenter.native="prev" @dragover.native="prev"
             class="sticker"
           ></sticker>
         </div>
@@ -113,6 +116,7 @@
 import sticker from "./sticker";
 import addDialog from "./addDialog";
 import { getIssue } from "@/api/getIssue";
+import { moveCard } from "@/api/card"
 import { fixBoradData } from "@/assets/js/fixBoradData";
 
 function judge(obj, val) {
@@ -143,7 +147,7 @@ export default {
       assiChange: false,
       searchNaN: false, // 上次搜索是否没有结果
       clickx: 0,
-      dropIndex: 0,
+      dropIndex: 0
     };
   },
   components: {
@@ -152,19 +156,29 @@ export default {
   },
   methods: {
     /* 鼠标拖动 */
-    drop(e) { 
+    drop(e) {
       this.clickx = e.clientX;
     },
     dropend(e, card, i, index) {
-      let diff = e.clientX - this.clickx, num = 0;
-      num = parseInt(diff/300) ;
-      if(diff%300 >= 160) num++;
-      if(num == 0 || index + num > 3) return;
-            console.log(num);
-           let temp = this.staticIssue[index].splice(i, 1)
-      // this.staticIssue[index + num].push(temp)
-
-
+      let diff = e.clientX - this.clickx,
+        num = 0;
+      num = parseInt(diff / 300);
+      if (diff % 300 >= 160) num++;
+      if (num == 0 || index + num > 3) return;
+      let temp = this.staticIssue[index].splice(i, 1);
+      this.staticIssue[index + num].push(...temp);
+      let params = {
+        query:
+          'mutation{moveProjectCard(input:{cardId:"'+ card.id +'",columnId:"' + this.boxInfo[index + num].id  +'"}){cardEdge{node{content{... on Issue{body}}}}}}'
+      };
+      moveCard(params).then(res => {
+        if(typeof res.data.data.errors != 'undefined') {
+          console.log("拖放出错");
+        }
+      })
+    },
+    prev(e) {
+      e.preventDefault();
     },
     getinfo() {
       let params = {
