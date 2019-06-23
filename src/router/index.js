@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import StoryList from '@/components/StoryList'
-import Sprint from '@/components/sprint'
+import History from '@/components/history'
 import Board from '@/components/board'
 
 Vue.use(Router)
@@ -16,6 +16,11 @@ export default new Router({
       path: '/storyList',
       name: 'storyList',
       component: StoryList
+    },
+    {
+      path: '/history',
+      name: 'history',
+      component: History
     }
   ]
 })

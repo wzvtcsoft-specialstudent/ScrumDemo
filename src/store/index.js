@@ -6,7 +6,8 @@ const state = {
   assignees: [],
   estimate: [],
   labels: [],
-  allLabels: []
+  allLabels: [],
+  boardData: []
 };
 const getters = {
   getAssignees(state) {
@@ -17,6 +18,9 @@ const getters = {
   },
   getEstimate(state) {
     return state.estimate
+  },
+  getBoardData(state) {
+    return state.boardData
   }
 };
 const mutations = {
@@ -32,6 +36,9 @@ const mutations = {
         state.estimate.push(item)
       }
     })
+  },
+  setBoardData(state, params) {
+    state.boardData = params
   }
 }
 

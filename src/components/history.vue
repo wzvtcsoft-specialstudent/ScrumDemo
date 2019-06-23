@@ -9,8 +9,8 @@
           <router-link to="/history" tag="span" class="link-item">History Sprint</router-link>
         </div>
       </div>
-      <div class="add-task" @click="dialogState = true">Add Task</div>
-      <div class="container">
+      <!-- <div class="add-task" @click="dialogState = true">Add Task</div> -->
+      <div class="container" style="marginLeft:116px">
         <div class="sub labels" @click="labelsState = !labelsState">
           <div>Labels</div>
           <img src="@/assets/img/infodrop.png">
@@ -47,18 +47,17 @@
         @keydown.enter="selComplete(3)"
       >
     </div>
-    <div class="board-body" v-show="state" @dragenter="prev" @dragover="prev">
-      <div class="body-container" style="marginLeft:7.25%">
+    <div class="board-body" v-show="state">
+      <div class="selectbox">
+        <div class="sprint-item" v-for="(spr, i) in sprintInfo" :key="spr.id" @click="selSprint(i)">{{ spr.name }}</div>
+      </div>
+      <div class="body-container">
         <span class="title">Future</span>
         <div class="issue-container">
           <sticker
             v-for="(card, i) in boxIssue[0]"
             :key="card.id"
             :list="card.issue"
-            draggable="true"
-            @dragstart.native="drop"
-            @dragend.native="dropend($event, card, i, 0)"
-            @dragenter.native="prev" @dragover.native="prev"
             class="sticker"
           ></sticker>
         </div>
@@ -70,10 +69,6 @@
             v-for="(card, i) in boxIssue[1]"
             :key="card.id"
             :list="card.issue"
-            draggable="true"
-            @dragstart.native="drop"
-            @dragend.native="dropend($event, card, i, 1)"
-            @dragenter.native="prev" @dragover.native="prev"
             class="sticker"
           ></sticker>
         </div>
@@ -85,10 +80,6 @@
             v-for="(card, i) in boxIssue[2]"
             :key="card.id"
             :list="card.issue"
-            draggable="true"
-            @dragstart.native="drop"
-            @dragend.native="dropend($event, card, i, 2)"
-            @dragenter.native="prev" @dragover.native="prev"
             class="sticker"
           ></sticker>
         </div>
@@ -100,14 +91,11 @@
             v-for="(card, i) in boxIssue[3]"
             :key="card.id"
             :list="card.issue"
-            draggable="true"
-            @dragstart.native="drop"
-            @dragend.native="dropend($event, card, i, 3)"
             class="sticker"
           ></sticker>
         </div>
       </div>
-      <add-dialog :connect="'0'" :type="'Task'" @state="changeState" v-if="dialogState"></add-dialog>
+      <!-- <add-dialog :connect="'0'" :type="'Task'" @state="changeState" v-if="dialogState"></add-dialog> -->
     </div>
   </div>
 </template>
@@ -116,7 +104,7 @@
 import sticker from "./sticker";
 import addDialog from "./addDialog";
 import { getIssue } from "@/api/getIssue";
-import { moveCard } from "@/api/card"
+import { moveCard } from "@/api/card";
 import { fixBoradData } from "@/assets/js/fixBoradData";
 
 function judge(obj, val) {
@@ -127,12 +115,14 @@ function judge(obj, val) {
 }
 
 export default {
-  name: "board",
+  name: "history",
   data() {
     return {
       state: false, // 是否开始渲染issue页面
-      assignees: this.$store.getters.getAssignees,
-      labels: this.$store.getters.getLabels,
+      assignees: [],
+      labels: [],
+      sprintInfo: [], // 所有里程碑的信息
+      sprintIndex: 0, // 选中的里程碑索引
       boxInfo: [], // 总列表的信息
       boxIssue: [], // 所有列表的issue集
       staticIssue: [], // 静态issue集
@@ -141,7 +131,7 @@ export default {
       labSel: [], // 选择的labels
       assiSel: [], // 选择的assignees
       word: "", // 搜索的内容
-      dialogState: false,
+      //   dialogState: false,
       menuState: false,
       labChange: false, // 是否显示的是源数据
       assiChange: false,
@@ -156,74 +146,82 @@ export default {
   },
   methods: {
     /* 鼠标拖动 */
-    drop(e) {
-      this.clickx = e.clientX;
-    },
-    dropend(e, card, i, index) {
-      let diff = e.clientX - this.clickx,
-        num = 0;
-      num = parseInt(diff / 300);
-      if (diff % 300 >= 160) num++;
-      if (num == 0 || index + num > 3) return;
-      let temp = this.staticIssue[index].splice(i, 1);
-      this.staticIssue[index + num].push(...temp);
-      let params = {
-        query:
-          'mutation{moveProjectCard(input:{cardId:"'+ card.id +'",columnId:"' + this.boxInfo[index + num].id  +'"}){cardEdge{node{content{... on Issue{body}}}}}}'
-      };
-      moveCard(params).then(res => {
-        if(typeof res.data.data.errors != 'undefined') {
-          console.log("拖放出错");
-        }
-      })
-    },
-    prev(e) {
-      e.preventDefault();
-    },
-    getinfo() {
-      let params = {
-        query:
-          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name columns(first:4){ nodes{id name cards(first:60){ nodes{ id column { id } state content{ ... on Issue{ id title number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
-      };
-      getIssue(params).then(res => {
-        let data = res.data.data.organization.repository,nowData = {};
-        nowData = data.projects.nodes.shift();
-        this.$store.commit("setAssignees", data.assignableUsers.nodes);
-        this.$store.commit("setLabels", data.labels.nodes);
-        // this.$store.commit("setBoardData", data.projects.nodes)
-        localStorage.setItem('labels', JSON.stringify(data.labels.nodes));
-        localStorage.setItem('assignees', JSON.stringify(data.assignableUsers.nodes))
-        localStorage.setItem('history', JSON.stringify(data.projects.nodes))
-        this.assignees = data.assignableUsers.nodes;
-        this.labels = data.labels.nodes;
-        var labLens = this.labels.length,
-          assiLens = this.assignees.length;
-        for (let i = 0; i < labLens; i++) {
-          this.labSel[i] = false;
-        }
-        for (let j = 0; j < assiLens; j++) {
-          this.assiSel[j] = false;
-        }
-        /* 对源数据进行初次整合 */
-        let allData = [];
-        nowData.columns.nodes.forEach(list => {
-          this.boxInfo.push({
-            name: list.name,
-            id: list.id
-          });
-          let subData = [];
-          list.cards.nodes.forEach(item => {
-            subData.push({
-              id: item.id,
-              issue: item.content
-            });
-          });
-          allData.push(subData);
-        });
-        this.boxIssue = fixBoradData(allData);
-        this.staticIssue = this.boxIssue;
-        this.state = true;
-      });
+    // drop(e) {
+    //   this.clickx = e.clientX;
+    // },
+    // dropend(e, card, i, index) {
+    //   let diff = e.clientX - this.clickx,
+    //     num = 0;
+    //   num = parseInt(diff / 300);
+    //   if (diff % 300 >= 160) num++;
+    //   if (num == 0 || index + num > 3) return;
+    //   let temp = this.staticIssue[index].splice(i, 1);
+    //   this.staticIssue[index + num].push(...temp);
+    //   let params = {
+    //     query:
+    //       'mutation{moveProjectCard(input:{cardId:"' +
+    //       card.id +
+    //       '",columnId:"' +
+    //       this.boxInfo[index + num].id +
+    //       '"}){cardEdge{node{content{... on Issue{body}}}}}}'
+    //   };
+    //   moveCard(params).then(res => {
+    //     if (typeof res.data.data.errors != "undefined") {
+    //       console.log("拖放出错");
+    //     }
+    //   });
+    // },
+    // prev(e) {
+    //   e.preventDefault();
+    // },
+    // getinfo() {
+    //   let params = {
+    //     query:
+    //       'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name columns(first:4){ nodes{id name cards(first:60){ nodes{ id column { id } state content{ ... on Issue{ id title number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
+    //   };
+    //   getIssue(params).then(res => {
+    //     let data = res.data.data.organization.repository,
+    //       nowData = {};
+    //     nowData = data.projects.nodes.shift();
+    //     this.$store.commit("setAssignees", data.assignableUsers.nodes);
+    //     this.$store.commit("setLabels", data.labels.nodes);
+    //     this.$store.commit("setBoardData", data.projects.nodes);
+    //     this.assignees = data.assignableUsers.nodes;
+    //     this.labels = data.labels.nodes;
+    //     var labLens = this.labels.length,
+    //       assiLens = this.assignees.length;
+    //     for (let i = 0; i < labLens; i++) {
+    //       this.labSel[i] = false;
+    //     }
+    //     for (let j = 0; j < assiLens; j++) {
+    //       this.assiSel[j] = false;
+    //     }
+    //     /* 对源数据进行初次整合 */
+    //     let allData = [];
+    //     nowData.columns.nodes.forEach(list => {
+    //       this.boxInfo.push({
+    //         name: list.name,
+    //         id: list.id
+    //       });
+    //       let subData = [];
+    //       list.cards.nodes.forEach(item => {
+    //         subData.push({
+    //           id: item.id,
+    //           issue: item.content
+    //         });
+    //       });
+    //       allData.push(subData);
+    //     });
+    //     this.boxIssue = fixBoradData(allData);
+    //     this.staticIssue = this.boxIssue;
+    //     this.state = true;
+    //   });
+    // },
+    
+    /* 选择里程碑 */
+    selSprint(i) {
+        // this.sprintIndex = i;
+        // this.boxIssue = this.staticIssue[i];
     },
     clickMenu() {
       this.menuState = !this.menuState;
@@ -251,7 +249,7 @@ export default {
       if (selected.length == 0) {
         if (this.labChange) {
           this.labChange = false;
-          this.boxIssue = this.staticIssue;
+          this.boxIssue = this.staticIssue[this.sprintIndex];
         }
         return;
       }
@@ -292,7 +290,7 @@ export default {
       if (selected.length == 0) {
         if (this.assiChange) {
           this.assiChange = false;
-          this.boxIssue = this.staticIssue;
+          this.boxIssue = this.staticIssue[this.sprintIndex];
         }
         return;
       }
@@ -333,10 +331,10 @@ export default {
     },
     search() {
       if (this.word == "") {
-        this.boxIssue = this.staticIssue;
+        this.boxIssue = this.staticIssue[this.sprintIndex];
         return;
       }
-      if (this.searchNaN) this.boxIssue = this.staticIssue;
+      if (this.searchNaN) this.boxIssue = this.staticIssue[this.sprintIndex];
       let result = [],
         nohave = true;
       this.boxIssue.forEach(line => {
@@ -354,10 +352,48 @@ export default {
       });
       if (nohave) this.searchNaN = true;
       this.boxIssue = result;
+    },
+    initData() {
+      let data = JSON.parse(localStorage.getItem("history"));
+      var fixresult = [],
+        fixinfo = [],
+        projectinfo = [];
+      data.forEach(obj => {
+        projectinfo.push({
+          id: obj.id,
+          name: obj.name
+        });
+        let allData = [],
+          allinfo = [];
+        obj.columns.nodes.forEach(list => {
+          let subData = [];
+          allinfo.push({
+            name: list.name,
+            id: list.id
+          });
+          list.cards.nodes.forEach(item => {
+            subData.push({
+              id: item.id,
+              issue: item.content
+            });
+          });
+          allData.push(subData);
+        });
+        fixresult.push(fixBoradData(allData));
+        fixinfo.push(allinfo);
+      });
+      this.staticIssue = fixresult;
+      this.boxInfo = fixinfo;
+      this.boxIssue = fixresult[0];
+      this.sprintInfo = projectinfo;
+      console.log(this.boxIssue);
+      this.assignees = JSON.parse(localStorage.getItem('assignees'));
+      this.labels = JSON.parse(localStorage.getItem('labels'))
+      this.state = true;
     }
   },
   created() {
-    this.getinfo();
+    this.initData();
   }
 };
 </script>
@@ -398,7 +434,27 @@ li {
   background: rgba(250, 251, 252, 1);
   opacity: 1;
 }
-
+.selectbox {
+  width: 160px;
+  height: 625px;
+  margin: 0 0 0 15px;
+  padding: 10px 10px 15px 10px;
+  border: 1px solid rgba(214, 218, 222, 1);
+  float: left;
+  cursor: pointer;
+}
+.sprint-item {
+  width: 100%;
+  height: 95px;
+  background:rgba(250,251,252,1);
+  margin-bottom: 6px;
+  font-size: 20px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  line-height: 95px;
+  color: rgba(112, 112, 112, 1);
+  overflow: hidden;
+}
 .menu {
   margin: 9px 0 0 15px;
   cursor: pointer;
@@ -429,22 +485,22 @@ li {
   color: #2680eb;
 }
 
-.add-task {
-  width: 104px;
-  height: 32px;
-  display: block;
-  text-align: center;
-  line-height: 32px;
-  font-size: 14px;
-  font-family: Source Han Sans CN;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 1);
-  margin: 9px 0 0 116px;
-  background: rgba(38, 128, 235, 1);
-  border-radius: 5px;
-  float: left;
-  cursor: pointer;
-}
+// .add-task {
+//   width: 104px;
+//   height: 32px;
+//   display: block;
+//   text-align: center;
+//   line-height: 32px;
+//   font-size: 14px;
+//   font-family: Source Han Sans CN;
+//   font-weight: 400;
+//   color: rgba(255, 255, 255, 1);
+//   margin: 9px 0 0 116px;
+//   background: rgba(38, 128, 235, 1);
+//   border-radius: 5px;
+//   float: left;
+//   cursor: pointer;
+// }
 .container {
   width: 118px;
   position: relative;
@@ -535,7 +591,7 @@ li {
   width: 318px;
   min-width: 280px;
   height: 635px;
-  margin-right: 12px;
+  margin-left: 12px;
   padding-bottom: 15px;
   float: left;
 }
