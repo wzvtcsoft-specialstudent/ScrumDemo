@@ -105,7 +105,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style  scoped>
 .sprint-main-container {
   margin: 0 auto;
   width: 1480px;

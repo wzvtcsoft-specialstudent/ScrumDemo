@@ -43,7 +43,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style  scoped>
     .sticker-container {
         width: 19.25%;
         min-width: 200px;
