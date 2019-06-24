@@ -362,7 +362,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style  scoped>
 * {
   border: 0;
   margin: 0;

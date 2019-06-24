@@ -402,7 +402,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style  scoped>
 * {
   border: 0;
   margin: 0;
@@ -489,7 +489,7 @@ li {
   color: #2680eb;
 }
 
-// .add-task {
+/* // .add-task {
 //   width: 104px;
 //   height: 32px;
 //   display: block;
@@ -504,7 +504,7 @@ li {
 //   border-radius: 5px;
 //   float: left;
 //   cursor: pointer;
-// }
+// } */
 .container {
   width: 118px;
   position: relative;
