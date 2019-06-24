@@ -1,6 +1,6 @@
 <template>
-  <div class="board-main">
-    <div class="board-title">
+  <div class="history-main">
+    <div class="history-title">
       <div class="menu" @click="clickMenu">
         <img src="@/assets/img/menu.png">
         <div class="menu-item" v-show="menuState" @mouseleave="menuState = false">
@@ -47,7 +47,7 @@
         @keydown.enter="selComplete(3)"
       >
     </div>
-    <div class="board-body" v-show="state">
+    <div class="history-body" v-show="state">
       <div class="selectbox">
         <div class="sprint-item" v-for="(spr, i) in sprintInfo" :key="spr.id" @click="selSprint(i)">{{ spr.name }}</div>
       </div>
@@ -55,7 +55,7 @@
         <span class="title">Future</span>
         <div class="issue-container">
           <sticker
-            v-for="(card, i) in boxIssue[0]"
+            v-for="(card, i) in listIssue[0]"
             :key="card.id"
             :list="card.issue"
             class="sticker"
@@ -66,7 +66,7 @@
         <span class="title">To do</span>
         <div class="issue-container">
           <sticker
-            v-for="(card, i) in boxIssue[1]"
+            v-for="(card, i) in listIssue[1]"
             :key="card.id"
             :list="card.issue"
             class="sticker"
@@ -77,7 +77,7 @@
         <span class="title">Doing</span>
         <div class="issue-container">
           <sticker
-            v-for="(card, i) in boxIssue[2]"
+            v-for="(card, i) in listIssue[2]"
             :key="card.id"
             :list="card.issue"
             class="sticker"
@@ -88,7 +88,7 @@
         <span class="title">Done</span>
         <div class="issue-container">
           <sticker
-            v-for="(card, i) in boxIssue[3]"
+            v-for="(card, i) in listIssue[3]"
             :key="card.id"
             :list="card.issue"
             class="sticker"
@@ -123,9 +123,9 @@ export default {
       labels: [],
       sprintInfo: [], // 所有里程碑的信息
       sprintIndex: 0, // 选中的里程碑索引
-      boxInfo: [], // 总列表的信息
-      boxIssue: [], // 所有列表的issue集
-      staticIssue: [], // 静态issue集
+      listInfo: [], // 总列表的信息
+      listIssue: [], // 所有列表的issue集
+      staIssue: [], // 静态issue集
       labelsState: false,
       assigneesState: false,
       labSel: [], // 选择的labels
@@ -155,14 +155,14 @@ export default {
     //   num = parseInt(diff / 300);
     //   if (diff % 300 >= 160) num++;
     //   if (num == 0 || index + num > 3) return;
-    //   let temp = this.staticIssue[index].splice(i, 1);
-    //   this.staticIssue[index + num].push(...temp);
+    //   let temp = this.staIssue[index].splice(i, 1);
+    //   this.staIssue[index + num].push(...temp);
     //   let params = {
     //     query:
     //       'mutation{moveProjectCard(input:{cardId:"' +
     //       card.id +
     //       '",columnId:"' +
-    //       this.boxInfo[index + num].id +
+    //       this.listInfo[index + num].id +
     //       '"}){cardEdge{node{content{... on Issue{body}}}}}}'
     //   };
     //   moveCard(params).then(res => {
@@ -199,7 +199,7 @@ export default {
     //     /* 对源数据进行初次整合 */
     //     let allData = [];
     //     nowData.columns.nodes.forEach(list => {
-    //       this.boxInfo.push({
+    //       this.listInfo.push({
     //         name: list.name,
     //         id: list.id
     //       });
@@ -212,16 +212,17 @@ export default {
     //       });
     //       allData.push(subData);
     //     });
-    //     this.boxIssue = fixBoradData(allData);
-    //     this.staticIssue = this.boxIssue;
+    //     this.listIssue = fixBoradData(allData);
+    //     this.staIssue = this.listIssue;
     //     this.state = true;
     //   });
     // },
     
     /* 选择里程碑 */
     selSprint(i) {
-        // this.sprintIndex = i;
-        // this.boxIssue = this.staticIssue[i];
+        this.sprintIndex = i;
+        this.listIssue = this.staIssue[i];
+        console.log(i);
     },
     clickMenu() {
       this.menuState = !this.menuState;
@@ -249,11 +250,11 @@ export default {
       if (selected.length == 0) {
         if (this.labChange) {
           this.labChange = false;
-          this.boxIssue = this.staticIssue[this.sprintIndex];
+          this.listIssue = this.staIssue[this.sprintIndex];
         }
         return;
       }
-      this.boxIssue.forEach(line => {
+      this.listIssue.forEach(line => {
         let sub = [];
         line.forEach(item => {
           item.issue.labels.forEach(lab => {
@@ -265,7 +266,7 @@ export default {
         result.push(sub);
       });
       this.labChange = true;
-      this.boxIssue = result;
+      this.listIssue = result;
     },
     /* 选择assignees标签 */
     selAssi(e, index) {
@@ -290,11 +291,11 @@ export default {
       if (selected.length == 0) {
         if (this.assiChange) {
           this.assiChange = false;
-          this.boxIssue = this.staticIssue[this.sprintIndex];
+          this.listIssue = this.staIssue[this.sprintIndex];
         }
         return;
       }
-      this.boxIssue.forEach(line => {
+      this.listIssue.forEach(line => {
         let sub = [];
         line.forEach(item => {
           if (
@@ -307,7 +308,7 @@ export default {
         result.push(sub);
       });
       this.assiChange = true;
-      this.boxIssue = result;
+      this.listIssue = result;
     },
     changeState(val) {
       this.dialogState = false;
@@ -331,13 +332,13 @@ export default {
     },
     search() {
       if (this.word == "") {
-        this.boxIssue = this.staticIssue[this.sprintIndex];
+        this.listIssue = this.staIssue[this.sprintIndex];
         return;
       }
-      if (this.searchNaN) this.boxIssue = this.staticIssue[this.sprintIndex];
+      if (this.searchNaN) this.listIssue = this.staIssue[this.sprintIndex];
       let result = [],
         nohave = true;
-      this.boxIssue.forEach(line => {
+      this.listIssue.forEach(line => {
         let sub = [];
         line.forEach(item => {
           if (
@@ -351,42 +352,45 @@ export default {
         result.push(sub);
       });
       if (nohave) this.searchNaN = true;
-      this.boxIssue = result;
+      this.listIssue = result;
     },
     initData() {
       let data = JSON.parse(localStorage.getItem("history"));
-      var fixresult = [],
-        fixinfo = [],
-        projectinfo = [];
-      data.forEach(obj => {
-        projectinfo.push({
-          id: obj.id,
-          name: obj.name
-        });
-        let allData = [],
-          allinfo = [];
-        obj.columns.nodes.forEach(list => {
-          let subData = [];
-          allinfo.push({
-            name: list.name,
-            id: list.id
-          });
+      console.log(data);
+      var sprintInfo = [],result = [],fixresult = [];
+      var projectData = [],projectInfo = [],issueData = []
+      for(let i in data) {
+        sprintInfo.push({
+          id: data[i].id,
+          name: data[i].name
+        })
+        console.log('-----------------------------');
+        // projectInfo  每一列的id和name
+        projectData = []
+        projectInfo = [] 
+        data[i].columns.nodes.forEach(list => {
+          projectInfo.push({
+            id: list.id,
+            name: list.name
+          })
+          issueData = []
           list.cards.nodes.forEach(item => {
-            subData.push({
+            issueData.push({
               id: item.id,
               issue: item.content
-            });
-          });
-          allData.push(subData);
-        });
-        fixresult.push(fixBoradData(allData));
-        fixinfo.push(allinfo);
-      });
-      this.staticIssue = fixresult;
-      this.boxInfo = fixinfo;
-      this.boxIssue = fixresult[0];
-      this.sprintInfo = projectinfo;
-      console.log(this.boxIssue);
+            })
+          })
+          projectData.push(issueData)
+        })
+        result.push(fixBoradData(projectData))
+      }
+      for(let i =0,lens = result[0].length; i<lens;i+=4) {
+        fixresult.push(result[0].slice(i,i+4))
+      }
+      this.staIssue = fixresult;
+      this.listInfo = projectInfo;
+      this.listIssue = fixresult[0];
+      this.sprintInfo = sprintInfo;
       this.assignees = JSON.parse(localStorage.getItem('assignees'));
       this.labels = JSON.parse(localStorage.getItem('labels'))
       this.state = true;
@@ -417,18 +421,18 @@ li {
   width: 164px;
   height: 31px;
 }
-.board-main {
+.history-main {
   width: 1526px;
   height: 712px;
 }
 
-.board-body {
+.history-body {
   width: 100%;
   height: 651px;
   margin-top: 8px;
 }
 
-.board-title {
+.history-title {
   width: 100%;
   height: 50px;
   background: rgba(250, 251, 252, 1);
@@ -635,3 +639,50 @@ li {
   border-radius: 19px;
 }
 </style>
+
+
+/* let params = {
+        query:
+          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name columns(first:4){ nodes{id name cards(first:60){ nodes{ id column { id } state content{ ... on Issue{ id title number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
+      };
+      getIssue(params).then( res => {
+        let data = res.data.data.organization.repository.projects.nodes;
+        data = data.shift();
+        console.log(data);
+         var sprintInfo = [],result = [],fixresult = [];
+      var projectData = [],projectInfo = [],issueData = []
+      for(let i in data) {
+        sprintInfo.push({
+          id: data[i].id,
+          name: data[i].name
+        })
+        console.log('-----------------------------');
+        // projectInfo  每一列的id和name
+        projectData = []
+        projectInfo = [] 
+        data[i].columns.nodes.forEach(list => {
+          projectInfo.push({
+            id: list.id,
+            name: list.name
+          })
+          issueData = []
+          list.cards.nodes.forEach(item => {
+            issueData.push({
+              id: item.id,
+              issue: item.content
+            })
+          })
+          projectData.push(issueData)
+        })
+        result.push(fixBoradData(projectData))
+      }
+      for(let i =0,lens = result[0].length; i<lens;i+=4) {
+        fixresult.push(result[0].slice(i,i+4))
+      }
+      this.staIssue = fixresult;
+      this.listInfo = projectInfo;
+      this.listIssue = fixresult[0];
+      this.sprintInfo = sprintInfo;
+      this.assignees = JSON.parse(localStorage.getItem('assignees'));
+      this.labels = JSON.parse(localStorage.getItem('labels'))
+      this.state = true; */

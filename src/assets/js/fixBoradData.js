@@ -42,6 +42,7 @@ export function fixBoradData(data) {
       boardIssue.push(obj)
     })
     result.push(boardIssue)
-  })
+  })  
   return result
+
 }

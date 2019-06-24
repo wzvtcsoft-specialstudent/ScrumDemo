@@ -47,7 +47,7 @@
         @keydown.enter="selComplete(3)"
       >
     </div>
-    <div class="board-body" v-show="state" @dragenter="prev" @dragover="prev">
+    <div class="board-body" v-show="state" @dragenter="prev" @dragover="prev"  key="board">
       <div class="body-container" style="marginLeft:7.25%">
         <span class="title">Future</span>
         <div class="issue-container">
