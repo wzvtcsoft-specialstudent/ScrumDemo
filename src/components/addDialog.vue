@@ -49,6 +49,7 @@
       </div>
       <input type="text" v-model="title" placeholder="Title" class="issue-title">
       <textarea class="issue-body" v-model="body" :placeholder="connect!=0?'Leave a comment,This Issue is related to #' + connect:'Leave a comment,This Issue is Epic'"></textarea>
+      <div><input type="checkbox" >是否添加到当前里程碑</div>
       <div class="selLabels">
         <div
           class="selLabels-item"
@@ -184,6 +185,11 @@ export default {
       }
       sum = rgbArr[0] * 0.299 + rgbArr[1] * 0.578 + rgbArr[2] * 0.114;
       return sum > 192 ? "#707070" : "#FFFFFF"; // 深色背景，白色文字；浅色背景，黑色文字
+    },
+    addmilestones(item){
+      if(item){
+        console.log(add)
+      }
     }
   },
   mounted() {
