@@ -53,7 +53,7 @@
         <div class="issue-container">
           <sticker
             v-for="(card, i) in boxIssue[0]"
-            :key="card.id"
+            :key="card.id + 'board'"
             :list="card.issue"
             draggable="true"
             @dragstart.native="drop"
@@ -68,7 +68,7 @@
         <div class="issue-container">
           <sticker
             v-for="(card, i) in boxIssue[1]"
-            :key="card.id"
+            :key="card.id + 'board'"
             :list="card.issue"
             draggable="true"
             @dragstart.native="drop"
@@ -83,7 +83,7 @@
         <div class="issue-container">
           <sticker
             v-for="(card, i) in boxIssue[2]"
-            :key="card.id"
+            :key="card.id + 'board'"
             :list="card.issue"
             draggable="true"
             @dragstart.native="drop"
@@ -98,7 +98,7 @@
         <div class="issue-container">
           <sticker
             v-for="(card, i) in boxIssue[3]"
-            :key="card.id"
+            :key="card.id + 'board'"
             :list="card.issue"
             draggable="true"
             @dragstart.native="drop"
@@ -188,12 +188,12 @@ export default {
       getIssue(params).then(res => {
         let data = res.data.data.organization.repository,nowData = {};
         nowData = data.projects.nodes.shift();
-        this.$store.commit("setAssignees", data.assignableUsers.nodes);
-        this.$store.commit("setLabels", data.labels.nodes);
+        // this.$store.commit("setAssignees", data.assignableUsers.nodes);
+        // this.$store.commit("setLabels", data.labels.nodes);
         // this.$store.commit("setBoardData", data.projects.nodes)
-        localStorage.setItem('labels', JSON.stringify(data.labels.nodes));
-        localStorage.setItem('assignees', JSON.stringify(data.assignableUsers.nodes))
-        localStorage.setItem('history', JSON.stringify(data.projects.nodes))
+        // localStorage.setItem('labels', JSON.stringify(data.labels.nodes));
+        // localStorage.setItem('assignees', JSON.stringify(data.assignableUsers.nodes))
+        // localStorage.setItem('history', JSON.stringify(data.projects.nodes))
         this.assignees = data.assignableUsers.nodes;
         this.labels = data.labels.nodes;
         var labLens = this.labels.length,
