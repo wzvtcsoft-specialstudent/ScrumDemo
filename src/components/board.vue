@@ -191,9 +191,9 @@ export default {
         // this.$store.commit("setAssignees", data.assignableUsers.nodes);
         // this.$store.commit("setLabels", data.labels.nodes);
         // this.$store.commit("setBoardData", data.projects.nodes)
-        // localStorage.setItem('labels', JSON.stringify(data.labels.nodes));
-        // localStorage.setItem('assignees', JSON.stringify(data.assignableUsers.nodes))
-        // localStorage.setItem('history', JSON.stringify(data.projects.nodes))
+        localStorage.setItem('labels', JSON.stringify(data.labels.nodes));
+        localStorage.setItem('assignees', JSON.stringify(data.assignableUsers.nodes))
+        localStorage.setItem('history', JSON.stringify(data.projects.nodes))
         this.assignees = data.assignableUsers.nodes;
         this.labels = data.labels.nodes;
         var labLens = this.labels.length,
