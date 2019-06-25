@@ -148,10 +148,24 @@ export default {
     /* 判断extends行 是否有issue */
     extendData() {
       try {
-        let arr = this.data[this.epici].nodes[this.userstoryi].nodes[this.taski]
-          .nodes;
-        this.titleState = arr == null ? false : true;
-        return arr;
+        // let arr = this.data[this.epici].nodes[this.userstoryi].nodes[this.taski]
+        //   .nodes;
+        //   console.log(arr[0]);
+        // if(typeof arr[0].number != 'undefined') {
+        //   this.titleState = true;
+        //   return arr;
+        // }
+        // this.titleState = arr[0].nodes == null ? false : true;
+
+        // return arr;
+        let arr = this.data[this.epici].nodes[this.userstoryi].nodes,flag = false;
+        arr.forEach(task => {
+          if(typeof task.nodes[0].number != 'undefined') {
+            flag = true;
+          }
+        })
+        this.titleState = flag;
+        return arr[this.taski].nodes
       } catch (error) {
         this.titleState = false;
         return [];
@@ -162,19 +176,19 @@ export default {
       // qcteams HuaAn
       let params = {
         query:
-          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} id name issues(states:[OPEN],first:100){  totalCount nodes{  title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
+          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} id name issues(states:[OPEN],first:100){  totalCount nodes{ id title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
       getIssue(params).then(res => {
         this.data = fixData(res.data.data.organization.repository.issues.nodes);
         // this.state = true;
-        this.$store.commit(
-          "setAssignees",
-          res.data.data.organization.repository.assignableUsers.nodes
-        );
-        this.$store.commit(
-          "setLabels",
-          res.data.data.organization.repository.labels.nodes
-        );
+        // this.$store.commit(
+        //   "setAssignees",
+        //   res.data.data.organization.repository.assignableUsers.nodes
+        // );
+        // this.$store.commit(
+        //   "setLabels",
+        //   res.data.data.organization.repository.labels.nodes
+        // );
         if (this.data.length > 4) this.epicState = true;
         if (
           typeof this.data[this.epici] !== "undefined" &&
@@ -194,6 +208,7 @@ export default {
             .length > 4
         )
           this.epicState = true;
+          this.findAllTask();
       });
     },
     selEpic(index) {
@@ -358,6 +373,49 @@ export default {
       if(this.connectIssue<1000 && typeof this.connectIssue != 'undefined') {
         this.dialogState = true;
       }
+    },
+    /* 找出所有的Task */
+    findAllTask() {
+      // let arr = this.data[this.epici].nodes[this.userstoryi].nodes,flag = false;
+      //   arr.forEach(task => {
+      //     if(typeof task.nodes[0].number != 'undefined') {
+      //       flag = true;
+      //     }
+      //   })
+      function judgeTask(task) {
+        var flag = true;
+        if(typeof task.nodes == 'undefined' || task.nodes == null) return true;
+        task.nodes.forEach(node => {
+          if(typeof node.number != 'undefined') flag = false;
+        })
+        return flag
+      }
+      var result = [];
+      this.data.forEach(epic => {
+        if(typeof epic.nodes == 'undefined') return false;
+        epic.nodes.forEach(story => {
+          if(typeof story.nodes == 'undefined' || story.nodes == null) return false;
+          let flags = true;
+          story.nodes.forEach(item => {
+             if(item.nodes == null) return false;
+            try {
+              if(typeof item.nodes[0].number != 'undefined') {
+            flags = false;
+          }
+            } catch (error) {
+              flags = false
+            }
+          })
+          story.nodes.forEach(task => {
+            if(judgeTask(task)&&flags) {
+              result.push(task)
+            }
+            else if(typeof task.nodes != 'undefined' && task.nodes != null) result.push(...task.nodes)
+          })
+        })
+      })
+      let allTast = result.filter(item => typeof item.title != 'undefined')
+      localStorage.setItem('allTask',JSON.stringify(allTast))
     }
   },
   components: {

@@ -3,7 +3,6 @@ import Router from 'vue-router'
 import StoryList from '@/components/StoryList'
 import History from '@/components/history'
 import Board from '@/components/board'
-import historysprint from '@/components/historysprint'
 
 Vue.use(Router)
 

@@ -9,8 +9,7 @@
           <router-link to="/history" tag="span" class="link-item">History Sprint</router-link>
         </div>
       </div>
-      <div class="add-task" @click="dialogState = true">Add Task</div>
-      <div class="container">
+      <div class="container" style="marginLeft:4.19%">
         <div class="sub labels" @click="labelsState = !labelsState">
           <div>Labels</div>
           <img src="@/assets/img/infodrop.png">
@@ -46,8 +45,28 @@
         v-model="word"
         @keydown.enter="selComplete(3)"
       >
+      <div class="task-container">
+        <div class="add-task" @click="addTaskState = !addTaskState">Add Card</div>
+        <div class="card-box" v-show="addTaskState" @mouseleave="addTaskState = false">
+          <div class="card-search-box">
+            <img src="@/assets/img/sousuo.png">
+            <input
+              type="text"
+              placeholder="Search all tasks"
+              v-model="taskword"
+              @keydown.enter="searchTask"
+            >
+          </div>
+          <div class="task-card" v-for="addCard in alltask" :key="addCard.number">
+            <a :href="addCard.issueUrl">#{{ addCard.number | fixNum }}</a>
+            <div class="task-card-title">{{ addCard.title }}</div>
+            <img src="@/assets/img/right.png" @click="addTaskCard(addCard.id)">
+          </div>
+          <!-- <sticker class="task-card" v-for="addCard in alltask" :key="addCard.number + 'card'" :list="addCard"></sticker> -->
+        </div>
+      </div>
     </div>
-    <div class="board-body" v-show="state" @dragenter="prev" @dragover="prev"  key="board">
+    <div class="board-body" v-show="state" @dragenter="prev" @dragover="prev" key="board">
       <div class="body-container" style="marginLeft:7.25%">
         <span class="title">Future</span>
         <div class="issue-container">
@@ -58,7 +77,8 @@
             draggable="true"
             @dragstart.native="drop"
             @dragend.native="dropend($event, card, i, 0)"
-            @dragenter.native="prev" @dragover.native="prev"
+            @dragenter.native="prev"
+            @dragover.native="prev"
             class="sticker"
           ></sticker>
         </div>
@@ -73,7 +93,8 @@
             draggable="true"
             @dragstart.native="drop"
             @dragend.native="dropend($event, card, i, 1)"
-            @dragenter.native="prev" @dragover.native="prev"
+            @dragenter.native="prev"
+            @dragover.native="prev"
             class="sticker"
           ></sticker>
         </div>
@@ -88,7 +109,8 @@
             draggable="true"
             @dragstart.native="drop"
             @dragend.native="dropend($event, card, i, 2)"
-            @dragenter.native="prev" @dragover.native="prev"
+            @dragenter.native="prev"
+            @dragover.native="prev"
             class="sticker"
           ></sticker>
         </div>
@@ -107,7 +129,7 @@
           ></sticker>
         </div>
       </div>
-      <add-dialog :connect="'0'" :type="'Task'" @state="changeState" v-if="dialogState"></add-dialog>
+      <!-- <add-dialog :connect="'0'" :type="'Task'" @state="changeState" v-if="dialogState"></add-dialog> -->
     </div>
   </div>
 </template>
@@ -116,7 +138,7 @@
 import sticker from "./sticker";
 import addDialog from "./addDialog";
 import { getIssue } from "@/api/getIssue";
-import { moveCard } from "@/api/card"
+import { moveCard,addCards } from "@/api/card";
 import { fixBoradData } from "@/assets/js/fixBoradData";
 
 function judge(obj, val) {
@@ -136,12 +158,15 @@ export default {
       boxInfo: [], // 总列表的信息
       boxIssue: [], // 所有列表的issue集
       staticIssue: [], // 静态issue集
+      staticTask: [], // 静态task集
+      alltask: [], // 显示的task
       labelsState: false,
       assigneesState: false,
+      addTaskState: false,
       labSel: [], // 选择的labels
       assiSel: [], // 选择的assignees
       word: "", // 搜索的内容
-      dialogState: false,
+      taskword: "", // 搜索task的内容
       menuState: false,
       labChange: false, // 是否显示的是源数据
       assiChange: false,
@@ -169,13 +194,17 @@ export default {
       this.staticIssue[index + num].push(...temp);
       let params = {
         query:
-          'mutation{moveProjectCard(input:{cardId:"'+ card.id +'",columnId:"' + this.boxInfo[index + num].id  +'"}){cardEdge{node{content{... on Issue{body}}}}}}'
+          'mutation{moveProjectCard(input:{cardId:"' +
+          card.id +
+          '",columnId:"' +
+          this.boxInfo[index + num].id +
+          '"}){cardEdge{node{content{... on Issue{body}}}}}}'
       };
       moveCard(params).then(res => {
-        if(typeof res.data.data.errors != 'undefined') {
+        if (typeof res.data.data.errors != "undefined") {
           console.log("拖放出错");
         }
-      })
+      });
     },
     prev(e) {
       e.preventDefault();
@@ -183,17 +212,21 @@ export default {
     getinfo() {
       let params = {
         query:
-          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name columns(first:4){ nodes{id name cards(first:60){ nodes{ id column { id } state content{ ... on Issue{ id title number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
+          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name columns(first:4){ nodes{id name cards(first:60){totalCount nodes{ id column { id } state content{ ... on Issue{ id title number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
       };
       getIssue(params).then(res => {
-        let data = res.data.data.organization.repository,nowData = {};
+        let data = res.data.data.organization.repository,
+          nowData = {};
         nowData = data.projects.nodes.shift();
-        // this.$store.commit("setAssignees", data.assignableUsers.nodes);
-        // this.$store.commit("setLabels", data.labels.nodes);
-        // this.$store.commit("setBoardData", data.projects.nodes)
-        localStorage.setItem('labels', JSON.stringify(data.labels.nodes));
-        localStorage.setItem('assignees', JSON.stringify(data.assignableUsers.nodes))
-        localStorage.setItem('history', JSON.stringify(data.projects.nodes))
+        this.$store.commit("setAssignees", data.assignableUsers.nodes);
+        this.$store.commit("setLabels", data.labels.nodes);
+        this.$store.commit("setBoardData", data.projects.nodes);
+        localStorage.setItem("labels", JSON.stringify(data.labels.nodes));
+        localStorage.setItem(
+          "assignees",
+          JSON.stringify(data.assignableUsers.nodes)
+        );
+        localStorage.setItem("history", JSON.stringify(data.projects.nodes));
         this.assignees = data.assignableUsers.nodes;
         this.labels = data.labels.nodes;
         var labLens = this.labels.length,
@@ -222,8 +255,31 @@ export default {
         });
         this.boxIssue = fixBoradData(allData);
         this.staticIssue = this.boxIssue;
+        this.staticTask = JSON.parse(localStorage.getItem("allTask"));
+        this.alltask = this.staticTask;
         this.state = true;
       });
+    },
+    /* 添加Task */
+    addTaskCard(id) {
+      let params = {
+        query:
+          'mutation{ addProjectCard(input:{contentId:"'+ id +'",projectColumnId:"'+ this.boxInfo[1].id +'"}){projectColumn{id}}}'
+      };
+      addCards(params).then(res => {
+        if(typeof res.data.data.error != 'undefined') alert("添加失败，可能看板内已存在该Task")
+      })
+    },
+    searchTask() {
+      if (this.taskword == "") {
+        this.alltask = this.staticTask;
+        return;
+      }
+      let result = [];
+      this.alltask.forEach(task => {
+        if(task.title.indexOf(this.taskword) != -1) result.push(task)
+      });
+      this.alltask = result;
     },
     clickMenu() {
       this.menuState = !this.menuState;
@@ -356,6 +412,12 @@ export default {
       this.boxIssue = result;
     }
   },
+  filters: {
+    fixNum(num) {
+      if (num < 10) return `0${num}`;
+      return num;
+    }
+  },
   created() {
     this.getinfo();
   }
@@ -429,6 +491,13 @@ li {
   color: #2680eb;
 }
 
+.task-container {
+  width: auto;
+  height: auto;
+  float: right;
+  margin: 9px 7.25% 0 0;
+  position: relative;
+}
 .add-task {
   width: 104px;
   height: 32px;
@@ -439,12 +508,81 @@ li {
   font-family: Source Han Sans CN;
   font-weight: 400;
   color: rgba(255, 255, 255, 1);
-  margin: 9px 0 0 116px;
   background: rgba(38, 128, 235, 1);
   border-radius: 5px;
   float: left;
   cursor: pointer;
 }
+.card-box {
+  width: 300px;
+  height: 651px;
+  position: absolute;
+  right: 0;
+  top: 49px;
+  background-color: white;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+  z-index: 999;
+}
+.card-search-box {
+  width: auto;
+}
+.card-search-box img {
+  width: 13px;
+  height: 13px;
+  padding: 8px;
+  margin: 9px 0 0 12px;
+  border: 1px solid rgba(214, 218, 222, 1);
+  background: rgba(250, 251, 252, 1);
+  border-right: none;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+  float: left;
+}
+.card-search-box input {
+  width: 245px;
+  height: 29px;
+  background: rgba(250, 251, 252, 1);
+  margin: 9px 0 0 0;
+  border: 1px solid rgba(214, 218, 222, 1);
+  border-left: none;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  float: left;
+}
+.card-search-box input:focus {
+  outline: none;
+}
+.task-card {
+  width: 300px;
+  min-height: 31px;
+  font-size: 12px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  max-height: 63px;
+  background: rgba(250, 251, 252, 1);
+  margin-top: 8px;
+  float: left;
+}
+.task-card-title {
+  display: block;
+  width: 210px;
+  min-height: 31px;
+  margin: 4% 0 0 7px;
+  color: rgba(112, 112, 112, 1);
+  float: left;
+}
+a {
+  text-decoration: none;
+  margin: 4% 0 0 16px;
+  color: rgba(38, 128, 235, 1);
+  float: left;
+}
+.task-card img {
+  margin: 4% 16px 0 0;
+  float: right;
+  cursor: pointer;
+}
+
 .container {
   width: 118px;
   position: relative;
@@ -515,6 +653,8 @@ li {
   margin: 9px 0 0 12px;
   border: 1px solid rgba(214, 218, 222, 1);
   border-right: none;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
   float: left;
 }
 .search {
@@ -524,6 +664,8 @@ li {
   margin: 9px 0 0 0;
   border: 1px solid rgba(214, 218, 222, 1);
   border-left: none;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
   float: left;
 }
 .search:focus {

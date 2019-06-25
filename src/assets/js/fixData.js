@@ -71,6 +71,7 @@ function merge(index) {
   let Url= issueItem.url;
   obj.number=context1;
   obj.baseurl=Url;
+  obj.id = issueItem.id;
   obj.title = context;
   obj.number = issueItem.number;
   obj.issueUrl = issueItem.url

@@ -460,7 +460,7 @@ li {
   margin-top: 8px;
 }
 .selectbox {
-  width: 160px;
+  width: 8.6%;
   height: 625px;
   margin: 0 0 0 15px;
   padding: 10px 10px 15px 10px;
@@ -470,19 +470,20 @@ li {
 }
 .sprint-item {
   width: 100%;
-  height: 95px;
+  height:auto;
   background: rgba(250, 251, 252, 1);
   margin-bottom: 6px;
   font-size: 20px;
   font-family: Source Han Sans CN;
   font-weight: 400;
-  line-height: 95px;
   color: rgba(112, 112, 112, 1);
   overflow: hidden;
+  word-wrap: break-word;
+  word-break: break-all;
 }
 .column {
   border: 1px solid rgba(214, 218, 222, 1);
-  width: 316px;
+  width: 20.5%;
   min-width: 280px;
   height: 635px;
   margin-left: 12px;
@@ -512,8 +513,19 @@ li {
   overflow-x: hidden;
 }
 .his-sticker {
-  width: 263px !important;
+  width:89% !important;
   margin-bottom: 12px;
   background: rgba(255, 255, 255, 1);
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 670px;
+}
+::-webkit-scrollbar-thumb {
+  width: 6px;
+  height: 212px;
+  background: rgba(210, 210, 210, 1);
+  opacity: 1;
+  border-radius: 19px;
 }
 </style>
