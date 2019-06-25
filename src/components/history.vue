@@ -53,7 +53,11 @@
           v-for="(spr, i) in sprintInfo"
           :key="spr.id"
           @click="selSprint(i)"
-        >{{ spr.name }}</div>
+        >
+        <span>{{ spr.name }}</span>
+        <el-progress :percentage="spr.planne" :format="format"></el-progress>
+        <span class="sprint-time">2019/6/20-2019/6/25</span>
+        </div>
       </div>
       <div class="column" :key="issueInfo[sprintSel][0].id">
         <span>Future</span>
@@ -136,7 +140,8 @@ export default {
       labChange: false,
       assiChange: false,
       searchNaN: false,
-      state: false
+      state: false,
+      percentage:0,
     };
   },
   components: {
@@ -147,19 +152,24 @@ export default {
       let data = JSON.parse(localStorage.getItem("history"));
       var sprintInfo = [],result = [],fixresult = [], issueInfo = [];
       var projectData = [],projectInfo = [],issueData = []
+      var cardsNum = 0, doneNum = 0
       for(let i in data) {
-        sprintInfo.push({
+        let tmp = {
           id: data[i].id,
           name: data[i].name
-        })
+        }
         projectData = []
         projectInfo = [] 
+        var percentage = 0
         data[i].columns.nodes.forEach(list => {
           projectInfo.push({
             id: list.id,
             name: list.name
           })
           issueData = []
+          cardsNum+=list.cards.totalCount
+          doneNum = list.cards.totalCount
+          percentage = doneNum / cardsNum *100
           list.cards.nodes.forEach(item => {
             issueData.push({
               id: item.id,
@@ -170,6 +180,8 @@ export default {
         })
         issueInfo.push(projectData)
         result.push(fixHistoryData(projectData))
+        tmp.planne = percentage 
+        sprintInfo.push(tmp)
       }
       for(let i =0,lens = result[0].length; i<lens;i+=4) {
         fixresult.push(result[0].slice(i,i+4))
@@ -308,7 +320,10 @@ export default {
           this.labelScreen();
           break;
       }
-    }
+    },
+    format(percentage) {
+      return `${percentage.toFixed(1)}%`;
+    },
   },
   created() {
     this.initData();
@@ -476,9 +491,16 @@ li {
   font-size: 20px;
   font-family: Source Han Sans CN;
   font-weight: 400;
-  line-height: 95px;
+  line-height: 40px;
   color: rgba(112, 112, 112, 1);
   overflow: hidden;
+}
+.sprint-time{
+  font-size:14px;
+  font-family:Source Han Sans CN;
+  font-weight:400;
+  line-height:24px;
+  color:rgba(192,192,192,1);
 }
 .column {
   border: 1px solid rgba(214, 218, 222, 1);
