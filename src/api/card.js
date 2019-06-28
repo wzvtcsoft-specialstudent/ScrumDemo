@@ -13,3 +13,10 @@ export function addCards(data) {
         data: JSON.stringify(data)
     })
 }
+
+export function getCard(data) {
+    return axios({
+        method: "POST",
+        data: JSON.stringify(data)
+    })
+}

@@ -46,7 +46,7 @@
         @keydown.enter="selComplete(3)"
       >
       <div class="task-container">
-        <div class="add-task" @click="addTaskState = !addTaskState">Add Card</div>
+        <div class="add-task" @click="showTaskBox">Add Card</div>
         <div class="card-box" v-show="addTaskState" @mouseleave="addTaskState = false">
           <div class="card-search-box">
             <img src="@/assets/img/sousuo.png">
@@ -57,10 +57,10 @@
               @keydown.enter="searchTask"
             >
           </div>
-          <div class="task-card" v-for="addCard in alltask" :key="addCard.number">
+          <div class="task-card" v-for="(addCard, i) in alltask" :key="addCard.number">
             <a :href="addCard.issueUrl">#{{ addCard.number | fixNum }}</a>
             <div class="task-card-title">{{ addCard.title }}</div>
-            <img src="@/assets/img/right.png" @click="addTaskCard(addCard.id)">
+            <img src="@/assets/img/right.png" @click="addTaskCard(addCard.id,i,addCard)">
           </div>
           <!-- <sticker class="task-card" v-for="addCard in alltask" :key="addCard.number + 'card'" :list="addCard"></sticker> -->
         </div>
@@ -138,8 +138,9 @@
 import sticker from "./sticker";
 import addDialog from "./addDialog";
 import { getIssue } from "@/api/getIssue";
-import { moveCard,addCards } from "@/api/card";
+import { moveCard, addCards, getCard } from "@/api/card";
 import { fixBoradData } from "@/assets/js/fixBoradData";
+import { findTask } from "@/assets/js/findTask";
 
 function judge(obj, val) {
   for (let key in obj) {
@@ -158,8 +159,8 @@ export default {
       boxInfo: [], // 总列表的信息
       boxIssue: [], // 所有列表的issue集
       staticIssue: [], // 静态issue集
-      staticTask: [], // 静态task集
-      alltask: [], // 显示的task
+      staticTask: null, // 静态task集
+      alltask: null, // 显示的task
       labelsState: false,
       assigneesState: false,
       addTaskState: false,
@@ -172,7 +173,8 @@ export default {
       assiChange: false,
       searchNaN: false, // 上次搜索是否没有结果
       clickx: 0,
-      dropIndex: 0
+      dropIndex: 0,
+      allCardId: [] // 当前sprint所有task的id
     };
   },
   components: {
@@ -218,9 +220,9 @@ export default {
         let data = res.data.data.organization.repository,
           nowData = {};
         nowData = data.projects.nodes.shift();
-        this.$store.commit("setAssignees", data.assignableUsers.nodes);
-        this.$store.commit("setLabels", data.labels.nodes);
-        this.$store.commit("setBoardData", data.projects.nodes);
+        // this.$store.commit("setAssignees", data.assignableUsers.nodes);
+        // this.$store.commit("setLabels", data.labels.nodes);
+        // this.$store.commit("setBoardData", data.projects.nodes);
         localStorage.setItem("labels", JSON.stringify(data.labels.nodes));
         localStorage.setItem(
           "assignees",
@@ -246,6 +248,7 @@ export default {
           });
           let subData = [];
           list.cards.nodes.forEach(item => {
+            this.allCardId.push(item.content.id);
             subData.push({
               id: item.id,
               issue: item.content
@@ -255,29 +258,103 @@ export default {
         });
         this.boxIssue = fixBoradData(allData);
         this.staticIssue = this.boxIssue;
-        this.staticTask = JSON.parse(localStorage.getItem("allTask"));
-        this.alltask = this.staticTask;
+        // this.staticTask = JSON.parse(localStorage.getItem("allTask"));
+        // this.alltask = this.staticTask;
         this.state = true;
       });
     },
     /* 添加Task */
-    addTaskCard(id) {
+    showTaskBox() {
+      this.addTaskState = !this.addTaskState;
+      if (this.staticTask != null) return;
       let params = {
         query:
-          'mutation{ addProjectCard(input:{contentId:"'+ id +'",projectColumnId:"'+ this.boxInfo[1].id +'"}){projectColumn{id}}}'
+          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){id name issues(states:[OPEN],first:100){  totalCount nodes{ id title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
+      };
+      getCard(params).then(res => {
+        let temp = this.findAllTask(
+            findTask(res.data.data.organization.repository.issues.nodes)
+          ),
+          result = [],
+          idArry = this.allCardId;
+        temp.forEach(task => {
+          if (!idArry.includes(task.id)) {
+            result.push(task);
+          }
+        });
+        this.staticTask = result;
+        this.alltask = result;
+      });
+    },
+    addTaskCard(id, index, card) {
+      let params = {
+        query:
+          'mutation{ addProjectCard(input:{contentId:"' +
+          id +
+          '",projectColumnId:"' +
+          this.boxInfo[1].id +
+          '"}){projectColumn{id}}}'
       };
       addCards(params).then(res => {
-        if(typeof res.data.data.error != 'undefined') alert("添加失败，可能看板内已存在该Task")
-      })
+        if (typeof res.data.data.error != "undefined") {
+          alert("添加失败，可能看板内已存在该Task");
+        }
+        this.staticTask.splice(index, 1);
+        this.alltask = this.staticTask;
+        this.staticIssue[1].push({
+          id: res.data.data.addProjectCard.projectColumn.id,
+          issue: card
+        })
+        this.boxIssue = this.staticIssue;
+      });
+    },
+    findAllTask(data) {
+      function judgeTask(task) {
+        var flag = true;
+        if (typeof task.nodes == "undefined" || task.nodes == null) return true;
+        task.nodes.forEach(node => {
+          if (typeof node.number != "undefined") flag = false;
+        });
+        return flag;
+      }
+      var result = [];
+      data.forEach(epic => {
+        if (typeof epic.nodes == "undefined") return false;
+        epic.nodes.forEach(story => {
+          if (typeof story.nodes == "undefined" || story.nodes == null)
+            return false;
+          let flags = true;
+          story.nodes.forEach(item => {
+            if (item.nodes == null) return false;
+            try {
+              if (typeof item.nodes[0].number != "undefined") {
+                flags = false;
+              }
+            } catch (error) {
+              flags = false;
+            }
+          });
+          story.nodes.forEach(task => {
+            if (judgeTask(task) && flags) {
+              result.push(task);
+            } else if (typeof task.nodes != "undefined" && task.nodes != null)
+              result.push(...task.nodes);
+          });
+        });
+      });
+      let allTast = result.filter(item => typeof item.title != "undefined");
+      // this.$store.commit('setAllTask',allTast)
+      return allTast;
     },
     searchTask() {
+      this.alltask = this.staticTask;
       if (this.taskword == "") {
         this.alltask = this.staticTask;
         return;
       }
       let result = [];
       this.alltask.forEach(task => {
-        if(task.title.indexOf(this.taskword) != -1) result.push(task)
+        if (task.title.indexOf(this.taskword) != -1) result.push(task);
       });
       this.alltask = result;
     },

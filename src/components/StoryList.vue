@@ -181,14 +181,14 @@ export default {
       getIssue(params).then(res => {
         this.data = fixData(res.data.data.organization.repository.issues.nodes);
         // this.state = true;
-        // this.$store.commit(
-        //   "setAssignees",
-        //   res.data.data.organization.repository.assignableUsers.nodes
-        // );
-        // this.$store.commit(
-        //   "setLabels",
-        //   res.data.data.organization.repository.labels.nodes
-        // );
+        this.$store.commit(
+          "setAssignees",
+          res.data.data.organization.repository.assignableUsers.nodes
+        );
+        this.$store.commit(
+          "setLabels",
+          res.data.data.organization.repository.labels.nodes
+        );
         if (this.data.length > 4) this.epicState = true;
         if (
           typeof this.data[this.epici] !== "undefined" &&
