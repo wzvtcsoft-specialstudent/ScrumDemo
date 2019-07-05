@@ -619,7 +619,7 @@ li {
   top: 49px;
   background-color: white;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
-  z-index: 999;
+  z-index: 1000;
 }
 .card-search-box {
   width: auto;

@@ -9,7 +9,7 @@
         @click="menuState = !menuState"
       />
       <div class="sticker-menu-item" v-show="menuState" @mouseleave="menuState = false">
-        <div class="item" @click="cliEdit">修改</div>
+        <div class="item" @click="cliEdit">编辑</div>
         <div class="item" v-show="isHome" @click="delcard">从此列删除</div>
       </div>
     </div>

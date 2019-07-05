@@ -89,7 +89,7 @@
         >{{ assi.name }}</div>
       </div>
       <div class="cancel" @click="cancel">取消</div>
-      <div class="confirm" @click="confirm">确认修改</div>
+      <div class="confirm" @click="confirm">更新内容</div>
     </div>
   </div>
 </template>
@@ -167,10 +167,10 @@ export default {
       this.body = "";
       editIssue(params).then(res => {
         if (typeof res.data.data.errors != "undefined") {
-          this.$message.error("修改失败，请检查...");
+          this.$message.error("更新失败，请检查...");
         } else {
           this.$message({
-              message: "修改成功！",
+              message: "更新成功！",
               type: 'success'
           })
           this.$emit("state", false);
