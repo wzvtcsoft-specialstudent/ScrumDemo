@@ -17,15 +17,22 @@ export function fixBoradData(data) {
       let obj = {}, subIssue = {}; 
       obj.id = item.id;
       subIssue.title = item.issue.title;
+      subIssue.body = item.issue.body;
       subIssue.number = item.issue.number;
       subIssue.issueUrl = item.issue.url;
+      subIssue.id = item.issue.id;
       subIssue.labels = [];
+      subIssue.assignees = [];
       if (item.issue.assignees.nodes.length != 0) {
-        subIssue.assignees = {
-          name: item.issue.assignees.nodes[0].name,
-          img: item.issue.assignees.nodes[0].avatarUrl,
-          time: item.issue.assignees.nodes[0].updatedAt
-        }
+        let assi = [];
+        item.issue.assignees.nodes.forEach(item => {
+          assi.push({
+            name: item.name,
+            img: item.avatarUrl,
+            time: item.updatedAt
+          })
+        })
+        subIssue.assignees = assi;
       }
       if (item.issue.labels.totalCount !== 0) {
         let lab = [];

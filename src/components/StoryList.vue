@@ -29,15 +29,17 @@
       <div class="line-label">
         <span>Epic</span>
       </div>
-      <transition-group appear mode="out-in" name="sticker">
+      <!-- <transition-group appear mode="out-in" name="sticker"> -->
         <sticker
           v-for="(epic, epic_i) in data"
           :class="{'sticker':true,'selected':epic_i === epici}"
           :key="epic.number + 'epic'"
           :list="epic"
+          :isHome="false"
+          @edit="clickEdit"
           @click.native="selEpic(epic_i)"
         ></sticker>
-      </transition-group>
+      <!-- </transition-group> -->
       <img
         v-show="epicState"
         src="@/assets/img/open.png"
@@ -50,16 +52,18 @@
       <div class="line-label">
         <div class="special">User Story</div>
       </div>
-      <transition-group appear mode="out-in" name="sticker">
+      <!-- <transition-group appear mode="out-in" name="sticker"> -->
         <sticker
           v-for="(story, story_i) in data[epici].nodes"
           v-show="typeof story.title !== 'undefined'"
           :class="{'sticker':true,'selected':story_i === userstoryi}"
           :key="story.number + 'story'"
           :list="story"
+          :isHome="false"
+          @edit="clickEdit"
           @click.native="selStory(story_i)"
         ></sticker>
-      </transition-group>
+      <!-- </transition-group> -->
       <img
         v-show="storyState"
         src="@/assets/img/open.png"
@@ -75,16 +79,18 @@
       <div class="line-label" v-show="titleState">
         <div class="special">user story</div>
       </div>
-      <transition-group appear mode="out-in" name="sticker">
+      <!-- <transition-group appear mode="out-in" name="sticker"> -->
         <sticker
           v-for="(task, task_i) in data[epici].nodes[userstoryi].nodes"
           v-show="typeof task.title !== 'undefined'"
           :key="task.number + 'task'"
           :class="{'sticker':true, 'selected':task_i === taski}"
           :list="task"
+          :isHome="false"
+          @edit="clickEdit"
           @click.native="selTask(task_i)"
         ></sticker>
-      </transition-group>
+      <!-- </transition-group> -->
       <img
         v-show="taskState"
         src="@/assets/img/open.png"
@@ -97,16 +103,18 @@
       <div class="line-label" v-show="titleState">
         <span>Task</span>
       </div>
-      <transition-group appear mode="out-in" name="sticker">
+      <!-- <transition-group appear mode="out-in" name="sticker"> -->
         <sticker
           v-for="extend in extendData()"
           v-show="typeof extend.title !== 'undefined'"
           :key="extend.number + 'extend'"
           class="sticker"
           :list="extend"
+          :isHome="false"
+          @edit="clickEdit"
           @click.native="selExtend"
         ></sticker>
-      </transition-group>
+      <!-- </transition-group> -->
       <img
         v-show="extendState"
         src="@/assets/img/open.png"
@@ -116,12 +124,14 @@
       >
     </div>
     <add-dialog :connect="connectIssue" :type="issueType" @state="changeState" v-show="dialogState"></add-dialog>
+    <edit-dialog class="edit-dialog" v-if="editDialogState" :list="editInfo" @state="cgEditState"></edit-dialog>
   </div>
 </template>
 
 <script>
 import sticker from "./sticker";
 import addDialog from "./addDialog";
+import editDialog from "./editDialog"
 import { getIssue } from "@/api/getIssue";
 import { fixData } from "@/assets/js/fixData";
 
@@ -140,6 +150,8 @@ export default {
       taskState: false,
       extendState: false,
       dialogState: false,
+      editDialogState: false,
+      editInfo: null,
       connectIssue: 0, // 创建issue所关联的issue
       issueType: "Epic" //创建的issue的类型
     };
@@ -334,6 +346,13 @@ export default {
         window.location.reload();
       }
     },
+     clickEdit(list) {
+      this.editInfo = list;
+      this.editDialogState = true;
+    },
+    cgEditState(state) {
+      this.editDialogState = state;
+    },
     /* Menu */
     clickMenu() {
       this.menuState = !this.menuState;
@@ -420,7 +439,8 @@ export default {
   },
   components: {
     sticker,
-    addDialog
+    addDialog,
+    editDialog
   },
   created() {
     this.getissue();
@@ -613,6 +633,9 @@ export default {
 }
 .add-item span:hover {
   color: #2680eb;
+}
+.edit-dialog {
+  z-index: 999;
 }
 </style>
 
