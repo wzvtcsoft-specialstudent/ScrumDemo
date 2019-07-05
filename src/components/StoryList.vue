@@ -558,7 +558,7 @@ export default {
   float: left;
 }
 .menu-item {
-  width: 8.5%;
+  width: 130px;
   height: 102px;
   position: absolute;
   left: 0;

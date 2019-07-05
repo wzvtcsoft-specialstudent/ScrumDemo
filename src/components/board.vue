@@ -75,6 +75,7 @@
             :key="card.id + 'board'"
             :list="card.issue"
             :isHome="true"
+            :id="card.id"
             @edit="clickEdit"
             draggable="true"
             @dragstart.native="drop"
@@ -93,6 +94,7 @@
             :key="card.id + 'board'"
             :list="card.issue"
             :isHome="true"
+            :id="card.id"
             @edit="clickEdit"
             draggable="true"
             @dragstart.native="drop"
@@ -111,6 +113,7 @@
             :key="card.id + 'board'"
             :list="card.issue"
             :isHome="true"
+            :id="card.id"
             @edit="clickEdit"
             draggable="true"
             @dragstart.native="drop"
@@ -129,6 +132,7 @@
             :key="card.id + 'board'"
             :list="card.issue"
             :isHome="true"
+            :id="card.id"
             @edit="clickEdit"
             draggable="true"
             @dragstart.native="drop"
@@ -560,7 +564,7 @@ li {
   float: left;
 }
 .menu-item {
-  width: 8.5%;
+  width: 130px;
   height: 102px;
   position: absolute;
   left: 0;

@@ -20,3 +20,10 @@ export function getCard(data) {
         data: JSON.stringify(data)
     })
 }
+
+export function delCard(data) {
+    return axios({
+        method: "POST",
+        data: JSON.stringify(data)
+    })
+}
