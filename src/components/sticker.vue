@@ -1,9 +1,16 @@
 <template>
     <div class="sticker-container">
-        <div class="info" v-if="typeof list.assignees !== 'undefined'">
-            <img :src="list.assignees.img" width="37px" height="37px">
-            <span class="name">{{ list.assignees.name }}</span>
-            <span class="time">{{ list.assignees.time | fixTime }}</span>
+        <div class="sticker-menu">
+            <img src="@/assets/img/more.png" class="more" width="20px" height="20px" @click="menuState = !menuState">
+            <div class="sticker-menu-item" v-show="menuState" @mouseleave="menuState = false">
+                <div class="item" @click="cliEdit">修改</div>
+                <div class="item" v-show="isHome">从此列删除</div>
+            </div>
+        </div>
+        <div class="info" v-if="list.assignees.length != 0">
+            <img :src="list.assignees[0].img" width="37px" height="37px" class="Head-portrait">
+            <span class="name">{{ list.assignees[0].name }}</span>
+            <span class="time">{{ list.assignees[0].time | fixTime }}</span>
         </div>
         <div class="context" v-show="typeof list.title !== 'undefined'">
             <a :href="list.issueUrl" target="view_window">#{{ list.number }}</a>
@@ -26,11 +33,14 @@ export default {
     name: 'sticker',
     data () {
         return {
+            menuState: false
         }
     },
-    props: ['list'],
-    created() {
-    
+    props: ['list','isHome'],
+    methods: {
+        cliEdit() {
+            this.$emit('edit',this.list)
+        }
     },
     filters: {
         fixTime(val) {
@@ -45,6 +55,7 @@ export default {
 
 <style  scoped>
     .sticker-container {
+        position: relative;
         width: 19.25%;
         min-width: 200px;
         height: 150px;
@@ -57,19 +68,53 @@ export default {
         padding: 10px 16px 17px 18px;
         cursor: pointer;
     }
+    .sticker-menu {
+        width: 100px;
+        height: auto;
+        position: absolute;
+        right: 10px;
+        z-index: 999;
+    }
+    .more {
+        float: right;
+    }
+    .sticker-menu-item {
+        display: block;
+        width: 100px;
+        height: auto;
+        float: right;
+        border-radius: 4px;
+        background-color: white;
+        border: 1px solid rgba(214, 218, 222, 1);
+    }
+    .sticker-menu-item .item {
+        width: 100%;
+        height: 26px;
+        line-height: 25px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 400;
+        font-family:Source Han Sans CN;
+        color: #101010;
+    }
+    .sticker-menu-item .item:hover {
+        background-color: #0366d6;
+        color: white;
+    }
+
     .info {
         width: 274px;
         text-align: left;
         float: left;
     }
-    img {
+    .Head-portrait {
         border-radius: 50%;
         background-color: white;
         opacity: 1;
         float: left;
     }
     .name {
-        width: 200px;
+        width: 190px;
         height: 15;
         font-size: 14px;
         float: left;

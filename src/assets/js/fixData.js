@@ -73,19 +73,22 @@ function merge(index) {
   obj.baseurl=Url;
   obj.id = issueItem.id;
   obj.title = context;
+  obj.body = issueItem.body;
   obj.number = issueItem.number;
-  obj.issueUrl = issueItem.url
+  obj.issueUrl = issueItem.url;
+  obj.assignees = [];
   obj.nodes = [];
   if(issueItem.assignees.nodes.length !== 0) {
-    obj.assignees = {
-      name:issueItem.assignees.nodes[0].name,
-      img:issueItem.assignees.nodes[0].avatarUrl,
-      color: userColor[issueItem.assignees.nodes[0].name],
-      time: issueItem.assignees.nodes[0].updatedAt
-    };
-    // data[index -1].assignees.nodes.forEach( item => {
-    //   obj.assignees.push({name:item.name, img:item.avatarUrl, color: userColor[item.name]})
-    // })
+    let assi = [];
+    issueItem.assignees.nodes.forEach(item => {
+      assi.push({
+        name:item.name,
+        img:item.avatarUrl,
+        color: userColor[item.name],
+        time: item.updatedAt
+      })
+    })
+    obj.assignees = assi;
   }
   /* 标签 */
   if(issueItem.labels.totalCount != 0) {

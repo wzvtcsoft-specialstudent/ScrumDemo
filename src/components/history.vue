@@ -47,17 +47,12 @@
         @keydown.enter="sel(3)"
       >
     </div>
-    <div class="his-body" v-show="state">
+    <div class="his-body" v-if="state">
       <div class="selectbox">
-        <div
-          class="sprint-item"
-          v-for="(spr, i) in sprintInfo"
-          :key="spr.id"
-          @click="selSprint(i)"
-        >
-        <span>{{ spr.name }}</span>
-        <el-progress :percentage="spr.planne" :format="format"></el-progress>
-        <span class="sprint-time">2019/6/20-2019/6/25</span>
+        <div class="sprint-item" v-for="(spr, i) in sprintInfo" :key="spr.id" @click="selSprint(i)">
+          <span>{{ spr.name }}</span>
+          <el-progress :percentage="spr.planne" :format="format"></el-progress>
+          <span class="sprint-time">2019/6/20-2019/6/25</span>
         </div>
       </div>
       <div class="column" :key="issueInfo[sprintSel][0].id">
@@ -111,8 +106,7 @@
 <script>
 import sticker from "./sticker";
 import { getSprint } from "@/api/getHistory";
-import { fixHistoryData } from "@/assets/js/fixHistory"
-import { fixBoradData } from "@/assets/js/fixBoradData";
+import { fixHistoryData } from "@/assets/js/fixHistory";
 
 function judge(obj, val) {
   for (let key in obj) {
@@ -142,7 +136,7 @@ export default {
       assiChange: false,
       searchNaN: false,
       state: false,
-      percentage:0,
+      percentage: 0
     };
   },
   components: {
@@ -150,50 +144,61 @@ export default {
   },
   methods: {
     initData() {
-      let data = JSON.parse(localStorage.getItem("history"));
-      var sprintInfo = [],result = [],fixresult = [], issueInfo = [];
-      var projectData = [],projectInfo = [],issueData = []
-      var cardsNum = 0, doneNum = 0
-      for(let i in data) {
-        let tmp = {
-          id: data[i].id,
-          name: data[i].name
+      try {
+        let data = JSON.parse(localStorage.getItem("history"));
+        var sprintInfo = [],
+          result = [],
+          fixresult = [],
+          issueInfo = [];
+        var projectData = [],
+          projectInfo = [],
+          issueData = [];
+        var cardsNum = 0,
+          doneNum = 0;
+        for (let i in data) {
+          let tmp = {
+            id: data[i].id,
+            name: data[i].name
+          };
+          projectData = [];
+          projectInfo = [];
+          var percentage = 0;
+          data[i].columns.nodes.forEach(list => {
+            projectInfo.push({
+              id: list.id,
+              name: list.name
+            });
+            issueData = [];
+            cardsNum += list.cards.totalCount;
+            doneNum = list.cards.totalCount;
+            percentage = (doneNum / cardsNum) * 100;
+            list.cards.nodes.forEach(item => {
+              issueData.push({
+                id: item.id,
+                issue: item.content
+              });
+            });
+            projectData.push(issueData);
+          });
+          issueInfo.push(projectData);
+          result.push(fixHistoryData(projectData));
+          tmp.planne = percentage;
+          sprintInfo.push(tmp);
         }
-        projectData = []
-        projectInfo = [] 
-        var percentage = 0
-        data[i].columns.nodes.forEach(list => {
-          projectInfo.push({
-            id: list.id,
-            name: list.name
-          })
-          issueData = []
-          cardsNum+=list.cards.totalCount
-          doneNum = list.cards.totalCount
-          percentage = doneNum / cardsNum *100
-          list.cards.nodes.forEach(item => {
-            issueData.push({
-              id: item.id,
-              issue: item.content
-            })
-          })
-          projectData.push(issueData)
-        })
-        issueInfo.push(projectData)
-        result.push(fixHistoryData(projectData))
-        tmp.planne = percentage 
-        sprintInfo.push(tmp)
+        for (let i = 0, lens = result[0].length; i < lens; i += 4) {
+          fixresult.push(result[0].slice(i, i + 4));
+        }
+        this.sprintAllIssue = fixresult;
+        this.issueInfo = issueInfo;
+        this.sprintIssue = fixresult[0];
+        this.sprintInfo = sprintInfo;
+        this.assignees = JSON.parse(localStorage.getItem("assignees"));
+        this.labels = JSON.parse(localStorage.getItem("labels"));
+        this.state = true;
+      } catch (error) {
+        this.state = false;
+        console.log(error);
       }
-      for(let i =0,lens = result[0].length; i<lens;i+=4) {
-        fixresult.push(result[0].slice(i,i+4))
-      }
-      this.sprintAllIssue = fixresult;
-      this.issueInfo = issueInfo;
-      this.sprintIssue = fixresult[0];
-      this.sprintInfo = sprintInfo;
-      this.assignees = JSON.parse(localStorage.getItem('assignees'));
-      this.labels = JSON.parse(localStorage.getItem('labels'))
-      this.state = true;
     },
     /* 选择 */
     selLab(e, index) {
@@ -270,12 +275,11 @@ export default {
       this.sprintIssue.forEach(line => {
         let sub = [];
         line.forEach(item => {
-          if (
-            typeof item.issue.assignees != "undefined" &&
-            selected.indexOf(item.issue.assignees.name) != -1
-          ) {
-            sub.push(item);
-          }
+          item.issue.assignees.forEach(assi => {
+            if(selected.indexOf(assi.name) != -1 && judge(sub, item.id)) {
+              sub.push(item)
+            }
+          });
         });
         result.push(sub);
       });
@@ -324,7 +328,7 @@ export default {
     },
     format(percentage) {
       return `${percentage.toFixed(1)}%`;
-    },
+    }
   },
   created() {
     this.initData();
@@ -486,7 +490,7 @@ li {
 }
 .sprint-item {
   width: 100%;
-  height:auto;
+  height: auto;
   background: rgba(250, 251, 252, 1);
   margin-bottom: 6px;
   font-size: 20px;
@@ -497,12 +501,12 @@ li {
   word-wrap: break-word;
   word-break: break-all;
 }
-.sprint-time{
-  font-size:14px;
-  font-family:Source Han Sans CN;
-  font-weight:400;
-  line-height:24px;
-  color:rgba(192,192,192,1);
+.sprint-time {
+  font-size: 14px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  line-height: 24px;
+  color: rgba(192, 192, 192, 1);
 }
 .column {
   border: 1px solid rgba(214, 218, 222, 1);
@@ -536,7 +540,7 @@ li {
   overflow-x: hidden;
 }
 .his-sticker {
-  width:89% !important;
+  width: 89% !important;
   margin-bottom: 12px;
   background: rgba(255, 255, 255, 1);
 }
