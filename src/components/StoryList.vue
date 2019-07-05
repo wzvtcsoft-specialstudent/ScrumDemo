@@ -7,6 +7,7 @@
           <router-link to="/" tag="span" class="link-item">Home</router-link>
           <router-link to="/storyList" tag="span" class="link-item">Story Map</router-link>
           <router-link to="/history" tag="span" class="link-item">History Sprint</router-link>
+          <router-link to="/bug" tag="span" class="link-item">bug</router-link>
         </div>
       </div>
       <div class="add" @click="clickAdd">
