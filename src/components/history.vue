@@ -62,6 +62,7 @@
             v-for="future in sprintIssue[0]"
             :key="'historyFuture' + future.id"
             :list="future.issue"
+            :comments="commentsData[future.issue.number]"
             class="his-sticker"
           ></sticker>
         </div>
@@ -73,6 +74,7 @@
             v-for="todo in sprintIssue[1]"
             :key="'historyFuture' + todo.id"
             :list="todo.issue"
+            :comments="commentsData[todo.issue.number]"
             class="his-sticker"
           ></sticker>
         </div>
@@ -84,6 +86,7 @@
             v-for="doing in sprintIssue[2]"
             :key="'historyFuture' + doing.id"
             :list="doing.issue"
+            :comments="commentsData[doing.issue.number]"
             class="his-sticker"
           ></sticker>
         </div>
@@ -95,6 +98,7 @@
             v-for="done in sprintIssue[3]"
             :key="'historyFuture' + done.id"
             :list="done.issue"
+            :comments="commentsData[done.issue.number]"
             class="his-sticker"
           ></sticker>
         </div>
@@ -134,6 +138,7 @@ export default {
       sprintIssue: [], // 当前sprint数据
       sprintInfo: [],
       issueInfo: [],
+      commentsData: [],
       word: "", // 搜索的内容
       labChange: false,
       assiChange: false,
@@ -149,6 +154,7 @@ export default {
   methods: {
     initData() {
       try {
+        this.commentsData = JSON.parse(localStorage.getItem('commit'))
         let data = JSON.parse(localStorage.getItem("history"));
         if(data.length == 0) {
           this.notHisState = true;
@@ -365,7 +371,7 @@ li {
   height: 31px;
 }
 .his-header {
-  width: 100%;
+  width: 1536px;
   height: 50px;
   background-color: rgba(250, 251, 252, 1);
 }
@@ -484,7 +490,7 @@ li {
 }
 
 .his-body {
-  width: 100%;
+  width: 1536px;
   height: 651px;
   margin-top: 8px;
 }

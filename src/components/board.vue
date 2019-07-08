@@ -2,7 +2,7 @@
   <div class="board-main">
     <div class="board-title">
       <div class="menu" @click="clickMenu">
-        <img src="@/assets/img/menu.png">
+        <img src="@/assets/img/menu.png" />
         <div class="menu-item" v-show="menuState" @mouseleave="menuState = false">
           <router-link to="/" tag="span" class="link-item">Home</router-link>
           <router-link to="/storyList" tag="span" class="link-item">Story Map</router-link>
@@ -13,12 +13,12 @@
       <div class="container" style="marginLeft:4.19%">
         <div class="sub labels" @click="labelsState = !labelsState">
           <div>Labels</div>
-          <img src="@/assets/img/infodrop.png">
+          <img src="@/assets/img/infodrop.png" />
         </div>
         <div class="list" v-show="labelsState" @mouseleave="selComplete(1)">
           <ul>
             <li v-for="(lab,i) in labels" :key="i">
-              <img src="@/assets/img/select.png" class="select" @click="selLab($event,i)">
+              <img src="@/assets/img/select.png" class="select" @click="selLab($event,i)" />
               <div class="list-name">{{ lab.name }}</div>
             </li>
           </ul>
@@ -27,42 +27,41 @@
       <div class="container">
         <div class="sub assignees" @click="assigneesState = !assigneesState">
           <div>Assignees</div>
-          <img src="@/assets/img/infodrop.png">
+          <img src="@/assets/img/infodrop.png" />
         </div>
         <div class="list" v-show="assigneesState" @mouseleave="selComplete(2)">
           <ul>
             <li v-for="(assi,i) in assignees" :key="i">
-              <img src="@/assets/img/select.png" class="select" @click="selAssi($event,i)">
+              <img src="@/assets/img/select.png" class="select" @click="selAssi($event,i)" />
               <div class="list-name">{{ assi.name }}</div>
             </li>
           </ul>
-
         </div>
       </div>
-      <img src="@/assets/img/sousuo.png" class="icon">
+      <img src="@/assets/img/sousuo.png" class="icon" />
       <input
         type="text"
         class="search"
         placeholder="Search all tasks"
         v-model="word"
         @keydown.enter="selComplete(3)"
-      >
+      />
       <div class="task-container">
         <div class="add-task" @click="showTaskBox">Add Card</div>
         <div class="card-box" v-show="addTaskState" @mouseleave="addTaskState = false">
           <div class="card-search-box">
-            <img src="@/assets/img/sousuo.png">
+            <img src="@/assets/img/sousuo.png" />
             <input
               type="text"
               placeholder="Search all tasks"
               v-model="taskword"
               @keydown.enter="searchTask"
-            >
+            />
           </div>
           <div class="task-card" v-for="(addCard, i) in alltask" :key="addCard.number">
             <a :href="addCard.issueUrl">#{{ addCard.number | fixNum }}</a>
             <div class="task-card-title">{{ addCard.title }}</div>
-            <img src="@/assets/img/right.png" @click="addTaskCard(addCard.id,i,addCard)">
+            <img src="@/assets/img/right.png" @click="addTaskCard(addCard.id,i,addCard)" />
           </div>
           <!-- <sticker class="task-card" v-for="addCard in alltask" :key="addCard.number + 'card'" :list="addCard"></sticker> -->
         </div>
@@ -78,6 +77,7 @@
             :list="card.issue"
             :isHome="true"
             :id="card.id"
+            :comments="commitData[card.issue.number]"
             @edit="clickEdit"
             draggable="true"
             @dragstart.native="drop"
@@ -87,7 +87,6 @@
             class="sticker"
           ></sticker>
         </div>
-        
       </div>
       <div class="body-container">
         <span class="title">To do</span>
@@ -98,6 +97,7 @@
             :list="card.issue"
             :isHome="true"
             :id="card.id"
+            :comments="commitData[card.issue.number]"
             @edit="clickEdit"
             draggable="true"
             @dragstart.native="drop"
@@ -117,6 +117,7 @@
             :list="card.issue"
             :isHome="true"
             :id="card.id"
+            :comments="commitData[card.issue.number]"
             @edit="clickEdit"
             draggable="true"
             @dragstart.native="drop"
@@ -136,6 +137,7 @@
             :list="card.issue"
             :isHome="true"
             :id="card.id"
+            :comments="commitData[card.issue.number]"
             @edit="clickEdit"
             draggable="true"
             @dragstart.native="drop"
@@ -147,7 +149,8 @@
       <edit-dialog class="edit-dialog" v-if="editDialogState" :list="editInfo" @state="cgEditState"></edit-dialog>
     </div>
     <div class="not-content" v-if="notState">
-      暂无冲刺周期信息，<b @click="createProState = true">点击创建</b>
+      暂无冲刺周期信息，
+      <b @click="createProState = true">点击创建</b>
     </div>
     <create-pro @state="cgProState" v-if="createProState"></create-pro>
   </div>
@@ -155,11 +158,13 @@
 
 <script>
 import sticker from "./sticker";
-import editDialog from "./editDialog"
-import createPro from "./createPro"
+import editDialog from "./editDialog";
+import createPro from "./createPro";
 import { getIssue } from "@/api/getIssue";
+import { getCommit } from "@/api/getCommit";
 import { moveCard, addCards, getCard } from "@/api/card";
 import { fixBoradData } from "@/assets/js/fixBoradData";
+import { fixComments } from "@/assets/js/fixComments"
 import { findTask } from "@/assets/js/findTask";
 
 function judge(obj, val) {
@@ -181,6 +186,7 @@ export default {
       boxIssue: [], // 所有列表的issue集
       staticIssue: [], // 静态issue集
       staticTask: null, // 静态task集
+      commitData: [],
       alltask: null, // 显示的task
       labelsState: false,
       assigneesState: false,
@@ -245,11 +251,14 @@ export default {
         let data = res.data.data.organization.repository,
           nowData = {};
         try {
-          if(data.projects.nodes.length == 0) {
+          if (data.projects.nodes.length == 0) {
             this.notState = true;
-            localStorage.setItem("history", JSON.stringify(data.projects.nodes));
+            localStorage.setItem(
+              "history",
+              JSON.stringify(data.projects.nodes)
+            );
             return;
-          } 
+          }
         } catch (error) {
           this.notState = true;
         }
@@ -294,18 +303,31 @@ export default {
         this.staticIssue = this.boxIssue;
         // this.staticTask = JSON.parse(localStorage.getItem("allTask"));
         // this.alltask = this.staticTask;
-        this.state = true;
       });
+      this.getcommit()
+    },
+    getcommit() {
+      let params = {
+        query:
+          'query{organization(login: "wzvtcsoft-specialstudent") {repository(name: "ScrumDemo") {issues(first:100){totalCount nodes{number comments(first:100){nodes{id body}}}}}}}'
+      };
+      getCommit(params).then(res=> {
+        let commitData = res.data.data.organization.repository.issues.nodes
+        commitData = fixComments(commitData);
+        localStorage.setItem('commit', JSON.stringify(commitData))
+        this.commitData = commitData;
+        this.state = true;
+      })
     },
     clickEdit(list) {
       this.editInfo = list;
       this.editDialogState = true;
     },
     cgEditState(state) {
-      this.editDialogState = state
+      this.editDialogState = state;
     },
     cgProState(state) {
-      this.createProState = state
+      this.createProState = state;
     },
     /* 添加Task */
     showTaskBox() {
@@ -348,7 +370,7 @@ export default {
         this.staticIssue[1].push({
           id: res.data.data.addProjectCard.cardEdge.node.id,
           issue: card
-        })
+        });
         this.boxIssue = this.staticIssue;
       });
     },
@@ -477,8 +499,8 @@ export default {
         let sub = [];
         line.forEach(item => {
           item.issue.assignees.forEach(assi => {
-            if(selected.indexOf(assi.name) != -1 && judge(sub,item.id)) {
-              sub.push(item)
+            if (selected.indexOf(assi.name) != -1 && judge(sub, item.id)) {
+              sub.push(item);
             }
           });
         });
@@ -767,7 +789,7 @@ a {
 .list {
   position: absolute;
   top: 32px;
-  z-index: 999;
+  z-index: 9999;
 }
 .select {
   width: 14px;
@@ -823,7 +845,6 @@ a {
   margin-top: 9px;
   overflow-y: scroll;
   overflow-x: hidden;
-  
 }
 .title {
   width: 91%;

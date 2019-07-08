@@ -1,38 +1,52 @@
 <template>
-  <div class="sticker-container">
-    <div class="sticker-menu">
-      <img
-        src="@/assets/img/more.png"
-        class="more"
-        width="20px"
-        height="20px"
-        @click="menuState = !menuState"
-      />
-      <div class="sticker-menu-item" v-show="menuState" @mouseleave="menuState = false">
-        <div class="item" @click="cliEdit">编辑</div>
-        <div class="item" v-show="isHome" @click="delcard">从此列删除</div>
+  <el-tooltip 
+    effect="light"
+    placement="right"
+    v-model="show"
+    manual>
+    <div slot="content" class="comments-container">
+      <div v-if="comments.state">
+        <ul>
+          <li v-for="(comment, i) in comments.comments" :key="comment.id">{{ i+1 }}. {{ comment.body }}</li>
+        </ul>
+      </div>
+      <div style="text-align: center" v-else>暂无验收标准</div>
+    </div>
+    <div class="sticker-container" @contextmenu.prevent="rightClick" @mouseleave="show = false">
+      <div class="sticker-menu">
+        <img
+          src="@/assets/img/more.png"
+          class="more"
+          width="20px"
+          height="20px"
+          @click="menuState = !menuState"
+        />
+        <div class="sticker-menu-item" v-show="menuState" @mouseleave="menuState = false">
+          <div class="item" @click="cliEdit">编辑</div>
+          <div class="item" v-show="isHome" @click="delcard">从此列删除</div>
+        </div>
+      </div>
+      <div class="info" v-if="typeof list.assignees != 'undefined' && list.assignees.length != 0">
+        <img :src="list.assignees[0].img" width="37px" height="37px" class="Head-portrait" />
+        <span class="name">{{ list.assignees[0].name }}</span>
+        <span class="time">{{ list.assignees[0].time | fixTime }}</span>
+      </div>
+      <div class="context" v-show="typeof list.title !== 'undefined'">
+        <a :href="list.issueUrl" target="view_window">#{{ list.number }}</a>
+        <span>{{ list.title }}</span>
+      </div>
+      <div class="labels-container">
+        <div
+          class="label"
+          v-for="(lab, lab_i) in list.labels"
+          :key="lab_i"
+          :style="'backgroundColor:#' + lab.bgcolor + ';color:' + lab.ftcolor"
+        >
+          <span class="label-name">{{ lab.name }}</span>
+        </div>
       </div>
     </div>
-    <div class="info" v-if="typeof list.assignees != 'undefined' && list.assignees.length != 0">
-      <img :src="list.assignees[0].img" width="37px" height="37px" class="Head-portrait" />
-      <span class="name">{{ list.assignees[0].name }}</span>
-      <span class="time">{{ list.assignees[0].time | fixTime }}</span>
-    </div>
-    <div class="context" v-show="typeof list.title !== 'undefined'">
-      <a :href="list.issueUrl" target="view_window">#{{ list.number }}</a>
-      <span>{{ list.title }}</span>
-    </div>
-    <div class="labels-container">
-      <div
-        class="label"
-        v-for="(lab, lab_i) in list.labels"
-        :key="lab_i"
-        :style="'backgroundColor:#' + lab.bgcolor + ';color:' + lab.ftcolor"
-      >
-        <span class="label-name">{{ lab.name }}</span>
-      </div>
-    </div>
-  </div>
+  </el-tooltip>
 </template>
 
 <script>
@@ -42,10 +56,11 @@ export default {
   name: "sticker",
   data() {
     return {
-      menuState: false
+      menuState: false,
+      show: false
     };
   },
-  props: ["list", "isHome", "id"],
+  props: ["list", "isHome", "id","comments"],
   methods: {
     cliEdit() {
       this.$emit("edit", this.list);
@@ -64,17 +79,17 @@ export default {
               '"}){deletedCardId}}'
           };
           delCard(params).then(res => {
-              console.log(res);
+            console.log(res);
             if (typeof res.data.data.error == "undefined") {
               this.$message({
                 message: "删除成功",
                 type: "success"
               });
-              setTimeout(()=>{
-                  window.location.reload();
-              },2000)
+              setTimeout(() => {
+                window.location.reload();
+              }, 2000);
             } else {
-                this.$message.error("删除失败，请检查...")
+              this.$message.error("删除失败，请检查...");
             }
           });
         })
@@ -84,6 +99,10 @@ export default {
             type: "info"
           });
         });
+    },
+    rightClick() {
+      this.show = !this.show;
+      return false;
     }
   },
   filters: {
@@ -98,13 +117,23 @@ export default {
 </script>
 
 <style  scoped>
+ul {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+li {
+  text-align: center;
+}
+.comments-container {
+  width: 200px;
+  max-height: 200px;
+}
 .sticker-container {
   position: relative;
   width: 19.25%;
   min-width: 200px;
   height: 150px;
-  // min-height: 115px;
-  // max-height: 132px;
   background-color: white;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
   opacity: 1;
@@ -204,7 +233,6 @@ a {
 .label {
   text-align: center;
   height: 13px;
-  // background:rgba(241,136,136,1);
   border-radius: 14px;
   margin-left: 3px;
   float: left;
