@@ -35,6 +35,7 @@
               <div class="list-name">{{ assi.name }}</div>
             </li>
           </ul>
+
         </div>
       </div>
       <img src="@/assets/img/sousuo.png" class="icon">
@@ -82,6 +83,7 @@
             class="sticker"
           ></sticker>
         </div>
+        
       </div>
       <div class="body-container">
         <span class="title">To do</span>
@@ -136,6 +138,7 @@
 
 <script>
 import sticker from "./sticker";
+
 import addDialog from "./addDialog";
 import { getIssue } from "@/api/getIssue";
 import { moveCard, addCards, getCard } from "@/api/card";
@@ -179,7 +182,8 @@ export default {
   },
   components: {
     sticker,
-    addDialog
+    addDialog,
+   
   },
   methods: {
     /* 鼠标拖动 */
@@ -766,6 +770,7 @@ a {
   margin-top: 9px;
   overflow-y: scroll;
   overflow-x: hidden;
+  
 }
 .title {
   width: 91%;

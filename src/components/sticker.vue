@@ -1,4 +1,5 @@
 <template>
+    <div class="big-box">
     <div class="sticker-container">
         <div class="info" v-if="typeof list.assignees !== 'undefined'">
             <img :src="list.assignees.img" width="37px" height="37px">
@@ -10,122 +11,195 @@
             <span>{{ list.title }}</span>
         </div>
         <div class="labels-container">
-            <div 
-            class="label" 
-            v-for="(lab, lab_i) in list.labels" 
-            :key="lab_i"
-            :style="'backgroundColor:#' + lab.bgcolor + ';color:' + lab.ftcolor">
+            <div class="label" v-for="(lab, lab_i) in list.labels" :key="lab_i" :style="'backgroundColor:#' + lab.bgcolor + ';color:' + lab.ftcolor">
                 <span class="label-name">{{ lab.name }}</span>
             </div>
+
         </div>
+
     </div>
+    <div class="acceptance">
+           {{commitList.body}}
+    </div>
+</div>
 </template>
 
 <script>
+import { getCommit } from "@/api/getCommit";
 export default {
     name: 'sticker',
-    data () {
+    data() {
         return {
+            commitList: {},
+            CommitBody: [],
+            List: [],
+            yanshou:null,
+            isA:false,
         }
     },
     props: ['list'],
     created() {
-    
+
     },
     filters: {
         fixTime(val) {
-            if(typeof val == 'undefined') return "";
-            let date = val.substr(0,10);
-            let time = val.substr(11,8);
+            if (typeof val == 'undefined') return "";
+            let date = val.substr(0, 10);
+            let time = val.substr(11, 8);
             return `${date} ${time}`;
         }
+    },
+    methods: {
+        getinfo() {
+            let params = {
+                query: 'query{organization(login: "wzvtcsoft-specialstudent") {repository(name: "ScrumDemo") {issues(first:100){totalCount nodes{number id title body comments(first:100){nodes{id body}}}}}}}'
+            };
+            getCommit(params).then(res => {
+                let data = res.data.data.organization.repository
+                data.issues.nodes.forEach(res => {
+                    res.comments.nodes.forEach(item => {
+                        this.commitList = {
+                            id: res.number,
+                            commitId: item.id,
+                            body: item.body
+                        }
+                        this.CommitBody.push(this.commitList)
+                        console.log(this.CommitBody)
+                    })
+                })
+
+
+            })
+
+        },
+        isCommit(num) {
+            this.CommitBody.forEach(item => {
+                if (item.id == num) {
+                    yanshou=item.body;
+                    this.isA=true;
+                    console.log(item.body)
+                }
+            })
+            //    console.log(this.List)
+        }
+    },
+    created() {
+        this.getinfo()
     }
+
 }
 </script>
 
-<style  scoped>
-    .sticker-container {
-        width: 19.25%;
-        min-width: 200px;
-        height: 150px;
-        // min-height: 115px;
-        // max-height: 132px;
-        background-color: white;
-        box-shadow:0px 3px 6px rgba(0,0,0,0.16);
-        opacity: 1;
-        border-radius: 10px;
-        padding: 10px 16px 17px 18px;
-        cursor: pointer;
-    }
-    .info {
-        width: 274px;
-        text-align: left;
-        float: left;
-    }
-    img {
-        border-radius: 50%;
-        background-color: white;
-        opacity: 1;
-        float: left;
-    }
-    .name {
-        width: 200px;
-        height: 15;
-        font-size: 14px;
-        float: left;
-        font-weight: 400;
-        line-height: 24px;
-        margin-left: 8px;
-        margin-top: 3px;
-        font-family:Source Han Sans CN;
-        color: #101010;
-    }
-    .time {
-        width: 200px;
-        height: 10px;
-        font-size: 10px;
-        font-weight: 400;
-        font-family: Source Han Sans CN;
-        line-height: 17px;
-        color: #707070;
-        margin-left: 8px;
-        float: left;
-    }
-    .context {
-        max-height: 60px;
-        overflow: hidden;
-        margin-top: 19px;
-        float: left;   
-        text-align: left; 
-        font-size: 12px;
-        line-height: 20px;
-        font-weight: 400;
-        color: #707070;
-        padding-bottom: 30px;
-    }
-    a {
-        color: #2680EB;
-        text-decoration: none;
-    }
-    .labels-container {
-        width: 274px;
-        height: auto;
-        float: left;
-    }
-    .label {
-        text-align: center;
-        height: 13px;
-        // background:rgba(241,136,136,1);
-        border-radius: 14px;      
-        margin-left: 3px;
-        float: left;
-        opacity: 0.8;
-        padding: 1px 12px 3px 12px;
-        line-height: 12px;
-    }
-    .label-name {
-        font-size: 12px;
-        font-family: Source Han Sans CN;
-        font-weight: 400;
-    }
+<style scoped>
+.big-box{
+    width: 265px;
+    height:auto;
+    position: relative;
+}
+
+.sticker-container {
+    width: 260px;
+    min-width: 200px;
+    height: 150px; // min-height: 115px;
+    // max-height: 132px;
+    background-color: white;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+    opacity: 1;
+    border-radius: 10px;
+    padding: 10px 16px 17px 18px;
+    cursor: pointer;
+   
+}
+
+.info {
+    width: 274px;
+    text-align: left;
+    float: left;
+}
+
+img {
+    border-radius: 50%;
+    background-color: white;
+    opacity: 1;
+    float: left;
+}
+
+.name {
+    width: 200px;
+    height: 15;
+    font-size: 14px;
+    float: left;
+    font-weight: 400;
+    line-height: 24px;
+    margin-left: 8px;
+    margin-top: 3px;
+    font-family: Source Han Sans CN;
+    color: #101010;
+}
+
+.time {
+    width: 200px;
+    height: 10px;
+    font-size: 10px;
+    font-weight: 400;
+    font-family: Source Han Sans CN;
+    line-height: 17px;
+    color: #707070;
+    margin-left: 8px;
+    float: left;
+}
+
+.context {
+    max-height: 60px;
+    overflow: hidden;
+    margin-top: 19px;
+    float: left;
+    text-align: left;
+    font-size: 12px;
+    line-height: 20px;
+    font-weight: 400;
+    color: #707070;
+    padding-bottom: 30px;
+}
+
+a {
+    color: #2680EB;
+    text-decoration: none;
+}
+
+.labels-container {
+    width: 274px;
+    height: auto;
+    float: left;
+}
+
+.label {
+    text-align: center;
+    height: 13px; // background:rgba(241,136,136,1);
+    border-radius: 14px;
+    margin-left: 3px;
+    float: left;
+    opacity: 0.8;
+    padding: 1px 12px 3px 12px;
+    line-height: 12px;
+}
+
+.label-name {
+    font-size: 12px;
+    font-family: Source Han Sans CN;
+    font-weight: 400;
+}
+
+.acceptance {
+    width: 280px;
+    height: 100px;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+    opacity: 1;
+    z-index: 999;
+    position: absolute;
+    left:280px;;
+}
+
+
 </style>
