@@ -7,6 +7,7 @@
           <router-link to="/" tag="span" class="link-item">Home</router-link>
           <router-link to="/storyList" tag="span" class="link-item">Story Map</router-link>
           <router-link to="/history" tag="span" class="link-item">History Sprint</router-link>
+          <router-link to="/bug" tag="span" class="link-item">bug</router-link>
         </div>
       </div>
       <div class="container" style="marginLeft:4.19%">
@@ -67,7 +68,7 @@
         </div>
       </div>
     </div>
-    <div class="board-body" v-show="state" @dragenter="prev" @dragover="prev" key="board">
+    <div class="board-body" v-if="state" @dragenter="prev" @dragover="prev" key="board">
       <div class="body-container" style="marginLeft:7.25%">
         <span class="title">Future</span>
         <div class="issue-container">
@@ -75,6 +76,9 @@
             v-for="(card, i) in boxIssue[0]"
             :key="card.id + 'board'"
             :list="card.issue"
+            :isHome="true"
+            :id="card.id"
+            @edit="clickEdit"
             draggable="true"
             @dragstart.native="drop"
             @dragend.native="dropend($event, card, i, 0)"
@@ -92,6 +96,9 @@
             v-for="(card, i) in boxIssue[1]"
             :key="card.id + 'board'"
             :list="card.issue"
+            :isHome="true"
+            :id="card.id"
+            @edit="clickEdit"
             draggable="true"
             @dragstart.native="drop"
             @dragend.native="dropend($event, card, i, 1)"
@@ -108,6 +115,9 @@
             v-for="(card, i) in boxIssue[2]"
             :key="card.id + 'board'"
             :list="card.issue"
+            :isHome="true"
+            :id="card.id"
+            @edit="clickEdit"
             draggable="true"
             @dragstart.native="drop"
             @dragend.native="dropend($event, card, i, 2)"
@@ -124,6 +134,9 @@
             v-for="(card, i) in boxIssue[3]"
             :key="card.id + 'board'"
             :list="card.issue"
+            :isHome="true"
+            :id="card.id"
+            @edit="clickEdit"
             draggable="true"
             @dragstart.native="drop"
             @dragend.native="dropend($event, card, i, 3)"
@@ -131,15 +144,14 @@
           ></sticker>
         </div>
       </div>
-      <!-- <add-dialog :connect="'0'" :type="'Task'" @state="changeState" v-if="dialogState"></add-dialog> -->
+      <edit-dialog class="edit-dialog" v-if="editDialogState" :list="editInfo" @state="cgEditState"></edit-dialog>
     </div>
   </div>
 </template>
 
 <script>
 import sticker from "./sticker";
-
-import addDialog from "./addDialog";
+import editDialog from "./editDialog"
 import { getIssue } from "@/api/getIssue";
 import { moveCard, addCards, getCard } from "@/api/card";
 import { fixBoradData } from "@/assets/js/fixBoradData";
@@ -167,6 +179,8 @@ export default {
       labelsState: false,
       assigneesState: false,
       addTaskState: false,
+      editDialogState: false,
+      editInfo: null,
       labSel: [], // 选择的labels
       assiSel: [], // 选择的assignees
       word: "", // 搜索的内容
@@ -182,8 +196,7 @@ export default {
   },
   components: {
     sticker,
-    addDialog,
-   
+    editDialog
   },
   methods: {
     /* 鼠标拖动 */
@@ -224,8 +237,8 @@ export default {
         let data = res.data.data.organization.repository,
           nowData = {};
         nowData = data.projects.nodes.shift();
-        // this.$store.commit("setAssignees", data.assignableUsers.nodes);
-        // this.$store.commit("setLabels", data.labels.nodes);
+        this.$store.commit("setAssignees", data.assignableUsers.nodes);
+        this.$store.commit("setLabels", data.labels.nodes);
         // this.$store.commit("setBoardData", data.projects.nodes);
         localStorage.setItem("labels", JSON.stringify(data.labels.nodes));
         localStorage.setItem(
@@ -266,6 +279,13 @@ export default {
         // this.alltask = this.staticTask;
         this.state = true;
       });
+    },
+    clickEdit(list) {
+      this.editInfo = list;
+      this.editDialogState = true;
+    },
+    cgEditState(state) {
+      this.editDialogState = state
     },
     /* 添加Task */
     showTaskBox() {
@@ -436,12 +456,11 @@ export default {
       this.boxIssue.forEach(line => {
         let sub = [];
         line.forEach(item => {
-          if (
-            typeof item.issue.assignees != "undefined" &&
-            selected.indexOf(item.issue.assignees.name) != -1
-          ) {
-            sub.push(item);
-          }
+          item.issue.assignees.forEach(assi => {
+            if(selected.indexOf(assi.name) != -1 && judge(sub,item.id)) {
+              sub.push(item)
+            }
+          });
         });
         result.push(sub);
       });
@@ -548,7 +567,7 @@ li {
   float: left;
 }
 .menu-item {
-  width: 8.5%;
+  width: 130px;
   height: 102px;
   position: absolute;
   left: 0;
@@ -790,7 +809,9 @@ a {
   margin-bottom: 12px;
   background: rgba(255, 255, 255, 1);
 }
-
+.edit-dialog {
+  z-index: 999;
+}
 ::-webkit-scrollbar {
   width: 6px;
   height: 670px;

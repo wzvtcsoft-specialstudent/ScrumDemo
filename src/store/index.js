@@ -29,17 +29,21 @@ const getters = {
 };
 const mutations = {
   setAssignees(state, params) {
-    state.assignees = params
+    if(state.assignees.length == 0) {
+      state.assignees = params
+    }
   },
   setLabels(state, params) {
     state.allLabels = params
-    params.forEach(item => {
-      if (isNaN(item.name)) {
-        state.labels.push(item)
-      } else {
-        state.estimate.push(item)
-      }
-    })
+    if(state.labels.length == 0) {
+      params.forEach(item => {
+        if (isNaN(item.name)) {
+          state.labels.push(item)
+        } else {
+          state.estimate.push(item)
+        }
+      })
+    }
   },
   setBoardData(state, params) {
     state.boardData = params
