@@ -100,6 +100,9 @@
         </div>
       </div>
     </div>
+    <div class="not-his-content" v-if="notHisState">
+      当前暂无历史冲刺信息
+    </div>
   </div>
 </template>
 
@@ -136,6 +139,7 @@ export default {
       assiChange: false,
       searchNaN: false,
       state: false,
+      notHisState: false,
       percentage: 0
     };
   },
@@ -146,6 +150,10 @@ export default {
     initData() {
       try {
         let data = JSON.parse(localStorage.getItem("history"));
+        if(data.length == 0) {
+          this.notHisState = true;
+          return;
+        }
         var sprintInfo = [],
           result = [],
           fixresult = [],
@@ -197,6 +205,7 @@ export default {
         this.state = true;
       } catch (error) {
         this.state = false;
+        this.notHisState = true;
         console.log(error);
       }
     },
@@ -367,7 +376,7 @@ li {
 }
 .his-menu-item {
   width: 130px;
-  height: 102px;
+  height: 126px;
   position: absolute;
   left: 0;
   background: rgba(255, 255, 255, 1);
@@ -479,6 +488,15 @@ li {
   height: 651px;
   margin-top: 8px;
 }
+.not-his-content {
+  width: 100%;
+  height: 600px;
+  margin-top: 8px;
+  padding-top: 51px;
+  text-align: center;
+  font-size: 25px;
+}
+
 .selectbox {
   width: 8.6%;
   height: 625px;

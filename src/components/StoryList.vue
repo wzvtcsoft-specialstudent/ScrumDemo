@@ -560,7 +560,7 @@ export default {
 }
 .menu-item {
   width: 130px;
-  height: 102px;
+  height: 126px;
   position: absolute;
   left: 0;
   background: rgba(255, 255, 255, 1);

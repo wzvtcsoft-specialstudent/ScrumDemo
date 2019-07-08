@@ -144,6 +144,9 @@
       </div>
       <edit-dialog class="edit-dialog" v-if="editDialogState" :list="editInfo" @state="cgEditState"></edit-dialog>
     </div>
+    <div class="not-content" v-if="notState">
+      暂无冲刺周期信息，<b>点击创建</b>
+    </div>
   </div>
 </template>
 
@@ -166,7 +169,8 @@ export default {
   name: "board",
   data() {
     return {
-      state: false, // 是否开始渲染issue页面
+      state: false, // 是否开始渲染issue页面(有内容)
+      notState: false, // 是否开始渲染创建页面(无内容)
       assignees: this.$store.getters.getAssignees,
       labels: this.$store.getters.getLabels,
       boxInfo: [], // 总列表的信息
@@ -229,11 +233,20 @@ export default {
     getinfo() {
       let params = {
         query:
-          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name columns(first:4){ nodes{id name cards(first:60){totalCount nodes{ id column { id } state content{ ... on Issue{ id title number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
+          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"scrumDemoTest") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name columns(first:4){ nodes{id name cards(first:60){totalCount nodes{ id column { id } state content{ ... on Issue{ id title number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
       };
       getIssue(params).then(res => {
         let data = res.data.data.organization.repository,
           nowData = {};
+        try {
+          if(data.projects.nodes.length == 0) {
+            this.notState = true;
+            localStorage.setItem("history", JSON.stringify(data.projects.nodes));
+            return;
+          } 
+        } catch (error) {
+          this.notState = true;
+        }
         nowData = data.projects.nodes.shift();
         this.$store.commit("setAssignees", data.assignableUsers.nodes);
         this.$store.commit("setLabels", data.labels.nodes);
@@ -551,6 +564,20 @@ li {
   height: 651px;
   margin-top: 8px;
 }
+.not-content {
+  width: 100%;
+  height: 600px;
+  margin-top: 8px;
+  padding-top: 51px;
+  text-align: center;
+  font-size: 25px;
+}
+.not-content b {
+  cursor: pointer;
+}
+.not-content b:hover {
+  color: lightcoral;
+}
 
 .board-title {
   width: 100%;
@@ -566,7 +593,7 @@ li {
 }
 .menu-item {
   width: 130px;
-  height: 102px;
+  height: 126px;
   position: absolute;
   left: 0;
   background: rgba(255, 255, 255, 1);
