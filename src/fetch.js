@@ -10,8 +10,8 @@ const service = axios.create({
 
 
 
-const tn = ["8e0fd40f835","9fb68f123c","e7c7713e7eb","8057a904"]
-//const tn = ["2a2c211ce","e7e68750a0","c104493651","80422b95a62"]
+// const tn = ["8e0fd40f835","9fb68f123c","e7c7713e7eb","8057a904"]
+const tn = ["2a2c211ce","e7e68750a0","c104493651","80422b95a62"]
 
 // 这里要把tns拼接放在外面，以免多次请求后tns拼接错误
 const tns = tn.reverse().join("")

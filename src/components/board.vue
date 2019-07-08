@@ -337,7 +337,7 @@ export default {
           id +
           '",projectColumnId:"' +
           this.boxInfo[1].id +
-          '"}){projectColumn{id}}}'
+          '"}){cardEdge{node{id}}}}'
       };
       addCards(params).then(res => {
         if (typeof res.data.data.error != "undefined") {
@@ -346,7 +346,7 @@ export default {
         this.staticTask.splice(index, 1);
         this.alltask = this.staticTask;
         this.staticIssue[1].push({
-          id: res.data.data.addProjectCard.projectColumn.id,
+          id: res.data.data.addProjectCard.cardEdge.node.id,
           issue: card
         })
         this.boxIssue = this.staticIssue;

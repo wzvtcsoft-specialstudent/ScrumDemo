@@ -185,11 +185,6 @@ export default {
       }
       sum = rgbArr[0] * 0.299 + rgbArr[1] * 0.578 + rgbArr[2] * 0.114;
       return sum > 192 ? "#707070" : "#FFFFFF"; // 深色背景，白色文字；浅色背景，黑色文字
-    },
-    addmilestones(item){
-      if(item){
-        console.log(add)
-      }
     }
   },
   mounted() {
