@@ -145,14 +145,16 @@
       <edit-dialog class="edit-dialog" v-if="editDialogState" :list="editInfo" @state="cgEditState"></edit-dialog>
     </div>
     <div class="not-content" v-if="notState">
-      暂无冲刺周期信息，<b>点击创建</b>
+      暂无冲刺周期信息，<b @click="createProState = true">点击创建</b>
     </div>
+    <create-pro @state="cgProState" v-if="createProState"></create-pro>
   </div>
 </template>
 
 <script>
 import sticker from "./sticker";
 import editDialog from "./editDialog"
+import createPro from "./createPro"
 import { getIssue } from "@/api/getIssue";
 import { moveCard, addCards, getCard } from "@/api/card";
 import { fixBoradData } from "@/assets/js/fixBoradData";
@@ -182,6 +184,7 @@ export default {
       assigneesState: false,
       addTaskState: false,
       editDialogState: false,
+      createProState: false,
       editInfo: null,
       labSel: [], // 选择的labels
       assiSel: [], // 选择的assignees
@@ -198,7 +201,8 @@ export default {
   },
   components: {
     sticker,
-    editDialog
+    editDialog,
+    createPro
   },
   methods: {
     /* 鼠标拖动 */
@@ -297,6 +301,9 @@ export default {
     },
     cgEditState(state) {
       this.editDialogState = state
+    },
+    cgProState(state) {
+      this.createProState = state
     },
     /* 添加Task */
     showTaskBox() {
