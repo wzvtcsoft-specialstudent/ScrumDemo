@@ -10,7 +10,7 @@
           <li v-for="(comment, i) in comments.comments" :key="comment.id">{{ i+1 }}. {{ comment.body }}</li>
         </ul>
       </div>
-      <div style="text-align: center" v-else>暂无验收标准</div>
+      <div class="no-comment" v-else>暂无验收标准</div>
     </div>
     <div class="sticker-container" @contextmenu.prevent="rightClick" @mouseleave="show = false">
       <div class="sticker-menu">
@@ -123,12 +123,29 @@ ul {
   margin: 0;
 }
 li {
-  text-align: center;
+  text-align: left;
+  padding-left: 10px;
+  list-style-type: none;
+  font-size: 14px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  line-height: 27px;
+  color: rgba(112, 112, 112, 1);
 }
 .comments-container {
   width: 200px;
   max-height: 200px;
+  overflow-y: auto;
 }
+.no-comment {
+  text-align: center;
+  font-size: 16px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  line-height: 27px;
+  color: rgba(112, 112, 112, 1);
+}
+
 .sticker-container {
   position: relative;
   width: 19.25%;
@@ -244,5 +261,16 @@ a {
   font-size: 12px;
   font-family: Source Han Sans CN;
   font-weight: 400;
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 670px;
+}
+::-webkit-scrollbar-thumb {
+  width: 6px;
+  height: 212px;
+  background: rgba(210, 210, 210, 1);
+  opacity: 1;
+  border-radius: 19px;
 }
 </style>
