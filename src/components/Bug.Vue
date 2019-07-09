@@ -45,12 +45,10 @@
           <sticker
             v-for="(card, i) in boxIssue[0]"
             :key="card.id + 'board'"
-            :list="card.issue"
-            draggable="true"
-            @dragstart.native="drop"
-            @dragend.native="dropend($event, card, i, 0)"
-            @dragenter.native="prev"
-            @dragover.native="prev"
+            :list="card"
+            :comments="{state: false}"
+            :isHome="false"
+            :id="card.id"
             class="sticker"
           ></sticker>
         </div>
@@ -61,12 +59,10 @@
           <sticker
             v-for="(card, i) in boxIssue[1]"
             :key="card.id + 'board'"
-            :list="card.issue"
-            draggable="true"
-            @dragstart.native="drop"
-            @dragend.native="dropend($event, card, i, 1)"
-            @dragenter.native="prev"
-            @dragover.native="prev"
+            :list="card"
+            :comments="{state: false}"
+            :isHome="false"
+            :id="card.id"
             class="sticker"
           ></sticker>
         </div>
@@ -83,6 +79,8 @@ import { getIssue } from "@/api/getIssue";
 import { moveCard, addCards, getCard } from "@/api/card";
 import { fixBoradData } from "@/assets/js/fixBoradData";
 import { findTask } from "@/assets/js/findTask";
+import { findInterface } from "@/assets/js/findBug";
+import { fixData } from "@/assets/js/fixBug";
 
 export default {
   name: "bug",
@@ -108,6 +106,7 @@ export default {
       assiChange: false,
       searchNaN: false, // 上次搜索是否没有结果
       clickx: 0,
+      data: null,
       dropIndex: 0,
       allCardId: [] // 当前sprint所有task的id
     };
@@ -120,9 +119,25 @@ export default {
     clickMenu() {
       this.menuState = !this.menuState;
     },
+    getInfo(){
+       let params = {
+        query:
+          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} id name issues(states:[OPEN],first:100){  totalCount nodes{ id title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
+      };
+      getIssue(params).then(res=>{
+         
+       
+         this.data=findInterface(res.data.data.organization.repository.issues.nodes)
+        //  console.log(this.data)
+         this.boxIssue=this.data
+         
+      })
+    }
   },
   filters: {},
-  created() {}
+  created() {
+    this.getInfo();
+  }
 };
 </script>
 

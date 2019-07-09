@@ -36,7 +36,7 @@
           :class="{'sticker':true,'selected':epic_i === epici}"
           :key="epic.number + 'epic'"
           :list="epic"
-          :comments="commentsData[epic.number]"
+          :comments="commentsData[epic.number] || {state: false}"
           :isHome="false"
           @edit="clickEdit"
           @click.native="selEpic(epic_i)"
@@ -61,7 +61,7 @@
           :class="{'sticker':true,'selected':story_i === userstoryi}"
           :key="story.number + 'story'"
           :list="story"
-          :comments="commentsData[story.number]"
+          :comments="commentsData[story.number] || {state: false}"
           :isHome="false"
           @edit="clickEdit"
           @click.native="selStory(story_i)"
@@ -89,7 +89,7 @@
           :key="task.number + 'task'"
           :class="{'sticker':true, 'selected':task_i === taski}"
           :list="task"
-          :comments="commentsData[task.number]"
+          :comments="commentsData[task.number] || {state: false}"
           :isHome="false"
           @edit="clickEdit"
           @click.native="selTask(task_i)"
@@ -114,7 +114,7 @@
           :key="extend.number + 'extend'"
           class="sticker"
           :list="extend"
-          :comments="commentsData[extend.number]"
+          :comments="commentsData[extend.number] || {state: false}"
           :isHome="false"
           @edit="clickEdit"
           @click.native="selExtend"
@@ -128,7 +128,7 @@
         @click="addExtend"
       >
     </div>
-    <add-dialog :connect="connectIssue" :type="issueType" @state="changeState" v-show="dialogState"></add-dialog>
+    <add-dialog style="z-index: 9999" :connect="connectIssue" :type="issueType" @state="changeState" v-show="dialogState"></add-dialog>
     <edit-dialog class="edit-dialog" v-if="editDialogState" :list="editInfo" @state="cgEditState"></edit-dialog>
   </div>
 </template>
