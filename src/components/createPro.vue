@@ -12,6 +12,26 @@
 </template>
 
 <script>
+import { XIANGMU_OWNERID } from "@/project";
+import { createProject, addProColumns } from "@/api/project";
+
+// 创建column的方法(返回一个promise)
+function addColumn(name, id) {
+  return new Promise((resolve, reject) => {
+    let params = {
+      query:
+        'mutation {addProjectColumn(input:{projectId:"'+ id  +'",name:"'+ name + '"}){clientMutationId}}'
+    };
+    addProColumns(params).then(res => {
+      if(typeof res.data.errors == 'undefined') {
+        resolve()
+      } else {
+        reject(res.data.error)
+      }
+    })
+  });
+}
+
 export default {
   name: "createPro",
   data() {
@@ -22,10 +42,37 @@ export default {
   },
   methods: {
     cancel() {
-      this.$emit('state', false)
+      this.$emit("state", false);
     },
     confirm() {
-      
+      if (this.proTitle.trim().length == 0) {
+        this.$message.error("周期名称不能为空");
+        return;
+      }
+      let params = {
+        query:
+          'mutation {createProject(input:{ownerId:"' +
+          XIANGMU_OWNERID +
+          '",name:"' +
+          this.proTitle +
+          '",body:"' +
+          this.proBody +
+          '"}) {project{id}}}'
+      };
+      // 这里利用了Promise 来依次创建column
+      createProject(params).then(res => {
+        if (typeof res.data.data.error == "undefined") {
+          var id = res.data.data.createProject.project.id
+          addColumn("Future", id)
+          .then(() => addColumn("To do", id))
+          .then(() => addColumn("Doing", id))
+          .then(() => addColumn("Done", id))
+          .then(()=>{this.$emit("state", true)})
+          .catch((err)=>{this.$message.error(err)})
+        } else {
+          this.$message.error("创建出错，请检查...");
+        }
+      });
     }
   }
 };

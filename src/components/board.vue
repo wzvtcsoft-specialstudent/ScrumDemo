@@ -11,6 +11,9 @@
         </div>
       </div>
       <div class="container" style="marginLeft:4.19%">
+        <div class="sub createPro" @click="createProState = true">创建新周期</div>
+      </div>
+      <div class="container">
         <div class="sub labels" @click="labelsState = !labelsState">
           <div>Labels</div>
           <img src="@/assets/img/infodrop.png" />
@@ -152,7 +155,7 @@
       暂无冲刺周期信息，
       <b @click="createProState = true">点击创建</b>
     </div>
-    <create-pro @state="cgProState" v-if="createProState"></create-pro>
+    <create-pro style="z-index:999" @state="cgProState" v-if="createProState"></create-pro>
   </div>
 </template>
 
@@ -245,7 +248,7 @@ export default {
     getinfo() {
       let params = {
         query:
-          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"scrumDemo") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name columns(first:4){ nodes{id name cards(first:60){totalCount nodes{ id column { id } state content{ ... on Issue{ id title number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
+          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name columns(first:4){ nodes{id name cards(first:60){totalCount nodes{ id column { id } state content{ ... on Issue{ id title number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
       };
       getIssue(params).then(res => {
         let data = res.data.data.organization.repository,
@@ -261,6 +264,7 @@ export default {
           }
         } catch (error) {
           this.notState = true;
+          return;
         }
         nowData = data.projects.nodes.shift();
         this.$store.commit("setAssignees", data.assignableUsers.nodes);
@@ -301,10 +305,10 @@ export default {
         });
         this.boxIssue = fixBoradData(allData);
         this.staticIssue = this.boxIssue;
+              this.getcommit()
         // this.staticTask = JSON.parse(localStorage.getItem("allTask"));
         // this.alltask = this.staticTask;
       });
-      this.getcommit()
     },
     getcommit() {
       let params = {
@@ -327,7 +331,10 @@ export default {
       this.editDialogState = state;
     },
     cgProState(state) {
-      this.createProState = state;
+      this.createProState = false;
+      if(state) {
+        window.location.reload()
+      }
     },
     /* 添加Task */
     showTaskBox() {
@@ -753,6 +760,16 @@ a {
   border-radius: 5px;
   cursor: pointer;
   text-align: center;
+}
+.createPro {
+  line-height: 32px;
+  text-align: center;
+  background: rgba(38, 128, 235, 1);
+  color: white;
+  border-radius: 5px;
+  font-size: 14px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
 }
 .labels div {
   display: block;
