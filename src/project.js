@@ -9,9 +9,9 @@ const NAME = "Dmsbog"; // repository{name: xxx}
 
 /* 项目ID */
 //StoryList
-const XIANGMU_ID = "MDEwOlJlcG9zaXRvcnkxOTYxNTIyMTE="; // 去github GraphQL API 查询
+const XIANGMU_ID = "MDEwOlJlcG9zaXRvcnkxOTYxNDM3NTY="; // 去github GraphQL API 查询
 /* 
-   Dmsbog: MDEwOlJlcG9zaXRvcnkxOTYxNTIyMTE=
+   Dmsbog: MDEwOlJlcG9zaXRvcnkxOTYxNDM3NTY=
    ScrumDemo: MDEwOlJlcG9zaXRvcnkxODcxMTgwMTM=
 */
 
@@ -22,7 +22,7 @@ const XIANGMU_OWNERID = "MDEyOk9yZ2FuaXphdGlvbjQ5MzA1ODk0"; // 去github GraphQL
 
 /* 
     Dmsbog: MDEyOk9yZ2FuaXphdGlvbjQ5MzA1ODk0
-    ScrumDemo: MDEyOk9yZ2FuaXphdGlvbjQ5MzA1ODk0
+    ScrumDemo: MDEwOlJlcG9zaXRvcnkxODcxMTgwMTM=
 */
 
 
