@@ -495,7 +495,7 @@ li {
   margin-top: 8px;
 }
 .not-his-content {
-  width: 100%;
+  width: 1536px;
   height: 600px;
   margin-top: 8px;
   padding-top: 51px;

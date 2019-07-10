@@ -73,6 +73,7 @@
 </template>
 
 <script>
+import { LOGIN,NAME } from "@/project"
 import sticker from "./sticker";
 import addDialog from "./addDialog";
 import { getIssue } from "@/api/getIssue";
@@ -122,7 +123,7 @@ export default {
     getInfo(){
        let params = {
         query:
-          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} id name issues(states:[OPEN],first:100){  totalCount nodes{ id title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
+          'query{organization(login:"' + LOGIN + '"){repository(name:"' + NAME +'"){assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} id name issues(states:[OPEN],first:100){  totalCount nodes{ id title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
       getIssue(params).then(res=>{
          
@@ -166,13 +167,13 @@ li {
 } */
 
 .board-body {
-  width: 100%;
+  width: 1536px;
   height: 651px;
   margin-top: 8px;
 }
 
 .board-title {
-  width: 100%;
+  width: 1536px;
   height: 50px;
   background: rgba(250, 251, 252, 1);
   opacity: 1;

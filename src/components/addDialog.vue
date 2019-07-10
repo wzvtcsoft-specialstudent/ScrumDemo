@@ -77,6 +77,7 @@
 
 <script>
 import { createIssue } from "@/api/createIssue";
+import { XIANGMU_ID } from "@/project"
 export default {
   name: "addDialog",
   data() {
@@ -97,7 +98,7 @@ export default {
   props: ["connect","type"],
   methods: {
     confirm() {
-      if (this.title.trim() == "" || this.body.trim() == "") return;
+      if (this.title.trim() == "") return;
       var labelStr = [],assigneesStr = [],body;
       this.labSel.forEach((state,i) => {
             if(state) {
@@ -125,7 +126,7 @@ export default {
       
       let params = {
         query:
-          'mutation{createIssue(input:{repositoryId:"MDEwOlJlcG9zaXRvcnkxODcxMTgwMTM=",title:"' +
+          'mutation{createIssue(input:{repositoryId:"' + XIANGMU_ID +'",title:"' +
           this.title +
           '",body:"' +
           body +
@@ -139,8 +140,17 @@ export default {
       this.body = "";
       // console.log(params);
       createIssue(params).then(res => {
-        // console.log(res);
-        this.$emit("state", res.data.data.createIssue != null);
+        console.log(res);
+        if(typeof res.data.errors == 'undefined') {
+          this.$emit("state", true);
+          this.$message({
+            message: "创建成功",
+            type: "success"
+          })
+        } else {
+          this.$message.error("创建失败，请检查...")
+        }
+        
       });
     },
     cancel() {
@@ -220,7 +230,7 @@ li {
 }
 .dialog-container {
   position: absolute;
-  width: 100%;
+  width: 1536px;
   height: 722px;
   background-color: rgba(255, 255, 255, 0.5);
   top: 0;

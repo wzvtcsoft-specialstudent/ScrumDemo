@@ -1,8 +1,8 @@
 <template>
-  <div class="main-contaienr" v-if="data">
+  <div class="main-contaienr">
     <div class="header">
       <div class="menu" @click="clickMenu">
-        <img src="@/assets/img/menu.png">
+        <img src="@/assets/img/menu.png" />
         <div class="menu-item" v-show="menuState" @mouseleave="menuState = false">
           <router-link to="/" tag="span" class="link-item">Home</router-link>
           <router-link to="/storyList" tag="span" class="link-item">Story Map</router-link>
@@ -10,10 +10,10 @@
           <router-link to="/bug" tag="span" class="link-item">bug</router-link>
         </div>
       </div>
-      <div class="add" @click="clickAdd">
+      <div class="add" @click="addState = !addState">
         <div class="addIssue">
           <div class="addIssue-title">New issue</div>
-          <img src="@/assets/img/drop.png" class="drop">
+          <img src="@/assets/img/drop.png" class="drop" />
         </div>
         <!-- 不论鼠标指针离开被选元素还是任何子元素，都会触发 mouseout 事件。
 
@@ -26,11 +26,12 @@
         </div>
       </div>
     </div>
-    <div class="container epic" ref="epic">
-      <div class="line-label">
-        <span>Epic</span>
-      </div>
-      <!-- <transition-group appear mode="out-in" name="sticker"> -->
+    <div class="mapbody" v-if="mapState">
+      <div class="container epic" ref="epic">
+        <div class="line-label">
+          <span>Epic</span>
+        </div>
+        <!-- <transition-group appear mode="out-in" name="sticker"> -->
         <sticker
           v-for="(epic, epic_i) in data"
           :class="{'sticker':true,'selected':epic_i === epici}"
@@ -41,20 +42,20 @@
           @edit="clickEdit"
           @click.native="selEpic(epic_i)"
         ></sticker>
-      <!-- </transition-group> -->
-      <img
-        v-show="epicState"
-        src="@/assets/img/open.png"
-        ref="imgepic"
-        class="open"
-        @click="addEpic"
-      >
-    </div>
-    <div class="container userstory" ref="story">
-      <div class="line-label">
-        <div class="special">User Story</div>
+        <!-- </transition-group> -->
+        <img
+          v-show="epicState"
+          src="@/assets/img/open.png"
+          ref="imgepic"
+          class="open"
+          @click="addEpic"
+        />
       </div>
-      <!-- <transition-group appear mode="out-in" name="sticker"> -->
+      <div class="container userstory" ref="story">
+        <div class="line-label">
+          <div class="special">User Story</div>
+        </div>
+        <!-- <transition-group appear mode="out-in" name="sticker"> -->
         <sticker
           v-for="(story, story_i) in data[epici].nodes"
           v-show="typeof story.title !== 'undefined'"
@@ -66,23 +67,23 @@
           @edit="clickEdit"
           @click.native="selStory(story_i)"
         ></sticker>
-      <!-- </transition-group> -->
-      <img
-        v-show="storyState"
-        src="@/assets/img/open.png"
-        ref="imgstory"
-        class="open"
-        @click="addStory"
-      >
-    </div>
-    <div class="container task" ref="task">
-      <div class="line-label">
-        <span>Task</span>
+        <!-- </transition-group> -->
+        <img
+          v-show="storyState"
+          src="@/assets/img/open.png"
+          ref="imgstory"
+          class="open"
+          @click="addStory"
+        />
       </div>
-      <div class="line-label" v-show="titleState">
-        <div class="special">user story</div>
-      </div>
-      <!-- <transition-group appear mode="out-in" name="sticker"> -->
+      <div class="container task" ref="task">
+        <div class="line-label">
+          <span>Task</span>
+        </div>
+        <div class="line-label" v-show="titleState">
+          <div class="special">user story</div>
+        </div>
+        <!-- <transition-group appear mode="out-in" name="sticker"> -->
         <sticker
           v-for="(task, task_i) in data[epici].nodes[userstoryi].nodes"
           v-show="typeof task.title !== 'undefined'"
@@ -94,20 +95,20 @@
           @edit="clickEdit"
           @click.native="selTask(task_i)"
         ></sticker>
-      <!-- </transition-group> -->
-      <img
-        v-show="taskState"
-        src="@/assets/img/open.png"
-        ref="imgtask"
-        class="open"
-        @click="addTask"
-      >
-    </div>
-    <div class="container extend" ref="extend">
-      <div class="line-label" v-show="titleState">
-        <span>Task</span>
+        <!-- </transition-group> -->
+        <img
+          v-show="taskState"
+          src="@/assets/img/open.png"
+          ref="imgtask"
+          class="open"
+          @click="addTask"
+        />
       </div>
-      <!-- <transition-group appear mode="out-in" name="sticker"> -->
+      <div class="container extend" ref="extend" v-if="mapState">
+        <div class="line-label" v-show="titleState">
+          <span>Task</span>
+        </div>
+        <!-- <transition-group appear mode="out-in" name="sticker"> -->
         <sticker
           v-for="extend in extendData()"
           v-show="typeof extend.title !== 'undefined'"
@@ -119,30 +120,40 @@
           @edit="clickEdit"
           @click.native="selExtend"
         ></sticker>
-      <!-- </transition-group> -->
-      <img
-        v-show="extendState"
-        src="@/assets/img/open.png"
-        ref="imgextend"
-        class="open"
-        @click="addExtend"
-      >
+        <!-- </transition-group> -->
+        <img
+          v-show="extendState"
+          src="@/assets/img/open.png"
+          ref="imgextend"
+          class="open"
+          @click="addExtend"
+        />
+      </div>
     </div>
-    <add-dialog style="z-index: 9999" :connect="connectIssue" :type="issueType" @state="changeState" v-show="dialogState"></add-dialog>
+    <div class="nodata" v-else>暂无内容</div>
+    <add-dialog
+      style="z-index: 9999"
+      :connect="connectIssue"
+      :type="issueType"
+      @state="changeState"
+      v-if="dialogState"
+    ></add-dialog>
     <edit-dialog class="edit-dialog" v-if="editDialogState" :list="editInfo" @state="cgEditState"></edit-dialog>
   </div>
 </template>
 
 <script>
+import { LOGIN, NAME } from "@/project";
 import sticker from "./sticker";
 import addDialog from "./addDialog";
-import editDialog from "./editDialog"
+import editDialog from "./editDialog";
 import { getIssue } from "@/api/getIssue";
 import { fixData } from "@/assets/js/fixData";
 
 export default {
   data() {
     return {
+      mapState: false,
       menuState: false,
       addState: false,
       titleState: false, //显示 userStory 还是 Task
@@ -166,24 +177,15 @@ export default {
     /* 判断extends行 是否有issue */
     extendData() {
       try {
-        // let arr = this.data[this.epici].nodes[this.userstoryi].nodes[this.taski]
-        //   .nodes;
-        //   console.log(arr[0]);
-        // if(typeof arr[0].number != 'undefined') {
-        //   this.titleState = true;
-        //   return arr;
-        // }
-        // this.titleState = arr[0].nodes == null ? false : true;
-
-        // return arr;
-        let arr = this.data[this.epici].nodes[this.userstoryi].nodes,flag = false;
+        let arr = this.data[this.epici].nodes[this.userstoryi].nodes,
+          flag = false;
         arr.forEach(task => {
-          if(typeof task.nodes[0].number != 'undefined') {
+          if (typeof task.nodes[0].number != "undefined") {
             flag = true;
           }
-        })
+        });
         this.titleState = flag;
-        return arr[this.taski].nodes
+        return arr[this.taski].nodes;
       } catch (error) {
         this.titleState = false;
         return [];
@@ -194,11 +196,16 @@ export default {
       // qcteams HuaAn
       let params = {
         query:
-          'query{organization(login:"wzvtcsoft-specialstudent"){repository(name:"ScrumDemo"){assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} id name issues(states:[OPEN],first:100){  totalCount nodes{ id title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
+          'query{organization(login:"' +
+          LOGIN +
+          '"){repository(name:"' +
+          NAME +
+          '"){assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} id name issues(states:[OPEN],first:100){  totalCount nodes{ id title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
-      this.commentsData = JSON.parse(localStorage.getItem('commit'));
+      // this.commentsData = JSON.parse(localStorage.getItem("commit"));
       getIssue(params).then(res => {
         this.data = fixData(res.data.data.organization.repository.issues.nodes);
+        if (this.data.length == 0) return;
         // this.state = true;
         this.$store.commit(
           "setAssignees",
@@ -208,26 +215,30 @@ export default {
           "setLabels",
           res.data.data.organization.repository.labels.nodes
         );
-        if (this.data.length > 4) this.epicState = true;
-        if (
-          typeof this.data[this.epici] !== "undefined" &&
-          this.data[this.epici].nodes.length > 4
-        )
-          this.storyState = true;
-        if (
-          typeof this.data[this.epici].nodes[this.userstoryi] !== "undefined" &&
-          this.data[this.epici].nodes[this.userstoryi].nodes.length > 4
-        )
-          this.taskState = true;
-        if (
-          typeof this.data[this.epici].nodes[this.userstoryi].nodes[
-            this.taski
-          ] !== "undefined" &&
-          this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes
-            .length > 4
-        )
-          this.epicState = true;
-          this.findAllTask();
+        try {
+          if (this.data.length > 4) this.epicState = true;
+          if (
+            typeof this.data[this.epici] !== "undefined" &&
+            this.data[this.epici].nodes.length > 4
+          )
+            this.storyState = true;
+          if (
+            typeof this.data[this.epici].nodes[this.userstoryi] !==
+              "undefined" &&
+            this.data[this.epici].nodes[this.userstoryi].nodes.length > 4
+          )
+            this.taskState = true;
+          if (
+            typeof this.data[this.epici].nodes[this.userstoryi].nodes[
+              this.taski
+            ] !== "undefined" &&
+            this.data[this.epici].nodes[this.userstoryi].nodes[this.taski].nodes
+              .length > 4
+          )
+            this.epicState = true;
+        } catch (error) {}
+        this.mapState = true;
+        this.findAllTask();
       });
     },
     selEpic(index) {
@@ -353,7 +364,7 @@ export default {
         window.location.reload();
       }
     },
-     clickEdit(list) {
+    clickEdit(list) {
       this.editInfo = list;
       this.editDialogState = true;
     },
@@ -363,9 +374,6 @@ export default {
     /* Menu */
     clickMenu() {
       this.menuState = !this.menuState;
-    },
-    clickAdd() {
-      this.addState = !this.addState;
     },
     create(val) {
       switch (val) {
@@ -396,7 +404,7 @@ export default {
           this.issueType = "user story";
           break;
       }
-      if(this.connectIssue<1000 && typeof this.connectIssue != 'undefined') {
+      if (this.connectIssue < 1000 && typeof this.connectIssue != "undefined") {
         this.dialogState = true;
       }
     },
@@ -410,38 +418,39 @@ export default {
       //   })
       function judgeTask(task) {
         var flag = true;
-        if(typeof task.nodes == 'undefined' || task.nodes == null) return true;
+        if (typeof task.nodes == "undefined" || task.nodes == null) return true;
         task.nodes.forEach(node => {
-          if(typeof node.number != 'undefined') flag = false;
-        })
-        return flag
+          if (typeof node.number != "undefined") flag = false;
+        });
+        return flag;
       }
       var result = [];
       this.data.forEach(epic => {
-        if(typeof epic.nodes == 'undefined') return false;
+        if (typeof epic.nodes == "undefined") return false;
         epic.nodes.forEach(story => {
-          if(typeof story.nodes == 'undefined' || story.nodes == null) return false;
+          if (typeof story.nodes == "undefined" || story.nodes == null)
+            return false;
           let flags = true;
           story.nodes.forEach(item => {
-             if(item.nodes == null) return false;
+            if (item.nodes == null) return false;
             try {
-              if(typeof item.nodes[0].number != 'undefined') {
-            flags = false;
-          }
+              if (typeof item.nodes[0].number != "undefined") {
+                flags = false;
+              }
             } catch (error) {
-              flags = false
+              flags = false;
             }
-          })
+          });
           story.nodes.forEach(task => {
-            if(judgeTask(task)&&flags) {
-              result.push(task)
-            }
-            else if(typeof task.nodes != 'undefined' && task.nodes != null) result.push(...task.nodes)
-          })
-        })
-      })
-      let allTast = result.filter(item => typeof item.title != 'undefined')
-      localStorage.setItem('allTask',JSON.stringify(allTast))
+            if (judgeTask(task) && flags) {
+              result.push(task);
+            } else if (typeof task.nodes != "undefined" && task.nodes != null)
+              result.push(...task.nodes);
+          });
+        });
+      });
+      let allTast = result.filter(item => typeof item.title != "undefined");
+      localStorage.setItem("allTask", JSON.stringify(allTast));
     }
   },
   components: {
@@ -478,10 +487,9 @@ export default {
 
 .main-contaienr {
   /* 1600px 1536px */
-  width: 100%;
+  width: 1519px;
   /* 757px 722px */
   height: 757px;
-  
 }
 .header {
   width: 100%;
@@ -509,6 +517,7 @@ export default {
 .extend {
   background: rgba(38, 143, 235, 0.06);
 }
+
 .sticker {
   float: left;
   margin-bottom: 45px;
@@ -643,6 +652,11 @@ export default {
 }
 .edit-dialog {
   z-index: 999;
+}
+.nodata {
+  margin-top: 100px;
+  text-align: center;
+  font-size: 30px;
 }
 </style>
 
