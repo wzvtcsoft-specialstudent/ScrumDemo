@@ -80,6 +80,8 @@
             :list="card.issue"
             :isHome="true"
             :id="card.id"
+            @addcomment="adCmt"
+            @editcomment="edCmt"
             :comments="commitData[card.issue.number]"
             @edit="clickEdit"
             draggable="true"
@@ -100,6 +102,8 @@
             :list="card.issue"
             :isHome="true"
             :id="card.id"
+            @addcomment="adCmt"
+            @editcomment="edCmt"
             :comments="commitData[card.issue.number]"
             @edit="clickEdit"
             draggable="true"
@@ -120,6 +124,8 @@
             :list="card.issue"
             :isHome="true"
             :id="card.id"
+            @addcomment="adCmt"
+            @editcomment="edCmt"
             :comments="commitData[card.issue.number]"
             @edit="clickEdit"
             draggable="true"
@@ -140,6 +146,8 @@
             :list="card.issue"
             :isHome="true"
             :id="card.id"
+            @addcomment="adCmt"
+            @editcomment="edCmt"
             :comments="commitData[card.issue.number]"
             @edit="clickEdit"
             draggable="true"
@@ -156,6 +164,13 @@
       <b @click="createProState = true">点击创建</b>
     </div>
     <create-pro style="z-index:999" @state="cgProState" v-if="createProState"></create-pro>
+    <add-comment
+      v-if="addComState"
+      :data="addComData"
+      :func="cmtFunc"
+      @state="cgCmtState"
+      style="z-index: 999"
+    ></add-comment>
   </div>
 </template>
 
@@ -163,11 +178,12 @@
 import sticker from "./sticker";
 import editDialog from "./editDialog";
 import createPro from "./createPro";
+import addComment from "./addComment";
 import { getIssue } from "@/api/getIssue";
 import { getCommit } from "@/api/getCommit";
 import { moveCard, addCards, getCard } from "@/api/card";
 import { fixBoradData } from "@/assets/js/fixBoradData";
-import { fixComments } from "@/assets/js/fixComments"
+import { fixComments } from "@/assets/js/fixComments";
 import { findTask } from "@/assets/js/findTask";
 
 function judge(obj, val) {
@@ -196,6 +212,9 @@ export default {
       addTaskState: false,
       editDialogState: false,
       createProState: false,
+      addComState: false,
+      addComData: {}, // 要添加comment的id
+      cmtFunc: "add", // 处理comment的类型
       editInfo: null,
       labSel: [], // 选择的labels
       assiSel: [], // 选择的assignees
@@ -213,7 +232,8 @@ export default {
   components: {
     sticker,
     editDialog,
-    createPro
+    createPro,
+    addComment
   },
   methods: {
     /* 鼠标拖动 */
@@ -305,7 +325,7 @@ export default {
         });
         this.boxIssue = fixBoradData(allData);
         this.staticIssue = this.boxIssue;
-              this.getcommit()
+        this.getcommit();
         // this.staticTask = JSON.parse(localStorage.getItem("allTask"));
         // this.alltask = this.staticTask;
       });
@@ -315,13 +335,13 @@ export default {
         query:
           'query{organization(login: "wzvtcsoft-specialstudent") {repository(name: "ScrumDemo") {issues(first:100){totalCount nodes{number comments(first:100){nodes{id body}}}}}}}'
       };
-      getCommit(params).then(res=> {
-        let commitData = res.data.data.organization.repository.issues.nodes
+      getCommit(params).then(res => {
+        let commitData = res.data.data.organization.repository.issues.nodes;
         commitData = fixComments(commitData);
-        localStorage.setItem('commit', JSON.stringify(commitData))
+        localStorage.setItem("commit", JSON.stringify(commitData));
         this.commitData = commitData;
         this.state = true;
-      })
+      });
     },
     clickEdit(list) {
       this.editInfo = list;
@@ -332,8 +352,18 @@ export default {
     },
     cgProState(state) {
       this.createProState = false;
-      if(state) {
-        window.location.reload()
+      if (state) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      }
+    },
+    cgCmtState(state) {
+      this.addComState = false;
+      if (state) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       }
     },
     /* 添加Task */
@@ -559,6 +589,22 @@ export default {
       });
       if (nohave) this.searchNaN = true;
       this.boxIssue = result;
+    },
+    adCmt(id) {
+      this.cmtFunc = "add";
+      this.addComData = {
+        id: id,
+        body: ""
+      };
+      this.addComState = true;
+    },
+    edCmt(id, body) {
+      this.cmtFunc = "edit";
+      this.addComData = {
+        id: id,
+        body: body
+      };
+      this.addComState = true;
     }
   },
   filters: {

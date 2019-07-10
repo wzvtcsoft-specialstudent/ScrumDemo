@@ -1,18 +1,19 @@
 <template>
-  <el-tooltip 
-    effect="light"
-    placement="right"
-    v-model="show"
-    manual>
-    <div slot="content" class="comments-container">
+  <el-tooltip effect="light" placement="right" v-model="show" manual enterable>
+    <div slot="content" class="comments-container" @mouseleave="show = false">
       <div v-if="comments.state">
         <ul>
-          <li v-for="(comment, i) in comments.comments" :key="comment.id">{{ i+1 }}. {{ comment.body }}</li>
+          <li
+            v-for="(comment, i) in comments.comments"
+            :key="comment.id"
+            @dblclick="dbcliComment(comment.id, comment.body)"
+          >{{ i+1 }}. {{ comment.body }}</li>
+          <li v-show="isHome" class="add" @click="clickComment">添加验收标准</li>
         </ul>
       </div>
-      <div class="no-comment" v-else>暂无验收标准</div>
+      <div class="no-comment" v-else>暂无验收标准,<b v-show="isHome" style="cursor: pointer;text-decoration: underline" @click="clickComment">添加</b></div>
     </div>
-    <div class="sticker-container" @contextmenu.prevent="rightClick" @mouseleave="show = false">
+    <div class="sticker-container" @contextmenu.prevent="rightClick">
       <div class="sticker-menu">
         <img
           src="@/assets/img/more.png"
@@ -51,6 +52,7 @@
 
 <script>
 import { delCard } from "@/api/card";
+import addComment from './addComment'
 
 export default {
   name: "sticker",
@@ -60,7 +62,7 @@ export default {
       show: false
     };
   },
-  props: ["list", "isHome", "id","comments"],
+  props: ["list", "isHome", "id", "comments"],
   methods: {
     cliEdit() {
       this.$emit("edit", this.list);
@@ -103,6 +105,12 @@ export default {
     rightClick() {
       this.show = !this.show;
       return false;
+    },
+    clickComment() {
+      this.$emit('addcomment', this.list.id)
+    },
+    dbcliComment(id, body) {
+      this.$emit('editcomment',id,body)
     }
   },
   filters: {
@@ -112,6 +120,9 @@ export default {
       let time = val.substr(11, 8);
       return `${date} ${time}`;
     }
+  },
+  components: {
+    addComment
   }
 };
 </script>
@@ -131,11 +142,26 @@ li {
   font-weight: 400;
   line-height: 27px;
   color: rgba(112, 112, 112, 1);
+  cursor: pointer;
+}
+li:hover {
+  color: red;
 }
 .comments-container {
   width: 200px;
   max-height: 200px;
   overflow-y: auto;
+}
+.comments-container .add {
+  display: block;
+  width: 100px;
+  background: rgba(38, 128, 235, 1);
+  color: white;
+  border-radius: 5px;
+  font-size: 14px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  margin: 10px auto 0 auto;
 }
 .no-comment {
   text-align: center;
