@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { XIANGMU_OWNERID } from "@/project";
+import { XIANGMU_ID } from "@/project";
 import { createProject, addProColumns } from "@/api/project";
 
 // 创建column的方法(返回一个promise)
@@ -52,7 +52,7 @@ export default {
       let params = {
         query:
           'mutation {createProject(input:{ownerId:"' +
-          XIANGMU_OWNERID +
+          XIANGMU_ID +
           '",name:"' +
           this.proTitle +
           '",body:"' +
