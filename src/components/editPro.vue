@@ -1,12 +1,12 @@
 <template>
   <div class="dialog-container">
     <div class="dialog">
-      <span class="title">编辑周期</span>
+      <span class="title">Edit Sprint</span>
       <div class="line"></div>
-      <input type="text" placeholder="本次周期名称" class="project-title" v-model="sprint_title" />
-      <textarea class="project-body" placeholder="对周期来些描述" v-model="sprint_body"></textarea>
-      <div class="cancel" @click="cancel">取消</div>
-      <div class="confirm" @click="confirm">更改周期</div>
+      <input type="text" placeholder="The name of this sprint" class="project-title" v-model="sprint_title" />
+      <textarea class="project-body" placeholder="Some descriptions of the sprint" v-model="sprint_body"></textarea>
+      <div class="cancel" @click="cancel">cancel</div>
+      <div class="confirm" @click="confirm">Create Sprint</div>
     </div>
   </div>
 </template>
@@ -49,7 +49,7 @@ export default {
     },
     confirm() {
       if (this.title.trim().length == 0) {
-        this.$message.error("周期名称不能为空");
+        this.$message.error("sprint name cannot be empty");
         return;
       }
       let params = {

@@ -1,14 +1,14 @@
 <template>
   <div class="dialog-container">
     <div class="dialog">
-      <span class="title" v-show="func == 'add'">添加验收标准</span>
-      <span class="title" v-show="func == 'edit'">编辑验收标准</span>
+      <span class="title" v-show="func == 'add'">add acceptance criteria</span>
+      <span class="title" v-show="func == 'edit'">edit acceptance criteria</span>
       <div class="line"></div>
-      <textarea class="comment-body" placeholder="请输入验收标准" v-model="commentBody"></textarea>
-      <div class="comment-del" v-show="func == 'edit'" @click="delcomment">删除此验收标准</div>
-      <div class="cancel" @click="cancel">取消</div>
-      <div class="confirm" @click="confirmAdd" v-if="func == 'add'">确认添加</div>
-      <div class="confirm" @click="confirmEdit" v-else>确认编辑</div>
+      <textarea class="comment-body" placeholder="input acceptance criteria" v-model="commentBody"></textarea>
+      <div class="comment-del" v-show="func == 'edit'" @click="delcomment">delete acceptance criteria</div>
+      <div class="cancel" @click="cancel">cancel</div>
+      <div class="confirm" @click="confirmAdd" v-if="func == 'add'">confirm add</div>
+      <div class="confirm" @click="confirmEdit" v-else>confirm edit</div>
     </div>
   </div>
 </template>
@@ -26,9 +26,9 @@ export default {
   },
   methods: {
     delcomment() {
-      this.$confirm("确定删除此验收标准?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+      this.$confirm("Make sure to remove this acceptance criteria?", "prompt", {
+        confirmButtonText: "Sure",
+        cancelButtonText: "Cancel",
         type: "warning"
       })
         .then(() => {
@@ -41,19 +41,19 @@ export default {
           delComment(params).then(res => {
               if(typeof res.data.errors == 'undefined') {
                   this.$message({
-                      message: "删除成功",
+                      message: "Successfully Deleted",
                       type: "success"
                   })
                   this.$emit('state', true)
               } else {
-                  this.$message.errors("删除失败，请检查...")
+                  this.$message.errors("Delete failed, please check...")
               }
           })
         })
         .catch(() => {
           this.$message({
             type: "info",
-            message: "已取消删除"
+            message: "Cancelled Delete"
           });
         });
     },
@@ -62,7 +62,7 @@ export default {
     },
     confirmAdd() {
       if (this.commentBody.trim().length == 0) {
-        this.$message.error("请输入验收标准");
+        this.$message.error("Please enter the acceptance criteria");
         return;
       }
       let params = {
@@ -77,18 +77,18 @@ export default {
         console.log(res);
         if (typeof res.data.errors == "undefined") {
           this.$message({
-            message: "添加成功",
+            message: "Added successfully",
             type: "success"
           });
           this.$emit("state", true);
         } else {
-          this.$message.error("添加出错，请检查...");
+          this.$message.error("Add error, please check...");
         }
       });
     },
     confirmEdit() {
       if (this.commentBody.trim().length == 0) {
-        this.$message.error("请输入验收标准");
+        this.$message.error("Please enter the acceptance criteria");
         return;
       }
       let params = {
@@ -103,12 +103,12 @@ export default {
         console.log(res);
         if (typeof res.data.errors == "undefined") {
           this.$message({
-            message: "修改成功",
+            message: "Successfully modified",
             type: "success"
           });
           this.$emit("state", true);
         } else {
-          this.$message.error("修改失败，请检查...");
+          this.$message.error("The modification failed, please check...");
         }
       });
     }

@@ -49,7 +49,7 @@
       </div>
       <input type="text" v-model="title" placeholder="Title" class="issue-title">
       <textarea class="issue-body" v-model="body" :placeholder="connect!=0?'Leave a comment,This Issue is related to #' + connect:'Leave a comment,This Issue is Epic'"></textarea>
-      <div><input type="checkbox" >是否添加到当前里程碑</div>
+      <div><input type="checkbox" >Add to current milestone</div>
       <div class="selLabels">
         <div
           class="selLabels-item"
@@ -143,11 +143,11 @@ export default {
         if(typeof res.data.errors == 'undefined') {
           this.$emit("state", true);
           this.$message({
-            message: "创建成功",
+            message: "Created successfully",
             type: "success"
           })
         } else {
-          this.$message.error("创建失败，请检查...")
+          this.$message.error("Creation failed, please check...")
         }
         
       });

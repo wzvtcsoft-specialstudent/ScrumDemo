@@ -8,10 +8,10 @@
             :key="comment.id"
             @dblclick="dbcliComment(comment.id, comment.body)"
           >{{ i+1 }}. {{ comment.body }}</li>
-          <li v-show="isHome" class="add" @click="clickComment">添加验收标准</li>
+          <li v-show="isHome" class="add" @click="clickComment">Add acceptance criteria</li>
         </ul>
       </div>
-      <div class="no-comment" v-else>暂无验收标准,<b v-show="isHome" style="cursor: pointer;text-decoration: underline" @click="clickComment">添加</b></div>
+      <div class="no-comment" v-else>No acceptance criteria,<b v-show="isHome" style="cursor: pointer;text-decoration: underline" @click="clickComment">Add</b></div>
     </div>
     <div class="sticker-container" @contextmenu.prevent="rightClick">
       <div class="sticker-menu">
@@ -23,8 +23,8 @@
           @click="menuState = !menuState"
         />
         <div class="sticker-menu-item" v-show="menuState" @mouseleave="menuState = false">
-          <div class="item" @click="cliEdit">编辑</div>
-          <div class="item" v-show="isHome" @click="delcard">从此列删除</div>
+          <div class="item" @click="cliEdit">Edit</div>
+          <div class="item" v-show="isHome" @click="delcard">Remove from this column</div>
         </div>
       </div>
       <div class="info" v-if="typeof list.assignees != 'undefined' && list.assignees.length != 0">
@@ -68,9 +68,9 @@ export default {
       this.$emit("edit", this.list);
     },
     delcard() {
-      this.$confirm("将该Task从列表中删除？", "消息", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+      this.$confirm("Remove the Task from the list？", "Message", {
+        confirmButtonText: "sure",
+        cancelButtonText: "cancel",
         type: "warning"
       })
         .then(() => {
@@ -84,20 +84,20 @@ export default {
             console.log(res);
             if (typeof res.data.data.error == "undefined") {
               this.$message({
-                message: "删除成功",
+                message: "successfully deleted",
                 type: "success"
               });
               setTimeout(() => {
                 window.location.reload();
               }, 2000);
             } else {
-              this.$message.error("删除失败，请检查...");
+              this.$message.error("Delete failed, please check...");
             }
           });
         })
         .catch(() => {
           this.$message({
-            message: "已取消删除",
+            message: "Cancelled delete",
             type: "info"
           });
         });

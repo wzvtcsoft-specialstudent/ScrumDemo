@@ -1,12 +1,12 @@
 <template>
   <div class="dialog-container">
     <div class="dialog">
-      <span class="title">创建周期</span>
+      <span class="title">Create Sprint</span>
       <div class="line"></div>
-      <input type="text" placeholder="本次周期名称" class="project-title" v-model="proTitle" />
-      <textarea class="project-body" placeholder="对周期来些描述" v-model="proBody"></textarea>
-      <div class="cancel" @click="cancel">取消</div>
-      <div class="confirm" @click="confirm">创建周期</div>
+      <input type="text" placeholder="The name of this sprint" class="project-title" v-model="proTitle" />
+      <textarea class="project-body" placeholder="Some descriptions of the sprint" v-model="proBody"></textarea>
+      <div class="cancel" @click="cancel">Cancel</div>
+      <div class="confirm" @click="confirm">Create Sprint</div>
     </div>
   </div>
 </template>
@@ -46,7 +46,7 @@ export default {
     },
     confirm() {
       if (this.proTitle.trim().length == 0) {
-        this.$message.error("周期名称不能为空");
+        this.$message.error("sprint name cannot be empty");
         return;
       }
       let params = {
@@ -68,9 +68,9 @@ export default {
           .then(() => addColumn("Doing", id))
           .then(() => addColumn("Done", id))
           .then(()=>{this.$emit("state", true)})
-          .catch((err)=>{this.$message.error("创建出错，请检查...")})
+          .catch((err)=>{this.$message.error("Create error, please check...")})
         } else {
-          this.$message.error("您可能无权限执行此操作");
+          this.$message.error("You may not have permission to perform this operation");
         }
       });
     }

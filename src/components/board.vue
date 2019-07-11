@@ -14,7 +14,7 @@
         <div class="sprint_title" @dblclick="editProState = true">{{this.sprint_title}}</div>
       </div>
       <div class="container">
-        <div class="sub createPro" @click="createProState = true">创建新周期</div>
+        <div class="sub createPro" @click="createProState = true">Create new sprint</div>
       </div>
       <div class="container">
         <div class="sub labels" @click="labelsState = !labelsState">
@@ -165,8 +165,8 @@
       <edit-dialog class="edit-dialog" v-if="editDialogState" :list="editInfo" @state="cgEditState"></edit-dialog>
     </div>
     <div class="not-content" v-if="notState">
-      暂无冲刺周期信息，
-      <b @click="createProState = true">点击创建</b>
+      No sprint cycle information，
+      <b @click="createProState = true">Click to create</b>
     </div>
     <create-pro style="z-index:999" @state="cgProState" v-if="createProState"></create-pro>
     <edit-pro style="z-index:999" @state="edProState" v-if="editProState" :title="sprint_title" :body="sprint_body" :id="sprint_id"></edit-pro>
@@ -441,7 +441,7 @@ export default {
       };
       addCards(params).then(res => {
         if (typeof res.data.data.error != "undefined") {
-          alert("添加失败，可能看板内已存在该Task");
+          alert("Add failed, it may be that the Task already exists in the board");
         }
         this.staticTask.splice(index, 1);
         this.alltask = this.staticTask;
@@ -646,10 +646,6 @@ export default {
         body: body
       };
       this.addComState = true;
-    },
-    changetitle(){
-      console.log("双击标题")
-
     }
   },
   filters: {
