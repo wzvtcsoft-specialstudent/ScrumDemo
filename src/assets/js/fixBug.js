@@ -1,4 +1,3 @@
-import { isNumber } from "util";
 
 var have = [], // 临时存放非根Issue
   epic = [], // 存放根Issue
@@ -18,15 +17,8 @@ var userColor = [];
 function init() {
     var i =0;
   /* 找出存在上级issue的issue编号 */
-  data.forEach(item => {
-    // for (let key in item.timelineItems.nodes) {
-    //     console.log(i++);
-    //  if(item.timelineItems.nodes[key].source === 'undefined')
-    //     have.push(item.timelineItems.nodes[key].source.number)
-      
-    // }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+  data.forEach(item => {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
     item.timelineItems.nodes.forEach( i => {
-        //console.log(i);
         if(typeof i.source !== 'undefined') {
             have.push(i.source.number)
         }
