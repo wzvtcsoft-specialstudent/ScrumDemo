@@ -185,7 +185,7 @@ export default {
             issueData = [];
             cardsNum += list.cards.totalCount;
             doneNum = list.cards.totalCount;
-            percentage = (doneNum / cardsNum) * 100;
+            percentage = cardsNum==0?0:(doneNum / cardsNum) * 100;
             list.cards.nodes.forEach(item => {
               issueData.push({
                 id: item.id,

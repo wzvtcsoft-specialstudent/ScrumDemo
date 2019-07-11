@@ -1,155 +1,91 @@
 <template>
   <div class="dialog-container">
     <div class="dialog">
-      <span class="title">{{ type }}</span>
+      <span class="title">报告Bug</span>
       <div class="line"></div>
       <div class="info">
         <div class="container">
           <div class="info-sub" @click="labelsState = !labelsState">
             <div>Labels</div>
-            <img src="@/assets/img/infodrop.png">
+            <img src="@/assets/img/infodrop.png" />
           </div>
           <div class="list" v-show="labelsState" @mouseleave="labelsState = false">
             <ul>
-              <li v-for="(lab,i) in labels" :key="i" v-show="lab.name != '界面Bug' && lab.name != '功能Bug'">
-                <img src="@/assets/img/select.png" class="select" @click="selLab($event,i)">
+              <li
+                v-for="(lab,i) in labels"
+                :key="i"
+                v-show="lab.name == '界面Bug' || lab.name == '功能Bug'"
+              >
+                <img src="@/assets/img/select.png" class="select" @click="selLab($event,i)" />
                 <div class="list-name">{{ lab.name }}</div>
               </li>
             </ul>
           </div>
         </div>
-        <div class="container">
-          <div class="info-sub" @click="estimateState = !estimateState">
-            <div>Estimate</div>
-            <img src="@/assets/img/infodrop.png">
-          </div>
-          <div class="list" v-show="estimateState" @mouseleave="estimateState = false">
-            <ul>
-              <li v-for="(esti,i) in estimations" :key="i">
-                <img src="@/assets/img/select.png" class="select" @click="selEsti($event,i)">
-                <div class="list-name">{{ esti.name }}</div>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="container">
-          <div class="info-sub" @click="assigneesState = !assigneesState">
-            <div>Assignees</div>
-            <img src="@/assets/img/infodrop.png">
-          </div>
-          <div class="list" v-show="assigneesState" @mouseleave="assigneesState = false">
-            <ul>
-              <li v-for="(assi,i) in assignees" :key="i">
-                <img src="@/assets/img/select.png" class="select" @click="selAssi($event,i)">
-                <div class="list-name">{{ assi.name }}</div>
-              </li>
-            </ul>
-          </div>
-        </div>
       </div>
-      <input type="text" v-model="title" placeholder="Title" class="issue-title">
-      <textarea class="issue-body" v-model="body" :placeholder="connect!=0?'Leave a comment,This Issue is related to #' + connect:'Leave a comment,This Issue is Epic'"></textarea>
-      <div><input type="checkbox" >是否添加到当前里程碑</div>
-      <div class="selLabels">
-        <div
-          class="selLabels-item"
-          v-for="(esti, i) in estimations"
-          v-show="estiSel[i]"
-          :key="i+'esti'"
-          :style="'backgroundColor:#' + esti.color + ';color:' + changeToRgb(esti.color)"
-        >{{ esti.name }}</div>
-        <div
-          class="selLabels-item"
-          v-for="(lab, i) in labels"
-          v-show="labSel[i]"
-          :key="i+'lab'"
-          :style="'backgroundColor:#' + lab.color + ';color:' + changeToRgb(lab.color)"
-        >{{ lab.name }}</div>
-      </div>
-      <div class="selAssignees">
-        <div class="selAssignees-item" v-for="(assi,i) in assignees" :key="i+'assi'" v-show="assiSel[i]">{{ assi.name }}</div>
-      </div>
+      <input type="text" v-model="title" placeholder="Bug产生的现象" class="issue-title" />
+      <textarea class="issue-body" v-model="body" placeholder="请尽量描述重现Bug的步骤"></textarea>
       <div class="cancel" @click="cancel">Cancel</div>
-      <div class="confirm" @click="confirm">Created</div>
+      <div class="confirm" @click="confirm">Report</div>
     </div>
   </div>
 </template>
 
 <script>
 import { createIssue } from "@/api/createIssue";
-import { XIANGMU_ID } from "@/project"
+import { XIANGMU_ID } from "@/project";
 export default {
-  name: "addDialog",
+  name: "addBUg",
   data() {
     return {
-      assignees: this.$store.getters.getAssignees,
-      labels: this.$store.getters.getLabels,
-      estimations: this.$store.getters.getEstimate,
+      labels: JSON.parse(localStorage.getItem("labels")),
       labelsState: false, // list显示/隐藏
-      estimateState: false,
-      assigneesState: false,
       labSel: [], // 保存选中的项
-      estiSel: [],
-      assiSel: [],
       title: "",
       body: ""
     };
   },
-  props: ["connect","type"],
   methods: {
     confirm() {
-      if (this.title.trim() == "") return;
-      var labelStr = [],assigneesStr = [],body;
-      this.labSel.forEach((state,i) => {
-            if(state) {
-              labelStr.push('"' + this.labels[i].id + '"')
-            }
-          })
-      this.estiSel.forEach((state,i) => {
-        if(state) {
-          labelStr.push('"' + this.estimations[i].id + '"')
-        }
-      })
-      labelStr = labelStr.join(',')
-
-      this.assiSel.forEach((state,i) => {
-        if(state) {
-          assigneesStr.push('"' + this.assignees[i].id + '"')
-        }
-      })
-      assigneesStr = assigneesStr.join(',')
-    
-      body = this.body.replace(/#\d/g, "");
-      if (this.connect != 0 && typeof this.connect != 'undefined' && this.connect < 10000) {
-        body = body + " #" + this.connect;
+      if (this.title.trim() == "" || this.body.trim() == "") {
+        this.$message({
+          message: "请填写完整",
+          type: "warning"
+        });
       }
-      
+      var labelStr = [],
+        body;
+      this.labSel.forEach((state, i) => {
+        if (state) {
+          labelStr.push('"' + this.labels[i].id + '"');
+        }
+      });
       let params = {
         query:
-          'mutation{createIssue(input:{repositoryId:"' + XIANGMU_ID +'",title:"' +
+          'mutation{createIssue(input:{repositoryId:"' +
+          XIANGMU_ID +
+          '",title:"' +
           this.title +
           '",body:"' +
-          body +
-          '",assigneeIds:[' +
-          assigneesStr +
-          "],labelIds:[" +
+          this.body +
+          '",labelIds:[' +
           labelStr +
-          "]}){issue{ body  title}}}"
+          ']}){issue{ body  title}}}'
       };
+        console.log(params);
       this.title = "";
       this.body = "";
-      // console.log(params);
       createIssue(params).then(res => {
-        if(typeof res.data.errors == 'undefined') {
+        console.log(res);
+        if (typeof res.data.errors == "undefined") {
           this.$emit("state", true);
           this.$message({
-            message: "创建成功",
+            message: "报告成功",
             type: "success"
-          })
+          });
         } else {
-          this.$message.error("创建失败，请检查...")
+          this.$message.error("报告失败，请检查...");
         }
-        
       });
     },
     cancel() {
@@ -165,26 +101,6 @@ export default {
         this.labSel[index] = true;
       }
     },
-    /* 故事点 */
-    selEsti(e, index) {
-      if (this.estiSel[index]) {
-        e.currentTarget.src = require("@/assets/img/select.png");
-        this.estiSel[index] = false;
-      } else {
-        e.currentTarget.src = require("@/assets/img/selected.png");
-        this.estiSel[index] = true;
-      }
-    },
-    /* 负责人 */
-    selAssi(e, index) {
-      if (this.assiSel[index]) {
-        e.currentTarget.src = require("@/assets/img/select.png");
-        this.assiSel[index] = false;
-      } else {
-        e.currentTarget.src = require("@/assets/img/selected.png");
-        this.assiSel[index] = true;
-      }
-    },
     /* 字体颜色 */
     changeToRgb(oldVal) {
       let rgbArr = [];
@@ -197,17 +113,9 @@ export default {
     }
   },
   mounted() {
-    var labLens = this.labels.length,
-    estiLens = this.estimations.length,
-     assiLens = this.assignees.length;
+    var labLens = this.labels.length;
     for (let i = 0; i < labLens; i++) {
       this.labSel[i] = false;
-    }
-    for(let j = 0; j < assiLens; j++) {
-      this.assiSel[j] = false;
-    }
-    for(let k = 0; k< estiLens; k++) {
-      this.estiSel[k] = false;
     }
   }
 };
@@ -395,7 +303,7 @@ textarea::-webkit-input-placeholder {
   display: block;
   height: 12px;
   line-height: 12px;
-  border:1px solid rgba(214,218,222,1);
+  border: 1px solid rgba(214, 218, 222, 1);
   border-radius: 16px;
   padding: 10px 12px 10px 11px;
   margin-right: 6px;

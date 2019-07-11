@@ -11,6 +11,9 @@
         </div>
       </div>
       <div class="container" style="marginLeft:4.19%">
+        <div class="sub addBug" @click="addBugState = true">报告Bug</div>
+      </div>
+      <div class="container">
         <div class="sub screen" @click="screenState = !screenState">
           <div>全部</div>
           <img src="@/assets/img/infodrop.png" />
@@ -67,15 +70,15 @@
           ></sticker>
         </div>
       </div>
-      <!-- <add-dialog :connect="'0'" :type="'Task'" @state="changeState" v-if="dialogState"></add-dialog> -->
     </div>
+    <add-bug style="z-index:999" v-if="addBugState" @state="cgState"></add-bug>
   </div>
 </template>
 
 <script>
 import { LOGIN, NAME } from "@/project";
 import sticker from "./sticker";
-import addDialog from "./addDialog";
+import addBug from "./addBug.vue";
 import { getIssue } from "@/api/getIssue";
 import { moveCard, addCards, getCard } from "@/api/card";
 import { fixBoradData } from "@/assets/js/fixBoradData";
@@ -89,7 +92,6 @@ function judge(obj, val) {
   return true;
 }
 
-
 export default {
   name: "bug",
   data() {
@@ -98,6 +100,7 @@ export default {
       boxIssue: [], // 所有列表的issue集
       staticIssue: [], // 静态issue集
       screenState: false,
+      addBugState: false,
       lastIndex: 0, // 上次筛选的索引
       word: "", // 搜索的内容
       menuState: false,
@@ -107,7 +110,7 @@ export default {
   },
   components: {
     sticker,
-    addDialog
+    addBug
   },
   methods: {
     getInfo() {
@@ -167,21 +170,27 @@ export default {
     screenWord() {
       this.boxIssue = this.staticIssue;
       this.screenBug(this.lastIndex);
-      if(this.word == "") return;
-      var result = [],sub = []
+      if (this.word == "") return;
+      var result = [],
+        sub = [];
       this.boxIssue.forEach(column => {
         sub = [];
         column.forEach(item => {
-          if (
-            item.title.indexOf(this.word) != -1 &&
-            judge(sub, item.id)
-          ) {
+          if (item.title.indexOf(this.word) != -1 && judge(sub, item.id)) {
             sub.push(item);
           }
         });
         result.push(sub);
       });
       this.boxIssue = result;
+    },
+    cgState(state) {
+      this.addBugState = false;
+      if(state) {
+        setTimeout(() => {
+        this.$message("请回Home界面刷新");
+      }, 2000);
+      }
     }
   },
   created() {
@@ -279,6 +288,17 @@ li:hover {
   border-radius: 5px;
   cursor: pointer;
   text-align: center;
+}
+
+.addBug {
+  line-height: 32px;
+  text-align: center;
+  background: rgba(38, 128, 235, 1);
+  color: white;
+  border-radius: 5px;
+  font-size: 14px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
 }
 .screen div {
   display: block;

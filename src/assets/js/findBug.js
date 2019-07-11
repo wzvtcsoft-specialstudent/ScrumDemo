@@ -56,7 +56,8 @@ export function findInterface(data)
             lab.ftcolor=changeToRgb(i.color)
             lab.name=i.name
             obj.number=item.number
-            obj.url=item.url
+            obj.baseurl=item.url
+            obj.issueUrl=item.url
             obj.title=item.title
             obj.body=item.body
             obj.state = item.state
