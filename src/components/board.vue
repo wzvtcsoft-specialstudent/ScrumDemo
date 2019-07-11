@@ -783,7 +783,7 @@ li {
 }
 .task-card-box {
   width: 300px;
-  height: 651px;
+  height: 500px;
   overflow-y: scroll;
   overflow-x: hidden;
 }

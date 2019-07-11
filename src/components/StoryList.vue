@@ -34,6 +34,7 @@
         <!-- <transition-group appear mode="out-in" name="sticker"> -->
         <sticker
           v-for="(epic, epic_i) in data"
+          v-show="typeof epic.title != 'undefined'"
           :class="{'sticker':true,'selected':epic_i === epici}"
           :key="epic.number + 'epic'"
           :list="epic"
@@ -143,6 +144,37 @@
 </template>
 
 <script>
+
+/* 判断issue是否带有 bug标签 */
+function filterData(issue) {
+  if(typeof issue.labels == 'undefined') return true;
+  for(let i in issue.labels) {
+    if(issue.labels[i].name.indexOf("Bug") != -1) return false;
+  }
+  return true;
+}
+
+/* 删除带有bug标签的issue */
+function screenData(data) {
+  var result = data.filter(epic => filterData(epic))
+  for(let e in result) {
+    if(result[e].nodes == null) continue;
+    for(let s1 in result[e].nodes) {
+      if(result[e].nodes[s1].nodes == null) continue;
+      for(let s2 in result[e].nodes[s1].nodes) {
+        if(result[e].nodes[s1].nodes[s2].nodes == null) continue;
+        result[e].nodes[s1].nodes[s2].nodes = result[e].nodes[s1].nodes[s2].nodes.filter(task => {
+          return filterData(task)
+        })
+      }
+      result[e].nodes[s1].nodes = result[e].nodes[s1].nodes.filter(s2 => filterData(s2))
+    }
+    result[e].nodes = result[e].nodes.filter(s1 => filterData(s1))
+  }
+  return result;
+}
+
+
 import { LOGIN, NAME } from "@/project";
 import sticker from "./sticker";
 import addDialog from "./addDialog";
@@ -206,6 +238,7 @@ export default {
       getIssue(params).then(res => {
         this.data = fixData(res.data.data.organization.repository.issues.nodes);
         if (this.data.length == 0) return;
+        this.data = screenData(this.data);
         // this.state = true;
         this.$store.commit(
           "setAssignees",
@@ -410,12 +443,6 @@ export default {
     },
     /* 找出所有的Task */
     findAllTask() {
-      // let arr = this.data[this.epici].nodes[this.userstoryi].nodes,flag = false;
-      //   arr.forEach(task => {
-      //     if(typeof task.nodes[0].number != 'undefined') {
-      //       flag = true;
-      //     }
-      //   })
       function judgeTask(task) {
         var flag = true;
         if (typeof task.nodes == "undefined" || task.nodes == null) return true;

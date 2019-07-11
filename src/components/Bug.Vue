@@ -81,7 +81,6 @@ import { moveCard, addCards, getCard } from "@/api/card";
 import { fixBoradData } from "@/assets/js/fixBoradData";
 import { findTask } from "@/assets/js/findTask";
 import { findInterface } from "@/assets/js/findBug";
-import { fixData } from "@/assets/js/fixBug";
 
 function judge(obj, val) {
   for (let key in obj) {

@@ -22,7 +22,7 @@ export function findInterface(data)
          let lab={}
          
         item.labels.nodes.forEach(i=>{
-          if(i.name=='界面bug')
+          if(i.name=='界面Bug')
           {
             lab.bgcolor=i.color
             lab.ftcolor=changeToRgb(i.color)
