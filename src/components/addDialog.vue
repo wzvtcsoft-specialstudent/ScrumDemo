@@ -140,7 +140,6 @@ export default {
       this.body = "";
       // console.log(params);
       createIssue(params).then(res => {
-        console.log(res);
         if(typeof res.data.errors == 'undefined') {
           this.$emit("state", true);
           this.$message({

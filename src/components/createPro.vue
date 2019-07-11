@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { XIANGMU_OWNERID } from "@/project";
+import { XIANGMU_ID } from "@/project";
 import { createProject, addProColumns } from "@/api/project";
 
 // 创建column的方法(返回一个promise)
@@ -52,7 +52,7 @@ export default {
       let params = {
         query:
           'mutation {createProject(input:{ownerId:"' +
-          XIANGMU_OWNERID +
+          XIANGMU_ID +
           '",name:"' +
           this.proTitle +
           '",body:"' +
@@ -61,16 +61,16 @@ export default {
       };
       // 这里利用了Promise 来依次创建column
       createProject(params).then(res => {
-        if (typeof res.data.data.error == "undefined") {
+        if (typeof res.data.errors == "undefined") {
           var id = res.data.data.createProject.project.id
           addColumn("Future", id)
           .then(() => addColumn("To do", id))
           .then(() => addColumn("Doing", id))
           .then(() => addColumn("Done", id))
           .then(()=>{this.$emit("state", true)})
-          .catch((err)=>{this.$message.error(err)})
+          .catch((err)=>{this.$message.error("创建出错，请检查...")})
         } else {
-          this.$message.error("创建出错，请检查...");
+          this.$message.error("您可能无权限执行此操作");
         }
       });
     }

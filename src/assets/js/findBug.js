@@ -1,4 +1,3 @@
-import { isNumber } from "util";
 
 function changeToRgb(oldVal) {
   let rgbArr = [];
@@ -23,7 +22,7 @@ export function findInterface(data)
          let lab={}
          
         item.labels.nodes.forEach(i=>{
-          if(i.name=='界面bug')
+          if(i.name=='界面Bug')
           {
             lab.bgcolor=i.color
             lab.ftcolor=changeToRgb(i.color)
@@ -33,6 +32,7 @@ export function findInterface(data)
             obj.issueUrl=item.url
             obj.title=item.title
             obj.body=item.body
+            obj.state = item.state
             obj.id=item.id
             obj.labels.push(lab)
             if(item.assignees.nodes.length!==0){
@@ -59,6 +59,7 @@ export function findInterface(data)
             obj.url=item.url
             obj.title=item.title
             obj.body=item.body
+            obj.state = item.state
             obj.id=item.id
             obj.labels.push(lab)
             if(item.assignees.nodes.length!==0){
