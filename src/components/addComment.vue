@@ -121,7 +121,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style  scoped>
 .dialog-container {
   position: absolute;
   width: 1536px;

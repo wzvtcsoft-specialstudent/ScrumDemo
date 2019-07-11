@@ -1,79 +1,69 @@
 <template>
   <div class="dialog-container">
     <div class="dialog">
-      <span class="title">创建周期</span>
+      <span class="title">编辑周期</span>
       <div class="line"></div>
-      <input type="text" placeholder="本次周期名称" class="project-title" v-model="proTitle" />
-      <textarea class="project-body" placeholder="对周期来些描述" v-model="proBody"></textarea>
+      <input type="text" placeholder="本次周期名称" class="project-title" v-model="sprint_title" />
+      <textarea class="project-body" placeholder="对周期来些描述" v-model="sprint_body"></textarea>
       <div class="cancel" @click="cancel">取消</div>
-      <div class="confirm" @click="confirm">创建周期</div>
+      <div class="confirm" @click="confirm">更改周期</div>
     </div>
   </div>
 </template>
 
 <script>
 import { XIANGMU_OWNERID } from "@/project";
-import { createProject, addProColumns } from "@/api/project";
+import { editProject, editProColumns } from "@/api/project";
 
 // 创建column的方法(返回一个promise)
-function addColumn(name, id) {
-  return new Promise((resolve, reject) => {
-    let params = {
-      query:
-        'mutation {addProjectColumn(input:{projectId:"'+ id  +'",name:"'+ name + '"}){clientMutationId}}'
-    };
-    addProColumns(params).then(res => {
-      if(typeof res.data.errors == 'undefined') {
-        resolve()
-      } else {
-        reject(res.data.error)
-      }
-    })
-  });
-}
+// function editColumn(name, id,body) {
+//   return new Promise((resolve, reject) => {
+//     let params = {
+//       query:
+//       'mutation {updateProject(input:{projectId:"'+ id +'",name:"'+ name +'",body:"'+ body +'"}){clientMutationId}}'
+//     };
+//     editProColumns(params).then(res => {
+//       if(typeof res.data.errors == 'undefined') {
+//         resolve()
+//       } else {
+//         reject(res.data.error)
+//       }
+//     })
+//   });
+// }
 
 export default {
-  name: "createPro",
+  name: "editPro",
   data() {
     return {
-      proTitle: "",
-      proBody: ""
+      sprint_title:"",
+      sprint_body:"",
+      
     };
+    
   },
+  props:["title","body","id"],
   methods: {
     cancel() {
       this.$emit("state", false);
     },
     confirm() {
-      if (this.proTitle.trim().length == 0) {
+      if (this.title.trim().length == 0) {
         this.$message.error("周期名称不能为空");
         return;
       }
       let params = {
         query:
-          'mutation {createProject(input:{ownerId:"' +
-          XIANGMU_OWNERID +
-          '",name:"' +
-          this.proTitle +
-          '",body:"' +
-          this.proBody +
-          '"}) {project{id}}}'
-      };
-      // 这里利用了Promise 来依次创建column
-      createProject(params).then(res => {
-        if (typeof res.data.data.error == "undefined") {
-          var id = res.data.data.createProject.project.id
-          addColumn("Future", id)
-          .then(() => addColumn("To do", id))
-          .then(() => addColumn("Doing", id))
-          .then(() => addColumn("Done", id))
-          .then(()=>{this.$emit("state", true)})
-          .catch((err)=>{this.$message.error(err)})
-        } else {
-          this.$message.error("创建出错，请检查...");
-        }
-      });
+          'mutation {updateProject(input:{projectId:"'+this.id+'",name:"'+this.sprint_title+'",body:"'+this.sprint_body+'"}) {project{id}}}' 
+        };
+    editProject(params)
+    window.location.reload()
+
     }
+  },
+  mounted(){
+    this.sprint_title = this.title
+    this.sprint_body = this.body
   }
 };
 </script>

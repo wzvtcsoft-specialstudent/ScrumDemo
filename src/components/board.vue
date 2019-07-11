@@ -11,6 +11,9 @@
         </div>
       </div>
       <div class="container" style="marginLeft:4.19%">
+        <div class="sprint_title" @dblclick="editProState = true">{{this.sprint_title}}</div>
+      </div>
+      <div class="container">
         <div class="sub createPro" @click="createProState = true">创建新周期</div>
       </div>
       <div class="container">
@@ -164,6 +167,7 @@
       <b @click="createProState = true">点击创建</b>
     </div>
     <create-pro style="z-index:999" @state="cgProState" v-if="createProState"></create-pro>
+    <edit-pro style="z-index:999" @state="edProState" v-if="editProState" :title="sprint_title" :body="sprint_body" :id="sprint_id"></edit-pro>
     <add-comment
       v-if="addComState"
       :data="addComData"
@@ -179,6 +183,7 @@ import { LOGIN, NAME } from "@/project"
 import sticker from "./sticker";
 import editDialog from "./editDialog";
 import createPro from "./createPro";
+import editPro from "./editPro";
 import addComment from "./addComment";
 import { getIssue } from "@/api/getIssue";
 import { getCommit } from "@/api/getCommit";
@@ -213,6 +218,7 @@ export default {
       addTaskState: false,
       editDialogState: false,
       createProState: false,
+      editProState:false,
       addComState: false,
       addComData: {}, // 要添加comment的id
       cmtFunc: "add", // 处理comment的类型
@@ -227,13 +233,17 @@ export default {
       searchNaN: false, // 上次搜索是否没有结果
       clickx: 0,
       dropIndex: 0,
-      allCardId: [] // 当前sprint所有task的id
+      allCardId: [] ,// 当前sprint所有task的id
+      sprint_title:null,
+      sprint_body:null,
+      sprint_id:null
     };
   },
   components: {
     sticker,
     editDialog,
     createPro,
+    editPro,
     addComment
   },
   methods: {
@@ -269,11 +279,14 @@ export default {
     getinfo() {
       let params = {
         query:
-          'query{organization(login:"' + LOGIN + '"){repository(name:"' + NAME + '") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name columns(first:4){ nodes{id name cards(first:60){totalCount nodes{ id column { id } state content{ ... on Issue{ id title number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
+          'query{organization(login:"' + LOGIN + '"){repository(name:"' + NAME + '") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name body columns(first:4){ nodes{id name cards(first:60){totalCount nodes{ id column { id } state content{ ... on Issue{ id title number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
       };
       getIssue(params).then(res => {
         let data = res.data.data.organization.repository,
           nowData = {};
+        this.sprint_title = data.projects.nodes[0].name,
+        this.sprint_body = data.projects.nodes[0].body,
+        this.sprint_id = data.projects.nodes[0].id
         try {
           if (data.projects.nodes.length == 0) {
             this.notState = true;
@@ -353,6 +366,14 @@ export default {
     },
     cgProState(state) {
       this.createProState = false;
+      if (state) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      }
+    },
+    edProState(state) {
+      this.editProState = false;
       if (state) {
         setTimeout(() => {
           window.location.reload();
@@ -606,6 +627,10 @@ export default {
         body: body
       };
       this.addComState = true;
+    },
+    changetitle(){
+      console.log("双击标题")
+
     }
   },
   filters: {
@@ -816,6 +841,14 @@ a {
   border-radius: 5px;
   font-size: 14px;
   font-family: Source Han Sans CN;
+  font-weight: 400;
+}
+.sprint_title{
+  line-height: 32px;
+  text-align: center;
+  color: rgba(112, 112, 112, 1);
+  border-radius: 5px;
+  font-size: 14px;
   font-weight: 400;
 }
 .labels div {

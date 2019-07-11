@@ -13,3 +13,17 @@ export function addProColumns(data) {
         data: JSON.stringify(data)
     })
 }
+
+export function editProject(data) {
+    return axios({
+        method: "POST",
+        data: JSON.stringify(data)
+    })
+}
+
+export function editProColumns(data) {
+    return axios({
+        method: "POST",
+        data: JSON.stringify(data)
+    })
+}
