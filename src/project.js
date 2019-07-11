@@ -5,11 +5,11 @@ const LOGIN = "wzvtcsoft-specialstudent"; // organization{login: xxx}
 
 /* 项目名称 */
 // board
-const NAME = "Dmsbog"; // repository{name: xxx}
+const NAME = "ScrumDemo"; // repository{name: xxx}
 
 /* 项目ID */
 //StoryList
-const XIANGMU_ID = "MDEwOlJlcG9zaXRvcnkxOTYxNTIyMTE="; //  respository{id: xxx}
+const XIANGMU_ID = "MDEwOlJlcG9zaXRvcnkxODcxMTgwMTM="; //  respository{id: xxx}
 /* 
    去github GraphQL API 查询
    Dmsbog: MDEwOlJlcG9zaXRvcnkxOTYxNTIyMTE=
