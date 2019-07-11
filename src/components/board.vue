@@ -61,10 +61,12 @@
               @keydown.enter="searchTask"
             />
           </div>
-          <div class="task-card" v-for="(addCard, i) in alltask" :key="addCard.number">
-            <a :href="addCard.issueUrl">#{{ addCard.number | fixNum }}</a>
-            <div class="task-card-title">{{ addCard.title }}</div>
-            <img src="@/assets/img/right.png" @click="addTaskCard(addCard.id,i,addCard)" />
+          <div class="task-card-box">
+            <div class="task-card" v-for="(addCard, i) in alltask" :key="addCard.number">
+              <a :href="addCard.issueUrl">#{{ addCard.number | fixNum }}</a>
+              <div class="task-card-title">{{ addCard.title }}</div>
+              <img src="@/assets/img/right.png" @click="addTaskCard(addCard.id,i,addCard)" />
+            </div>
           </div>
           <!-- <sticker class="task-card" v-for="addCard in alltask" :key="addCard.number + 'card'" :list="addCard"></sticker> -->
         </div>
@@ -175,7 +177,7 @@
 </template>
 
 <script>
-import { LOGIN, NAME } from "@/project"
+import { LOGIN, NAME } from "@/project";
 import sticker from "./sticker";
 import editDialog from "./editDialog";
 import createPro from "./createPro";
@@ -269,7 +271,11 @@ export default {
     getinfo() {
       let params = {
         query:
-          'query{organization(login:"' + LOGIN + '"){repository(name:"' + NAME + '") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name columns(first:4){ nodes{id name cards(first:60){totalCount nodes{ id column { id } state content{ ... on Issue{ id title number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
+          'query{organization(login:"' +
+          LOGIN +
+          '"){repository(name:"' +
+          NAME +
+          '") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name columns(first:4){ nodes{id name cards(first:60){totalCount nodes{ id column { id } state content{ ... on Issue{ id title number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
       };
       getIssue(params).then(res => {
         let data = res.data.data.organization.repository,
@@ -334,7 +340,11 @@ export default {
     getcommit() {
       let params = {
         query:
-          'query{organization(login: "' + LOGIN + '") {repository(name: "' + NAME + '") {issues(first:100){totalCount nodes{number comments(first:100){nodes{id body}}}}}}}'
+          'query{organization(login: "' +
+          LOGIN +
+          '") {repository(name: "' +
+          NAME +
+          '") {issues(first:100){totalCount nodes{number comments(first:100){nodes{id body}}}}}}}'
       };
       getCommit(params).then(res => {
         let commitData = res.data.data.organization.repository.issues.nodes;
@@ -373,21 +383,30 @@ export default {
       if (this.staticTask != null) return;
       let params = {
         query:
-          'query{organization(login:"' + LOGIN + '"){repository(name:"' + NAME +'"){id name issues(states:[OPEN],first:100){  totalCount nodes{ id title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
+          'query{organization(login:"' +
+          LOGIN +
+          '"){repository(name:"' +
+          NAME +
+          '"){id name issues(states:[OPEN],first:100){  totalCount nodes{ id title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
       getCard(params).then(res => {
-        let temp = this.findAllTask(
-            findTask(res.data.data.organization.repository.issues.nodes)
-          ),
-          result = [],
-          idArry = this.allCardId;
-        temp.forEach(task => {
-          if (!idArry.includes(task.id)) {
-            result.push(task);
-          }
-        });
-        this.staticTask = result;
-        this.alltask = result;
+        try {
+          let temp = this.findAllTask(
+              findTask(res.data.data.organization.repository.issues.nodes)
+            ),
+            result = [],
+            idArry = this.allCardId;
+          temp.forEach(task => {
+            if (!idArry.includes(task.id)) {
+              result.push(task);
+            }
+          });
+          this.staticTask = result;
+          this.alltask = result;
+        } catch (error) {
+          this.staticTask = [];
+          this.alltask = [];
+        }
       });
     },
     addTaskCard(id, index, card) {
@@ -762,6 +781,12 @@ li {
 .card-search-box input:focus {
   outline: none;
 }
+.task-card-box {
+  width: 300px;
+  height: 651px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
 .task-card {
   width: 300px;
   min-height: 31px;
@@ -770,7 +795,7 @@ li {
   font-weight: 400;
   max-height: 63px;
   background: rgba(250, 251, 252, 1);
-  margin-top: 8px;
+  margin-bottom: 8px;
   float: left;
 }
 .task-card-title {

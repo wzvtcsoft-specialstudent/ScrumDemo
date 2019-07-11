@@ -360,9 +360,9 @@ export default {
     },
     changeState(val) {
       this.dialogState = false;
-      if (val) {
-        window.location.reload();
-      }
+      // if (val) {
+      //   window.location.reload();
+      // }
     },
     clickEdit(list) {
       this.editInfo = list;
