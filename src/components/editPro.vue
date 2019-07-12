@@ -1,79 +1,69 @@
 <template>
   <div class="dialog-container">
     <div class="dialog">
-      <span class="title">Create Sprint</span>
+      <span class="title">Edit Sprint</span>
       <div class="line"></div>
-      <input type="text" placeholder="The name of this sprint" class="project-title" v-model="proTitle" />
-      <textarea class="project-body" placeholder="Some descriptions of the sprint" v-model="proBody"></textarea>
-      <div class="cancel" @click="cancel">Cancel</div>
+      <input type="text" placeholder="The name of this sprint" class="project-title" v-model="sprint_title" />
+      <textarea class="project-body" placeholder="Some descriptions of the sprint" v-model="sprint_body"></textarea>
+      <div class="cancel" @click="cancel">cancel</div>
       <div class="confirm" @click="confirm">Create Sprint</div>
     </div>
   </div>
 </template>
 
 <script>
-import { XIANGMU_ID } from "@/project";
-import { createProject, addProColumns } from "@/api/project";
+import { XIANGMU_OWNERID } from "@/project";
+import { editProject, editProColumns } from "@/api/project";
 
 // 创建column的方法(返回一个promise)
-function addColumn(name, id) {
-  return new Promise((resolve, reject) => {
-    let params = {
-      query:
-        'mutation {addProjectColumn(input:{projectId:"'+ id  +'",name:"'+ name + '"}){clientMutationId}}'
-    };
-    addProColumns(params).then(res => {
-      if(typeof res.data.errors == 'undefined') {
-        resolve()
-      } else {
-        reject(res.data.error)
-      }
-    })
-  });
-}
+// function editColumn(name, id,body) {
+//   return new Promise((resolve, reject) => {
+//     let params = {
+//       query:
+//       'mutation {updateProject(input:{projectId:"'+ id +'",name:"'+ name +'",body:"'+ body +'"}){clientMutationId}}'
+//     };
+//     editProColumns(params).then(res => {
+//       if(typeof res.data.errors == 'undefined') {
+//         resolve()
+//       } else {
+//         reject(res.data.error)
+//       }
+//     })
+//   });
+// }
 
 export default {
-  name: "createPro",
+  name: "editPro",
   data() {
     return {
-      proTitle: "",
-      proBody: ""
+      sprint_title:"",
+      sprint_body:"",
+      
     };
+    
   },
+  props:["title","body","id"],
   methods: {
     cancel() {
       this.$emit("state", false);
     },
     confirm() {
-      if (this.proTitle.trim().length == 0) {
+      if (this.title.trim().length == 0) {
         this.$message.error("sprint name cannot be empty");
         return;
       }
       let params = {
         query:
-          'mutation {createProject(input:{ownerId:"' +
-          XIANGMU_ID +
-          '",name:"' +
-          this.proTitle +
-          '",body:"' +
-          this.proBody +
-          '"}) {project{id}}}'
-      };
-      // 这里利用了Promise 来依次创建column
-      createProject(params).then(res => {
-        if (typeof res.data.errors == "undefined") {
-          var id = res.data.data.createProject.project.id
-          addColumn("Future", id)
-          .then(() => addColumn("To do", id))
-          .then(() => addColumn("Doing", id))
-          .then(() => addColumn("Done", id))
-          .then(()=>{this.$emit("state", true)})
-          .catch((err)=>{this.$message.error("Create error, please check...")})
-        } else {
-          this.$message.error("You may not have permission to perform this operation");
-        }
-      });
+          'mutation {updateProject(input:{projectId:"'+this.id+'",name:"'+this.sprint_title+'",body:"'+this.sprint_body+'"}) {project{id}}}' 
+        };
+    editProject(params)
+    window.location.reload()
+
     }
+  },
+  mounted(){
+    this.sprint_title = this.title
+    this.sprint_body = this.body
   }
 };
 </script>

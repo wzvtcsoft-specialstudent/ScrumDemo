@@ -11,7 +11,10 @@
         </div>
       </div>
       <div class="container" style="marginLeft:4.19%">
-        <div class="sub createPro" @click="createProState = true">创建新周期</div>
+        <div class="sprint_title" @dblclick="editProState = true">{{this.sprint_title}}</div>
+      </div>
+      <div class="container">
+        <div class="sub createPro" @click="createProState = true">Create new sprint</div>
       </div>
       <div class="container">
         <div class="sub labels" @click="labelsState = !labelsState">
@@ -162,10 +165,11 @@
       <edit-dialog class="edit-dialog" v-if="editDialogState" :list="editInfo" @state="cgEditState"></edit-dialog>
     </div>
     <div class="not-content" v-if="notState">
-      暂无冲刺周期信息，
-      <b @click="createProState = true">点击创建</b>
+      No sprint cycle information，
+      <b @click="createProState = true">Click to create</b>
     </div>
     <create-pro style="z-index:999" @state="cgProState" v-if="createProState"></create-pro>
+    <edit-pro style="z-index:999" @state="edProState" v-if="editProState" :title="sprint_title" :body="sprint_body" :id="sprint_id"></edit-pro>
     <add-comment
       v-if="addComState"
       :data="addComData"
@@ -181,6 +185,7 @@ import { LOGIN, NAME } from "@/project";
 import sticker from "./sticker";
 import editDialog from "./editDialog";
 import createPro from "./createPro";
+import editPro from "./editPro";
 import addComment from "./addComment";
 import { getIssue } from "@/api/getIssue";
 import { getCommit } from "@/api/getCommit";
@@ -215,6 +220,7 @@ export default {
       addTaskState: false,
       editDialogState: false,
       createProState: false,
+      editProState:false,
       addComState: false,
       addComData: {}, // 要添加comment的id
       cmtFunc: "add", // 处理comment的类型
@@ -229,13 +235,17 @@ export default {
       searchNaN: false, // 上次搜索是否没有结果
       clickx: 0,
       dropIndex: 0,
-      allCardId: [] // 当前sprint所有task的id
+      allCardId: [] ,// 当前sprint所有task的id
+      sprint_title:null,
+      sprint_body:null,
+      sprint_id:null
     };
   },
   components: {
     sticker,
     editDialog,
     createPro,
+    editPro,
     addComment
   },
   methods: {
@@ -280,6 +290,9 @@ export default {
       getIssue(params).then(res => {
         let data = res.data.data.organization.repository,
           nowData = {};
+        this.sprint_title = data.projects.nodes[0].name,
+        this.sprint_body = data.projects.nodes[0].body,
+        this.sprint_id = data.projects.nodes[0].id
         try {
           if (data.projects.nodes.length == 0) {
             this.notState = true;
@@ -369,6 +382,14 @@ export default {
         }, 2000);
       }
     },
+    edProState(state) {
+      this.editProState = false;
+      if (state) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      }
+    },
     cgCmtState(state) {
       this.addComState = false;
       if (state) {
@@ -420,7 +441,7 @@ export default {
       };
       addCards(params).then(res => {
         if (typeof res.data.data.error != "undefined") {
-          alert("添加失败，可能看板内已存在该Task");
+          alert("Add failed, it may be that the Task already exists in the board");
         }
         this.staticTask.splice(index, 1);
         this.alltask = this.staticTask;
@@ -841,6 +862,14 @@ a {
   border-radius: 5px;
   font-size: 14px;
   font-family: Source Han Sans CN;
+  font-weight: 400;
+}
+.sprint_title{
+  line-height: 32px;
+  text-align: center;
+  color: rgba(112, 112, 112, 1);
+  border-radius: 5px;
+  font-size: 14px;
   font-weight: 400;
 }
 .labels div {

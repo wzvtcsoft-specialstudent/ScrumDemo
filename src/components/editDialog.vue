@@ -1,7 +1,7 @@
 <template>
   <div class="dialog-container">
     <div class="dialog">
-      <span class="title">修改</span>
+      <span class="title">Edit</span>
       <div class="line"></div>
       <div class="info">
         <div class="container">
@@ -88,8 +88,8 @@
           v-show="assiSel[i]"
         >{{ assi.name }}</div>
       </div>
-      <div class="cancel" @click="cancel">取消</div>
-      <div class="confirm" @click="confirm">更新内容</div>
+      <div class="cancel" @click="cancel">cancel</div>
+      <div class="confirm" @click="confirm">update content</div>
     </div>
   </div>
 </template>
@@ -119,7 +119,7 @@ export default {
     confirm() {
       if (this.title.trim() == "") {
           this.$message({
-              message: "title 不能为空",
+              message: "title can not be empty",
               type: "warning"
           })
           return;
@@ -167,10 +167,10 @@ export default {
       this.body = "";
       editIssue(params).then(res => {
         if (typeof res.data.data.errors != "undefined") {
-          this.$message.error("更新失败，请检查...");
+          this.$message.error("Update failed, please check...");
         } else {
           this.$message({
-              message: "更新成功！",
+              message: "update completed!",
               type: 'success'
           })
           this.$emit("state", false);

@@ -131,7 +131,7 @@
         />
       </div>
     </div>
-    <div class="nodata" v-else>暂无内容</div>
+    <div class="nodata" v-else>no content</div>
     <add-dialog
       style="z-index: 9999"
       :connect="connectIssue"

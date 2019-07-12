@@ -105,7 +105,7 @@
       </div>
     </div>
     <div class="not-his-content" v-if="notHisState">
-      当前暂无历史冲刺信息
+      There is currently no historical sprint information
     </div>
   </div>
 </template>

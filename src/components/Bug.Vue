@@ -15,19 +15,19 @@
       </div>
       <div class="container">
         <div class="sub screen" @click="screenState = !screenState">
-          <div>全部</div>
+          <div>All</div>
           <img src="@/assets/img/infodrop.png" />
         </div>
         <div class="list" v-show="screenState" @mouseleave="screenState = false">
           <ul>
             <li>
-              <div class="list-name" @click="screenBug(0)">全部</div>
+              <div class="list-name" @click="screenBug(0)">All</div>
             </li>
             <li>
-              <div class="list-name" @click="screenBug(1)">已完成</div>
+              <div class="list-name" @click="screenBug(1)">Closed</div>
             </li>
             <li>
-              <div class="list-name" @click="screenBug(2)">未完成</div>
+              <div class="list-name" @click="screenBug(2)">Opened</div>
             </li>
           </ul>
         </div>
@@ -43,7 +43,7 @@
     </div>
     <div class="board-body">
       <div class="body-container" style="marginLeft:7.25%">
-        <span class="title">界面Bug</span>
+        <span class="title">Interface Bug</span>
         <div class="issue-container">
           <sticker
             v-for="(card, i) in boxIssue[0]"
@@ -57,7 +57,7 @@
         </div>
       </div>
       <div class="body-container">
-        <span class="title">功能Bug</span>
+        <span class="title">Functional Bug</span>
         <div class="issue-container">
           <sticker
             v-for="(card, i) in boxIssue[1]"
