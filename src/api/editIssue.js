@@ -6,3 +6,10 @@ export function editIssue(data) {
         data: JSON.stringify(data)
     })
 }
+
+export function closeIssue(data) {
+    return axios({
+        method: "POST",
+        data: JSON.stringify(data)
+    })
+}

@@ -52,6 +52,8 @@
             :comments="{state: false}"
             :isHome="false"
             :id="card.id"
+            :isBug="true"
+            @state="cgState"
             class="sticker"
           ></sticker>
         </div>
@@ -66,6 +68,8 @@
             :comments="{state: false}"
             :isHome="false"
             :id="card.id"
+            :isBug="true"
+            @state="cgState"
             class="sticker"
           ></sticker>
         </div>
@@ -120,7 +124,7 @@ export default {
           LOGIN +
           '"){repository(name:"' +
           NAME +
-          '"){id name issues(states:[OPEN],first:100){  totalCount nodes{ id title state number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
+          '"){id name issues(first:100){  totalCount nodes{ id title state number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
       getIssue(params).then(res => {
         try {
@@ -145,7 +149,7 @@ export default {
           this.boxIssue.forEach(column => {
             tmp = [];
             column.forEach(bug => {
-              if (bug.state == "CLOSE") tmp.push(bug);
+              if (bug.state == "CLOSED") tmp.push(bug);
             });
             result.push(tmp);
           });
@@ -188,7 +192,8 @@ export default {
       this.addBugState = false;
       if(state) {
         setTimeout(() => {
-        this.$message("请回Home界面刷新");
+        // this.$message("Please refresh the Home interface");
+        window.location.reload();
       }, 2000);
       }
     }

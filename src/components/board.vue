@@ -14,7 +14,7 @@
         <div class="sprint_title" @dblclick="editProState = true">{{this.sprint_title}}</div>
       </div>
       <div class="container">
-        <div class="sub createPro" @click="createProState = true">Create new sprint</div>
+        <div class="sub createPro" @click="createProState = true">Create sprint</div>
       </div>
       <div class="container">
         <div class="sub labels" @click="labelsState = !labelsState">
@@ -871,6 +871,8 @@ a {
   border-radius: 5px;
   font-size: 14px;
   font-weight: 400;
+  font-style: italic;
+  cursor: pointer;
 }
 .labels div {
   display: block;

@@ -49,7 +49,6 @@
       </div>
       <input type="text" v-model="title" placeholder="Title" class="issue-title">
       <textarea class="issue-body" v-model="body" :placeholder="connect!=0?'Leave a comment,This Issue is related to #' + connect:'Leave a comment,This Issue is Epic'"></textarea>
-      <div><input type="checkbox" >Add to current milestone</div>
       <div class="selLabels">
         <div
           class="selLabels-item"

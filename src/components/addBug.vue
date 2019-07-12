@@ -49,7 +49,7 @@ export default {
     confirm() {
       if (this.title.trim() == "" || this.body.trim() == "") {
         this.$message({
-          message: "请填写完整",
+          message: "Please complete the form",
           type: "warning"
         });
       }
@@ -80,11 +80,11 @@ export default {
         if (typeof res.data.errors == "undefined") {
           this.$emit("state", true);
           this.$message({
-            message: "报告成功",
+            message: "The report was successful",
             type: "success"
           });
         } else {
-          this.$message.error("报告失败，请检查...");
+          this.$message.error("report failed. Please check it...");
         }
       });
     },

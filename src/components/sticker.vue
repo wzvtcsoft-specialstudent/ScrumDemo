@@ -11,10 +11,25 @@
           <li v-show="isHome" class="add" @click="clickComment">Add acceptance criteria</li>
         </ul>
       </div>
-      <div class="no-comment" v-else>No acceptance criteria,<b v-show="isHome" style="cursor: pointer;text-decoration: underline" @click="clickComment">Add</b></div>
+      <div class="no-comment" v-else>
+        No acceptance criteria,
+        <b
+          v-show="isHome"
+          style="cursor: pointer;text-decoration: underline"
+          @click="clickComment"
+        >Add</b>
+      </div>
     </div>
     <div class="sticker-container" @contextmenu.prevent="rightClick">
-      <div class="sticker-menu">
+      <img
+        src="@/assets/img/completed.png"
+        width="20"
+        height="20"
+        class="completed"
+        @click="complete"
+        v-if="isBug"
+      />
+      <div class="sticker-menu" v-else>
         <img
           src="@/assets/img/more.png"
           class="more"
@@ -24,7 +39,7 @@
         />
         <div class="sticker-menu-item" v-show="menuState" @mouseleave="menuState = false">
           <div class="item" @click="cliEdit">Edit</div>
-          <div class="item" v-show="isHome" @click="delcard">Remove from this column</div>
+          <div class="item" v-show="isHome" @click="delcard">Remove</div>
         </div>
       </div>
       <div class="info" v-if="typeof list.assignees != 'undefined' && list.assignees.length != 0">
@@ -52,7 +67,8 @@
 
 <script>
 import { delCard } from "@/api/card";
-import addComment from './addComment'
+import { closeIssue } from "@/api/editIssue";
+import addComment from "./addComment";
 
 export default {
   name: "sticker",
@@ -62,7 +78,7 @@ export default {
       show: false
     };
   },
-  props: ["list", "isHome", "id", "comments"],
+  props: ["list", "isHome", "id", "comments", "isBug"],
   methods: {
     cliEdit() {
       this.$emit("edit", this.list);
@@ -81,7 +97,6 @@ export default {
               '"}){deletedCardId}}'
           };
           delCard(params).then(res => {
-            console.log(res);
             if (typeof res.data.data.error == "undefined") {
               this.$message({
                 message: "successfully deleted",
@@ -102,15 +117,52 @@ export default {
           });
         });
     },
+    /* 关闭Issue */
+    complete() {
+      if (this.list.state == "CLOSED") {
+        this.$message("The Issue has been closed");
+        return;
+      }
+      this.$confirm("Determine that Bug has been resolved", "Tip", {
+        confirmButtonText: "sure",
+        cancelButtonText: "cancel",
+        type: "warning"
+      })
+        .then(() => {
+          let params = {
+            query:
+              'mutation{closeIssue(input:{issueId: "' +
+              this.list.id +
+              '"}) {clientMutationId}}'
+          };
+          closeIssue(params).then(res => {
+            if (typeof res.data.errors == "undefined") {
+              this.$message({
+                message: "The Issue was successfully closed",
+                type: "success"
+              });
+              this.$emit("state", true);
+            } else {
+              this.$message.errors("Close failed, please check...");
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            message: "Cancelled delete",
+            type: "info"
+          });
+        });
+    },
     rightClick() {
       this.show = !this.show;
       return false;
     },
     clickComment() {
-      this.$emit('addcomment', this.list.id)
+      this.$emit("addcomment", this.list.id);
     },
     dbcliComment(id, body) {
-      this.$emit('editcomment',id,body)
+      this.$emit("editcomment", id, body);
     }
   },
   filters: {
@@ -154,11 +206,12 @@ li:hover {
 }
 .comments-container .add {
   display: block;
-  width: 100px;
+  width: 160px;
   background: rgba(38, 128, 235, 1);
   color: white;
   border-radius: 5px;
-  font-size: 14px;
+  text-align: center;
+  font-size: 12px;
   font-family: Source Han Sans CN;
   font-weight: 400;
   margin: 10px auto 0 auto;
@@ -183,6 +236,11 @@ li:hover {
   border-radius: 10px;
   padding: 10px 16px 17px 18px;
   cursor: pointer;
+}
+.completed {
+  position: absolute;
+  right: 10px;
+  z-index: 999;
 }
 .sticker-menu {
   width: 100px;
