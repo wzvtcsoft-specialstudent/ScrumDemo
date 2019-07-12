@@ -236,9 +236,9 @@ export default {
       clickx: 0,
       dropIndex: 0,
       allCardId: [] ,// 当前sprint所有task的id
-      sprint_title:null,
-      sprint_body:null,
-      sprint_id:null
+      sprint_title:"",
+      sprint_body:"",
+      sprint_id:""
     };
   },
   components: {
@@ -290,9 +290,7 @@ export default {
       getIssue(params).then(res => {
         let data = res.data.data.organization.repository,
           nowData = {};
-        this.sprint_title = data.projects.nodes[0].name,
-        this.sprint_body = data.projects.nodes[0].body,
-        this.sprint_id = data.projects.nodes[0].id
+
         try {
           if (data.projects.nodes.length == 0) {
             this.notState = true;
@@ -305,7 +303,10 @@ export default {
         } catch (error) {
           this.notState = true;
           return;
-        }
+        }        
+        this.sprint_title = data.projects.nodes[0].name,
+        this.sprint_body = data.projects.nodes[0].body,
+        this.sprint_id = data.projects.nodes[0].id
         nowData = data.projects.nodes.shift();
         this.$store.commit("setAssignees", data.assignableUsers.nodes);
         this.$store.commit("setLabels", data.labels.nodes);
