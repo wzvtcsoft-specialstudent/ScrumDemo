@@ -11,7 +11,7 @@
         </div>
       </div>
       <div class="container" style="marginLeft:4.19%">
-        <div class="sprint_title" @dblclick="editProState = true">{{this.sprint_title}}</div>
+        <div class="sprint_title" @dblclick="editProState = true" >{{this.sprint_title}}</div>
       </div>
       <div class="container">
         <div class="sub createPro" @click="createProState = true">Create sprint</div>
@@ -238,7 +238,8 @@ export default {
       allCardId: [] ,// 当前sprint所有task的id
       sprint_title:"",
       sprint_body:"",
-      sprint_id:""
+      sprint_id:"",
+      projectColumn_id:""
     };
   },
   components: {
@@ -307,6 +308,14 @@ export default {
         this.sprint_title = data.projects.nodes[0].name,
         this.sprint_body = data.projects.nodes[0].body,
         this.sprint_id = data.projects.nodes[0].id
+        console.log (data.projects.nodes[0].columns.nodes[0].name) 
+        console.log (data.projects.nodes[0].columns.nodes[1].name) 
+        console.log (data.projects.nodes[0].columns.nodes[2].name) 
+        console.log (data.projects.nodes[0].columns.nodes[3].name) 
+        let node = data.projects.nodes[0].columns.nodes[1]
+        this.projectColumn_id = node.id
+        console.log(node.name)
+        localStorage.setItem('projectColumn_id',JSON.stringify(this.projectColumn_id));     
         nowData = data.projects.nodes.shift();
         this.$store.commit("setAssignees", data.assignableUsers.nodes);
         this.$store.commit("setLabels", data.labels.nodes);

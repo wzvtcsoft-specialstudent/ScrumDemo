@@ -13,3 +13,10 @@ export function closeIssue(data) {
         data: JSON.stringify(data)
     })
 }
+
+export function openIssue(data) {
+    return axios({
+        method: "POST",
+        data: JSON.stringify(data)
+    })
+}

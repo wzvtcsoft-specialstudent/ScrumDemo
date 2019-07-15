@@ -5,17 +5,17 @@
         <img src="@/assets/img/menu.png" />
         <div class="menu-item" v-show="menuState" @mouseleave="menuState = false">
           <router-link to="/" tag="span" class="link-item">Home</router-link>
-          <router-link to="/storyList" tag="span" class="link-item">Story Map</router-link>
-          <router-link to="/history" tag="span" class="link-item">History Sprint</router-link>
-          <router-link to="/bug" tag="span" class="link-item">bug</router-link>
+          <router-link to="/storyList" tag="span" class="link-item">Story map</router-link>
+          <router-link to="/history" tag="span" class="link-item">History sprint</router-link>
+          <router-link to="/bug" tag="span" class="link-item">Bug</router-link>
         </div>
       </div>
       <div class="container" style="marginLeft:4.19%">
-        <div class="sub addBug" @click="addBugState = true">报告Bug</div>
+        <div class="sub addBug" @click="addBugState = true">Add bug</div>
       </div>
       <div class="container">
         <div class="sub screen" @click="screenState = !screenState">
-          <div>All</div>
+          <div>{{this.bug_state}}</div>
           <img src="@/assets/img/infodrop.png" />
         </div>
         <div class="list" v-show="screenState" @mouseleave="screenState = false">
@@ -43,7 +43,7 @@
     </div>
     <div class="board-body">
       <div class="body-container" style="marginLeft:7.25%">
-        <span class="title">Interface Bug</span>
+        <span class="title">Interface bug</span>
         <div class="issue-container">
           <sticker
             v-for="(card, i) in boxIssue[0]"
@@ -59,7 +59,7 @@
         </div>
       </div>
       <div class="body-container">
-        <span class="title">Functional Bug</span>
+        <span class="title">Functional bug</span>
         <div class="issue-container">
           <sticker
             v-for="(card, i) in boxIssue[1]"
@@ -109,7 +109,8 @@ export default {
       word: "", // 搜索的内容
       menuState: false,
       searchNaN: false, // 上次搜索是否没有结果
-      clickx: 0
+      clickx: 0,
+      bug_state:"All"
     };
   },
   components: {
@@ -142,6 +143,7 @@ export default {
       this.boxIssue = this.staticIssue;
       switch (n) {
         case 0:
+          this.bug_state = "All"
           break;
         case 1:
           var result = [],
@@ -154,6 +156,7 @@ export default {
             result.push(tmp);
           });
           this.boxIssue = result;
+          this.bug_state = "Closed"
           break;
         case 2:
           var result = [],
@@ -166,6 +169,7 @@ export default {
             result.push(tmp);
           });
           this.boxIssue = result;
+          this.bug_state = "Open"
           break;
         default:
           break;

@@ -1,7 +1,7 @@
 <template>
   <div class="dialog-container">
     <div class="dialog">
-      <span class="title">报告Bug</span>
+      <span class="title">Add bug</span>
       <div class="line"></div>
       <div class="info">
         <div class="container">
@@ -14,7 +14,7 @@
               <li
                 v-for="(lab,i) in labels"
                 :key="i"
-                v-show="lab.name == '界面Bug' || lab.name == '功能Bug'"
+                v-show="lab.name == 'Interface bug' || lab.name == 'Functional bug'"
               >
                 <img src="@/assets/img/select.png" class="select" @click="selLab($event,i)" />
                 <div class="list-name">{{ lab.name }}</div>
@@ -23,10 +23,10 @@
           </div>
         </div>
       </div>
-      <input type="text" v-model="title" placeholder="Bug产生的现象" class="issue-title" />
-      <textarea class="issue-body" v-model="body" placeholder="请尽量描述重现Bug的步骤"></textarea>
+      <input type="text" v-model="title" placeholder="Bug generated phenomenon" class="issue-title" />
+      <textarea class="issue-body" v-model="body" placeholder="Please try to describe the steps to reproduce the bug."></textarea>
       <div class="cancel" @click="cancel">Cancel</div>
-      <div class="confirm" @click="confirm">Report</div>
+      <div class="confirm" @click="confirm">Add</div>
     </div>
   </div>
 </template>

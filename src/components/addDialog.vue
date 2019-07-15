@@ -49,6 +49,7 @@
       </div>
       <input type="text" v-model="title" placeholder="Title" class="issue-title">
       <textarea class="issue-body" v-model="body" :placeholder="connect!=0?'Leave a comment,This Issue is related to #' + connect:'Leave a comment,This Issue is Epic'"></textarea>
+      <div v-if="this.type == 'Task'"><input type="checkbox" @click="Add($event)">Add to current sprint</div>
       <div class="selLabels">
         <div
           class="selLabels-item"
@@ -75,6 +76,7 @@
 </template>
 
 <script>
+import { moveCard, addCards, getCard } from "@/api/card";
 import { createIssue } from "@/api/createIssue";
 import { XIANGMU_ID } from "@/project"
 export default {
@@ -91,12 +93,21 @@ export default {
       estiSel: [],
       assiSel: [],
       title: "",
-      body: ""
+      body: "",
+      issue_id:"",
+      checked:false,
+      projectColumnId:""
     };
   },
-  props: ["connect","type"],
+  props: ["connect","type",],
   methods: {
+    Add(e){
+      this.checked = e.target.checked
+      console.log(this.checked)
+    },
     confirm() {
+      this.projectColumnId = localStorage.getItem('projectColumn_id').replace("\"","").replace("\"",""); 
+      console.log(this.projectColumnId)
       if (this.title.trim() == "") return;
       var labelStr = [],assigneesStr = [],body;
       this.labSel.forEach((state,i) => {
@@ -133,7 +144,7 @@ export default {
           assigneesStr +
           "],labelIds:[" +
           labelStr +
-          "]}){issue{ body  title}}}"
+          "]}){issue{ id body  title}}}"
       };
       this.title = "";
       this.body = "";
@@ -145,11 +156,30 @@ export default {
             message: "Created successfully",
             type: "success"
           })
+          this.issue_id =  res.data.data.createIssue.issue.id
         } else {
           this.$message.error("Creation failed, please check...")
         }
         
-      });
+      }).then(()=>{
+          if(this.checked){
+            console.log(this.issue_id) 
+            console.log(this.projectColumnId) 
+            let params = {
+              query:
+              'mutation{ addProjectCard(input:{contentId:"' +
+              this.issue_id +
+              '",projectColumnId:"' +
+              this.projectColumnId +
+              '"}){cardEdge{node{id}}}}'
+              };
+            addCards(params).then(()=>{
+              })
+            }else{
+                console.log(3)
+            }
+      })
+      
     },
     cancel() {
       this.$emit("state", false);
