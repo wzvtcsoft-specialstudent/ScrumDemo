@@ -78,6 +78,7 @@ function merge(index) {
   obj.issueUrl = issueItem.url;
   obj.assignees = [];
   obj.nodes = [];
+  obj.state = issueItem.state
   if(issueItem.assignees.nodes.length !== 0) {
     let assi = [];
     issueItem.assignees.nodes.forEach(item => {
@@ -85,7 +86,8 @@ function merge(index) {
         name:item.name,
         img:item.avatarUrl,
         color: userColor[item.name],
-        time: item.updatedAt
+        time: item.updatedAt,
+        state: item.state
       })
     })
     obj.assignees = assi;

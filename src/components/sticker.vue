@@ -30,15 +30,32 @@
         v-if="isBug"
       />
       <div class="sticker-menu" v-else>
+        <span v-if = "list.state == 'OPEN'">
+          <img
+          src="@/assets/img/issue_opened.png"
+          class="more"
+          width="20px"
+          height="20px"
+        />
+        </span>
+        <span v-if = "list.state == 'CLOSED'">
+          <img
+          src="@/assets/img/issues_close.png"
+          class="more"
+          width="20px"
+          height="20px"
+        />
+        </span>
         <img
           src="@/assets/img/more.png"
           class="more"
           width="20px"
           height="20px"
-          @click="menuState = !menuState"
+          @click="clickMore(list.state)"
         />
         <div class="sticker-menu-item" v-show="menuState" @mouseleave="menuState = false">
           <div class="item" @click="cliEdit">Edit</div>
+          <div class="item" @click="editState(list.state)" >{{this.list_state[q]}} issue</div>
           <div class="item" v-show="isHome" @click="delcard">Remove</div>
         </div>
       </div>
@@ -68,6 +85,7 @@
 <script>
 import { delCard } from "@/api/card";
 import { closeIssue } from "@/api/editIssue";
+import { openIssue } from "@/api/editIssue";
 import addComment from "./addComment";
 
 export default {
@@ -75,7 +93,9 @@ export default {
   data() {
     return {
       menuState: false,
-      show: false
+      show: false,
+      q:1,
+      list_state:["Closed","Open"]
     };
   },
   // props: ["list", "isHome", "id", "isBug"],
@@ -92,8 +112,61 @@ export default {
    isBug:Boolean
   },
   methods: {
+    clickMore(state){
+      this.menuState = !this.menuState;
+      if(state == "OPEN"){
+        this.q = 0
+      }else{
+        this.q = 1
+      }
+    },
     cliEdit() {
       this.$emit("edit", this.list);
+    },
+    editState(state){
+      if(state=="OPEN"){
+        let params = {
+            query:
+              'mutation{closeIssue(input:{issueId: "' +
+              this.list.id +
+              '"}) {clientMutationId}}'
+          };
+          closeIssue(params).then(res => {
+            if (typeof res.data.errors == "undefined") {
+              this.$message({
+                message: "The Issue was successfully closed",
+                type: "success"
+              });
+              this.$emit("state", true);
+            } else {
+              this.$message.errors("Close failed, please check...");
+            }
+          }).then(()=>{
+            window.location.reload();
+          })
+          // window.location.reload();
+      }else{
+        let params = {
+            query:
+              'mutation{reopenIssue(input:{issueId: "' +
+              this.list.id +
+              '"}) {clientMutationId}}'
+          };
+          openIssue(params).then(res => {
+            if (typeof res.data.errors == "undefined") {
+              this.$message({
+                message: "The Issue was successfully opened",
+                type: "success"
+              });
+              this.$emit("state", true);
+            } else {
+              this.$message.errors("Close failed, please check...");
+            }
+          }).then(()=>{
+            window.location.reload();
+          })
+          // window.location.reload();
+      }
     },
     delcard() {
       this.$confirm("Remove the Task from the list？", "Message", {

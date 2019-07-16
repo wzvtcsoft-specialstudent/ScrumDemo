@@ -69,29 +69,29 @@
     <div class="body-container" style="marginLeft:7.25%">
       <span class="title">Future</span>
       <div class="issue-container">
-        <!--commitData[card.issue.number]-->
-        <sticker v-for="(card, i) in boxIssue[0]" :key="card.id + 'board'"   v-if="boxIssue[0].length!==0" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt" :comments="{state: false}" @edit="clickEdit" draggable="true" @dragstart.native="drop"
+        <!---->
+        <sticker v-for="(card, i) in boxIssue[0]" :key="card.id + 'board'"  :comments="commitData[card.issue.number]" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt"  @edit="clickEdit" draggable="true" @dragstart.native="drop"
           @dragend.native="dropend($event, card, i, 0)" @dragenter.native="prev" @dragover.native="prev" class="sticker"></sticker>
       </div>
     </div>
     <div class="body-container">
       <span class="title">To do</span>
       <div class="issue-container">
-        <sticker v-for="(card, i) in boxIssue[1]" v-if="boxIssue[1].length!==0" :key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt" :comments="{state: false}" @edit="clickEdit" draggable="true" @dragstart.native="drop"
+        <sticker v-for="(card, i) in boxIssue[1]" :comments="commitData[card.issue.number]":key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt"  @edit="clickEdit" draggable="true" @dragstart.native="drop"
           @dragend.native="dropend($event, card, i, 1)" @dragenter.native="prev" @dragover.native="prev" class="sticker"></sticker>
       </div>
     </div>
     <div class="body-container">
       <span class="title">Doing</span>
       <div class="issue-container">
-        <sticker v-for="(card, i) in boxIssue[2]" v-if="boxIssue[2].length!==0" :key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt" :comments="{state: false}" @edit="clickEdit" draggable="true" @dragstart.native="drop"
+        <sticker v-for="(card, i) in boxIssue[2]" :comments="commitData[card.issue.number]" :key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt" @edit="clickEdit" draggable="true" @dragstart.native="drop"
           @dragend.native="dropend($event, card, i, 2)" @dragenter.native="prev" @dragover.native="prev" class="sticker"></sticker>
       </div>
     </div>
     <div class="body-container">
       <span class="title">Done</span>
       <div class="issue-container">
-        <sticker v-for="(card, i) in boxIssue[3]" v-if="boxIssue[3].length!==0" :key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt" :comments="{state: false}" @edit="clickEdit" draggable="true" @dragstart.native="drop"
+        <sticker v-for="(card, i) in boxIssue[3]" :comments="commitData[card.issue.number]" :key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt"  @edit="clickEdit" draggable="true" @dragstart.native="drop"
           @dragend.native="dropend($event, card, i, 3)" class="sticker"></sticker>
       </div>
     </div>
