@@ -69,30 +69,30 @@
     <div class="body-container" style="marginLeft:7.25%">
       <span class="title">Future</span>
       <div class="issue-container">
-        <!---->
+        <!--@changecard="movedcard"-->
         <sticker v-for="(card, i) in boxIssue[0]" :key="card.id + 'board'"  :comments="commitData[card.issue.number]" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt"  @edit="clickEdit" draggable="true" @dragstart.native="drop"
-          @dragend.native="dropend($event, card, i, 0)" @dragenter.native="prev" @dragover.native="prev" class="sticker"></sticker>
+          @dragend.native="dropend($event, card, i, 0)" @dragenter.native="prev"  @dragover.native="prev" class="sticker"></sticker>
       </div>
     </div>
     <div class="body-container">
       <span class="title">To do</span>
       <div class="issue-container">
-        <sticker v-for="(card, i) in boxIssue[1]" :comments="commitData[card.issue.number]":key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt"  @edit="clickEdit" draggable="true" @dragstart.native="drop"
-          @dragend.native="dropend($event, card, i, 1)" @dragenter.native="prev" @dragover.native="prev" class="sticker"></sticker>
+        <sticker v-for="(card, i) in boxIssue[1]" :comments="commitData[card.issue.number]" :key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt"  @edit="clickEdit" draggable="true" @dragstart.native="drop"
+          @dragend.native="dropend($event, card, i, 1)"   @dragenter.native="prev" @dragover.native="prev" class="sticker"></sticker>
       </div>
     </div>
     <div class="body-container">
       <span class="title">Doing</span>
       <div class="issue-container">
         <sticker v-for="(card, i) in boxIssue[2]" :comments="commitData[card.issue.number]" :key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt" @edit="clickEdit" draggable="true" @dragstart.native="drop"
-          @dragend.native="dropend($event, card, i, 2)" @dragenter.native="prev" @dragover.native="prev" class="sticker"></sticker>
+          @dragend.native="dropend($event, card, i, 2)"   @dragenter.native="prev" @dragover.native="prev" class="sticker"></sticker>
       </div>
     </div>
     <div class="body-container">
       <span class="title">Done</span>
       <div class="issue-container">
         <sticker v-for="(card, i) in boxIssue[3]" :comments="commitData[card.issue.number]" :key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt"  @edit="clickEdit" draggable="true" @dragstart.native="drop"
-          @dragend.native="dropend($event, card, i, 3)" class="sticker"></sticker>
+          @dragend.native="dropend($event, card, i, 3)"  class="sticker"></sticker>
       </div>
     </div>
     <edit-dialog class="edit-dialog" v-if="editDialogState" :list="editInfo" @state="cgEditState"></edit-dialog>
@@ -117,6 +117,7 @@ import editDialog from "./editDialog";
 import createPro from "./createPro";
 import editPro from "./editPro";
 import addComment from "./addComment";
+import { closeIssue,openIssue } from "@/api/editIssue";
 import {
   getIssue
 } from "@/api/getIssue";
@@ -147,6 +148,7 @@ function judge(obj, val) {
 
 export default {
   name: "board",
+   
   data() {
     return {
       state: false, // 是否开始渲染issue页面(有内容)
@@ -205,6 +207,14 @@ export default {
       if (num == 0 || index + num > 3) return;
       let temp = this.staticIssue[index].splice(i, 1);
       this.staticIssue[index + num].push(...temp);
+      if((index+num)==3)
+      {
+        
+        this.ClosedIssue(card.issue.id)
+      }
+      else {
+        this.OpenIssue(card.issue.id)
+      }
       let params = {
         query: 'mutation{moveProjectCard(input:{cardId:"' +
           card.id +
@@ -230,9 +240,10 @@ export default {
           '") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name columns(first:4){ nodes{id name cards(first:60){totalCount nodes{ id column { id } state content{ ... on Issue{ id title state number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
       };
       getIssue(params).then(res => {
+        console.log("刷新")
         let data = res.data.data.organization.repository,
           nowData = {};
-        console.log(data)
+        
         try {
           if (data.projects.nodes.length == 0) {
             this.notState = true;
@@ -287,8 +298,29 @@ export default {
           allData.push(subData);
         });
         this.boxIssue = fixBoradData(allData);
-        this.staticIssue = this.boxIssue;
-        this.getcommit();
+       this.getcommit();
+      //  this.moveChangedCard();
+       this.staticIssue = this.boxIssue;
+       
+      // if(index==3){
+      //   console.log("DONE",i)
+      //   i.forEach(it=>{
+      //     if(it.issue.state=='OPEN')
+      //  {
+      //    this.ClosedIssue(it.issue.id)
+      //  }
+      //   })
+      // }
+      // else {
+      //   i.forEach(it=>{
+      //     if(it.issue.state=='CLOSED')
+      //  {
+      //    this.OpenIssue(it.issue.id)
+      //  }
+      //   })
+      // }
+      
+      
         // this.staticTask = JSON.parse(localStorage.getItem("allTask"));
         // this.alltask = this.staticTask;
       });
@@ -302,7 +334,7 @@ export default {
           '") {issues(states:[OPEN] first:100){totalCount nodes{number comments(first:100){nodes{id body}}}}}}}'
       };
       getCommit(params).then(res => {
-         console.log(res)
+         
         let commitData = res.data.data.organization.repository.issues.nodes;
        
         commitData = fixComments(commitData);
@@ -311,6 +343,29 @@ export default {
         this.state = true;
         
       });
+    },
+    ClosedIssue(id)
+    {
+      let params = {
+            query:
+              'mutation{closeIssue(input:{issueId: "' +
+           id +
+              '"}) {clientMutationId}}'
+          };
+          closeIssue(params).then(()=>{
+            window.location.reload();
+          })
+    },
+    OpenIssue(id){
+      let params = {
+            query:
+              'mutation{reopenIssue(input:{issueId: "' +
+              id +
+              '"}) {clientMutationId}}'
+          };
+          openIssue(params).then(()=>{
+            window.location.reload();
+          })
     },
     clickEdit(list) {
       this.editInfo = list;
@@ -377,7 +432,7 @@ export default {
           if (typeof i.labels !== 'undefined') {
             i.labels.nodes.forEach(it => {
               if ((it.name == '功能Bug') || (it.name == '界面Bug')) { 
-                console.log(i)
+                
                   this.alltask.push(i)
               }
             })
@@ -429,6 +484,62 @@ export default {
         });
         this.boxIssue = this.staticIssue;
       });
+    },
+    // moveChangedCard(){
+    //   console.log("我被触发了")
+    //   this.boxIssue[0].forEach(i=>{
+         
+    //   if(i.issue.state=='CLOSED')
+    //   {
+    //     console.log(i.id)
+    //     console.log("我被移动了0")
+    //     this.movedCard(i.id)
+        
+    //   }
+    //   })
+    //    this.boxIssue[1].forEach(i=>{
+    //   if(i.issue.state=='CLOSED')
+    //   {
+    //     console.log(i.id)
+    //     this.movedCard(i.id)
+    //    console.log("我被移动了1")
+    //   }
+    //   })
+    //    this.boxIssue[2].forEach(i=>{
+    //   if(i.issue.state=='CLOSED')
+    //   {
+    //     console.log(i.id)
+    //     console.log("我被移动了2")
+    //     this.movedCard(i.id)
+        
+    //   }
+    //   })
+    // },
+    movedcard(id){
+      // let card={}
+      // this.boxIssue.forEach(i=>{
+      //     i.forEach(it=>{
+      //       if(it.issue.id==id)
+      //       {
+      //         card.id=i.id
+      //         console.log("找到id"+id)
+      //       }
+      //     })
+      // })
+       console.log(id)
+       console.log("ID"+this.boxInfo[3].id )
+      let params = {
+        query: 'mutation{moveProjectCard(input:{cardId:"' +
+         id +
+          '",columnId:"' +
+          this.boxInfo[3].id +
+          '"}){cardEdge{node{content{... on Issue{body}}}}}}'
+      };
+       
+      moveCard(params).then(res=>{
+        console.log("11124454646")
+        window.location.reload();
+      })
     },
     findAllTask(data) {
       function judgeTask(task) {

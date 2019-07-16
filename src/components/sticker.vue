@@ -90,6 +90,7 @@ import addComment from "./addComment";
 
 export default {
   name: "sticker",
+ 
   data() {
     return {
       menuState: false,
@@ -132,17 +133,20 @@ export default {
               '"}) {clientMutationId}}'
           };
           closeIssue(params).then(res => {
+            
             if (typeof res.data.errors == "undefined") {
+            
               this.$message({
                 message: "The Issue was successfully closed",
                 type: "success"
               });
               this.$emit("state", true);
+              // this.$emit("changecard", this.list.id);
+              this.$parent.movedcard(this.id);
             } else {
               this.$message.errors("Close failed, please check...");
+              
             }
-          }).then(()=>{
-            window.location.reload();
           })
           // window.location.reload();
       }else{
