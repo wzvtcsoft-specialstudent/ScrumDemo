@@ -117,6 +117,8 @@ import editDialog from "./editDialog";
 import createPro from "./createPro";
 import editPro from "./editPro";
 import addComment from "./addComment";
+import { closeIssue } from "@/api/editIssue";
+import { openIssue } from "@/api/editIssue";
 import {
   getIssue
 } from "@/api/getIssue";
@@ -205,6 +207,32 @@ export default {
       if (num == 0 || index + num > 3) return;
       let temp = this.staticIssue[index].splice(i, 1);
       this.staticIssue[index + num].push(...temp);
+      if(index + num == 3){
+          console.log(card.issue.state)
+        if(card.issue.state == 'OPEN'){
+          let params = {
+              query:
+                'mutation{closeIssue(input:{issueId: "' +
+                card.issue.id +
+                '"}) {clientMutationId}}'
+            };
+            closeIssue(params).then(()=>{
+              window.location.reload();
+            })
+          }
+      }else{
+        if(card.issue.state == 'CLOSED'){
+          let params = {
+              query:
+                'mutation{reopenIssue(input:{issueId: "' +
+                card.issue.id +
+                '"}) {clientMutationId}}'
+            };
+            openIssue(params).then(()=>{
+              window.location.reload();
+            })
+       }
+      }
       let params = {
         query: 'mutation{moveProjectCard(input:{cardId:"' +
           card.id +
@@ -232,7 +260,6 @@ export default {
       getIssue(params).then(res => {
         let data = res.data.data.organization.repository,
           nowData = {};
-        console.log(data)
         try {
           if (data.projects.nodes.length == 0) {
             this.notState = true;
@@ -302,7 +329,6 @@ export default {
           '") {issues(states:[OPEN] first:100){totalCount nodes{number comments(first:100){nodes{id body}}}}}}}'
       };
       getCommit(params).then(res => {
-         console.log(res)
         let commitData = res.data.data.organization.repository.issues.nodes;
        
         commitData = fixComments(commitData);
