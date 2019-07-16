@@ -117,7 +117,8 @@ import editDialog from "./editDialog";
 import createPro from "./createPro";
 import editPro from "./editPro";
 import addComment from "./addComment";
-import { closeIssue,openIssue } from "@/api/editIssue";
+import { closeIssue } from "@/api/editIssue";
+import { openIssue } from "@/api/editIssue";
 import {
   getIssue
 } from "@/api/getIssue";
