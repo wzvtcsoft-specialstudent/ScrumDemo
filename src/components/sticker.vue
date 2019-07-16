@@ -1,5 +1,5 @@
 <template>
-  <el-tooltip effect="light" placement="right" v-model="show" manual enterable>
+  <el-tooltip effect="light" placement="right" :hide-after="2000" v-model="show" manual enterable>
     <div slot="content" class="comments-container" @mouseleave="show = false">
       <div v-if="comments.state">
         <ul>
@@ -78,7 +78,19 @@ export default {
       show: false
     };
   },
-  props: ["list", "isHome", "id", "comments", "isBug"],
+  // props: ["list", "isHome", "id", "isBug"],
+  props:{
+   comments:{
+     type:Object,
+     default:function(){
+       return {state:false}
+     }
+   },
+   list:Object,
+   isHome:Boolean,
+   id:String,
+   isBug:Boolean
+  },
   methods: {
     cliEdit() {
       this.$emit("edit", this.list);

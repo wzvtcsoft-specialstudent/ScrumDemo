@@ -1,198 +1,142 @@
 <template>
-  <div class="board-main">
-    <div class="board-title">
-      <div class="menu" @click="clickMenu">
-        <img src="@/assets/img/menu.png" />
-        <div class="menu-item" v-show="menuState" @mouseleave="menuState = false">
-          <router-link to="/" tag="span" class="link-item">Home</router-link>
-          <router-link to="/storyList" tag="span" class="link-item">Story Map</router-link>
-          <router-link to="/history" tag="span" class="link-item">History Sprint</router-link>
-          <router-link to="/bug" tag="span" class="link-item">bug</router-link>
-        </div>
+<div class="board-main">
+  <div class="board-title">
+    <div class="menu" @click="clickMenu">
+      <img src="@/assets/img/menu.png" />
+      <div class="menu-item" v-show="menuState" @mouseleave="menuState = false">
+        <router-link to="/" tag="span" class="link-item">Home</router-link>
+        <router-link to="/storyList" tag="span" class="link-item">Story Map</router-link>
+        <router-link to="/history" tag="span" class="link-item">History Sprint</router-link>
+        <router-link to="/bug" tag="span" class="link-item">bug</router-link>
       </div>
-      <div class="container" style="marginLeft:4.19%">
-        <div class="sprint_title" @dblclick="editProState = true">{{this.sprint_title}}</div>
+    </div>
+    <div class="container" style="marginLeft:4.19%">
+      <div class="sprint_title" @dblclick="editProState = true">{{this.sprint_title}}</div>
+    </div>
+    <div class="container">
+      <div class="sub createPro" @click="createProState = true">Create sprint</div>
+    </div>
+    <div class="container">
+      <div class="sub labels" @click="labelsState = !labelsState">
+        <div>Labels</div>
+        <img src="@/assets/img/infodrop.png" />
       </div>
-      <div class="container">
-        <div class="sub createPro" @click="createProState = true">Create sprint</div>
+      <div class="list" v-show="labelsState" @mouseleave="selComplete(1)">
+        <ul>
+          <li v-for="(lab,i) in labels" :key="i">
+            <img src="@/assets/img/select.png" class="select" @click="selLab($event,i)" />
+            <div class="list-name">{{ lab.name }}</div>
+          </li>
+        </ul>
       </div>
-      <div class="container">
-        <div class="sub labels" @click="labelsState = !labelsState">
-          <div>Labels</div>
-          <img src="@/assets/img/infodrop.png" />
-        </div>
-        <div class="list" v-show="labelsState" @mouseleave="selComplete(1)">
-          <ul>
-            <li v-for="(lab,i) in labels" :key="i">
-              <img src="@/assets/img/select.png" class="select" @click="selLab($event,i)" />
-              <div class="list-name">{{ lab.name }}</div>
-            </li>
-          </ul>
-        </div>
+    </div>
+    <div class="container">
+      <div class="sub assignees" @click="assigneesState = !assigneesState">
+        <div>Assignees</div>
+        <img src="@/assets/img/infodrop.png" />
       </div>
-      <div class="container">
-        <div class="sub assignees" @click="assigneesState = !assigneesState">
-          <div>Assignees</div>
-          <img src="@/assets/img/infodrop.png" />
-        </div>
-        <div class="list" v-show="assigneesState" @mouseleave="selComplete(2)">
-          <ul>
-            <li v-for="(assi,i) in assignees" :key="i">
-              <img src="@/assets/img/select.png" class="select" @click="selAssi($event,i)" />
-              <div class="list-name">{{ assi.name }}</div>
-            </li>
-          </ul>
-        </div>
+      <div class="list" v-show="assigneesState" @mouseleave="selComplete(2)">
+        <ul>
+          <li v-for="(assi,i) in assignees" :key="i">
+            <img src="@/assets/img/select.png" class="select" @click="selAssi($event,i)" />
+            <div class="list-name">{{ assi.name }}</div>
+          </li>
+        </ul>
       </div>
-      <img src="@/assets/img/sousuo.png" class="icon" />
-      <input
-        type="text"
-        class="search"
-        placeholder="Search all tasks"
-        v-model="word"
-        @keydown.enter="selComplete(3)"
-      />
-      <div class="task-container">
-        <div class="add-task" @click="showTaskBox">Add Card</div>
-        <div class="card-box" v-show="addTaskState" @mouseleave="addTaskState = false">
-          <div class="card-search-box">
-            <img src="@/assets/img/sousuo.png" />
-            <input
-              type="text"
-              placeholder="Search all tasks"
-              v-model="taskword"
-              @keydown.enter="searchTask"
-            />
+    </div>
+    <img src="@/assets/img/sousuo.png" class="icon" />
+    <input type="text" class="search" placeholder="Search all tasks" v-model="word" @keydown.enter="selComplete(3)" />
+    <div class="task-container">
+      <div class="add-task" @click="showTaskBox">Add Card</div>
+      <div class="card-box" v-show="addTaskState" @mouseleave="addTaskState = false">
+        <div class="card-search-box">
+          <img src="@/assets/img/sousuo.png" />
+          <input type="text" placeholder="Search all tasks" v-model="taskword" @keydown.enter="searchTask" />
+        </div>
+        <div class="task-card-box">
+          <div class="task-card" v-for="(addCard, i) in alltask" :key="addCard.number">
+            <a :href="addCard.issueUrl">#{{ addCard.number | fixNum }}</a>
+            <div class="task-card-title">{{ addCard.title }}</div>
+            <img src="@/assets/img/right.png" @click="addTaskCard(addCard.id,i,addCard)" />
           </div>
-          <div class="task-card-box">
-            <div class="task-card" v-for="(addCard, i) in alltask" :key="addCard.number">
-              <a :href="addCard.issueUrl">#{{ addCard.number | fixNum }}</a>
-              <div class="task-card-title">{{ addCard.title }}</div>
-              <img src="@/assets/img/right.png" @click="addTaskCard(addCard.id,i,addCard)" />
-            </div>
-          </div>
-          <!-- <sticker class="task-card" v-for="addCard in alltask" :key="addCard.number + 'card'" :list="addCard"></sticker> -->
         </div>
+        <!-- <sticker class="task-card" v-for="addCard in alltask" :key="addCard.number + 'card'" :list="addCard"></sticker> -->
       </div>
     </div>
-    <div class="board-body" v-if="state" @dragenter="prev" @dragover="prev" key="board">
-      <div class="body-container" style="marginLeft:7.25%">
-        <span class="title">Future</span>
-        <div class="issue-container">
-          <sticker
-            v-for="(card, i) in boxIssue[0]"
-            :key="card.id + 'board'"
-            :list="card.issue"
-            :isHome="true"
-            :id="card.id"
-            @addcomment="adCmt"
-            @editcomment="edCmt"
-            :comments="commitData[card.issue.number]"
-            @edit="clickEdit"
-            draggable="true"
-            @dragstart.native="drop"
-            @dragend.native="dropend($event, card, i, 0)"
-            @dragenter.native="prev"
-            @dragover.native="prev"
-            class="sticker"
-          ></sticker>
-        </div>
-      </div>
-      <div class="body-container">
-        <span class="title">To do</span>
-        <div class="issue-container">
-          <sticker
-            v-for="(card, i) in boxIssue[1]"
-            :key="card.id + 'board'"
-            :list="card.issue"
-            :isHome="true"
-            :id="card.id"
-            @addcomment="adCmt"
-            @editcomment="edCmt"
-            :comments="commitData[card.issue.number]"
-            @edit="clickEdit"
-            draggable="true"
-            @dragstart.native="drop"
-            @dragend.native="dropend($event, card, i, 1)"
-            @dragenter.native="prev"
-            @dragover.native="prev"
-            class="sticker"
-          ></sticker>
-        </div>
-      </div>
-      <div class="body-container">
-        <span class="title">Doing</span>
-        <div class="issue-container">
-          <sticker
-            v-for="(card, i) in boxIssue[2]"
-            :key="card.id + 'board'"
-            :list="card.issue"
-            :isHome="true"
-            :id="card.id"
-            @addcomment="adCmt"
-            @editcomment="edCmt"
-            :comments="commitData[card.issue.number]"
-            @edit="clickEdit"
-            draggable="true"
-            @dragstart.native="drop"
-            @dragend.native="dropend($event, card, i, 2)"
-            @dragenter.native="prev"
-            @dragover.native="prev"
-            class="sticker"
-          ></sticker>
-        </div>
-      </div>
-      <div class="body-container">
-        <span class="title">Done</span>
-        <div class="issue-container">
-          <sticker
-            v-for="(card, i) in boxIssue[3]"
-            :key="card.id + 'board'"
-            :list="card.issue"
-            :isHome="true"
-            :id="card.id"
-            @addcomment="adCmt"
-            @editcomment="edCmt"
-            :comments="commitData[card.issue.number]"
-            @edit="clickEdit"
-            draggable="true"
-            @dragstart.native="drop"
-            @dragend.native="dropend($event, card, i, 3)"
-            class="sticker"
-          ></sticker>
-        </div>
-      </div>
-      <edit-dialog class="edit-dialog" v-if="editDialogState" :list="editInfo" @state="cgEditState"></edit-dialog>
-    </div>
-    <div class="not-content" v-if="notState">
-      No sprint cycle information，
-      <b @click="createProState = true">Click to create</b>
-    </div>
-    <create-pro style="z-index:999" @state="cgProState" v-if="createProState"></create-pro>
-    <edit-pro style="z-index:999" @state="edProState" v-if="editProState" :title="sprint_title" :body="sprint_body" :id="sprint_id"></edit-pro>
-    <add-comment
-      v-if="addComState"
-      :data="addComData"
-      :func="cmtFunc"
-      @state="cgCmtState"
-      style="z-index: 999"
-    ></add-comment>
   </div>
+
+  <div class="board-body" v-if="state" @dragenter="prev" @dragover="prev" key="board">
+    <div class="body-container" style="marginLeft:7.25%">
+      <span class="title">Future</span>
+      <div class="issue-container">
+        <!--commitData[card.issue.number]-->
+        <sticker v-for="(card, i) in boxIssue[0]" :key="card.id + 'board'"   v-if="boxIssue[0].length!==0" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt" :comments="{state: false}" @edit="clickEdit" draggable="true" @dragstart.native="drop"
+          @dragend.native="dropend($event, card, i, 0)" @dragenter.native="prev" @dragover.native="prev" class="sticker"></sticker>
+      </div>
+    </div>
+    <div class="body-container">
+      <span class="title">To do</span>
+      <div class="issue-container">
+        <sticker v-for="(card, i) in boxIssue[1]" v-if="boxIssue[1].length!==0" :key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt" :comments="{state: false}" @edit="clickEdit" draggable="true" @dragstart.native="drop"
+          @dragend.native="dropend($event, card, i, 1)" @dragenter.native="prev" @dragover.native="prev" class="sticker"></sticker>
+      </div>
+    </div>
+    <div class="body-container">
+      <span class="title">Doing</span>
+      <div class="issue-container">
+        <sticker v-for="(card, i) in boxIssue[2]" v-if="boxIssue[2].length!==0" :key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt" :comments="{state: false}" @edit="clickEdit" draggable="true" @dragstart.native="drop"
+          @dragend.native="dropend($event, card, i, 2)" @dragenter.native="prev" @dragover.native="prev" class="sticker"></sticker>
+      </div>
+    </div>
+    <div class="body-container">
+      <span class="title">Done</span>
+      <div class="issue-container">
+        <sticker v-for="(card, i) in boxIssue[3]" v-if="boxIssue[3].length!==0" :key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt" :comments="{state: false}" @edit="clickEdit" draggable="true" @dragstart.native="drop"
+          @dragend.native="dropend($event, card, i, 3)" class="sticker"></sticker>
+      </div>
+    </div>
+    <edit-dialog class="edit-dialog" v-if="editDialogState" :list="editInfo" @state="cgEditState"></edit-dialog>
+  </div>
+  <div class="not-content" v-if="notState">
+    No sprint cycle information，
+    <b @click="createProState = true">Click to create</b>
+  </div>
+  <create-pro style="z-index:999" @state="cgProState" v-if="createProState"></create-pro>
+  <edit-pro style="z-index:999" @state="edProState" v-if="editProState" :title="sprint_title" :body="sprint_body" :id="sprint_id"></edit-pro>
+  <add-comment v-if="addComState" :data="addComData" :func="cmtFunc" @state="cgCmtState" style="z-index: 999"></add-comment>
+</div>
 </template>
 
 <script>
-import { LOGIN, NAME } from "@/project";
+import {
+  LOGIN,
+  NAME
+} from "@/project";
 import sticker from "./sticker";
 import editDialog from "./editDialog";
 import createPro from "./createPro";
 import editPro from "./editPro";
 import addComment from "./addComment";
-import { getIssue } from "@/api/getIssue";
-import { getCommit } from "@/api/getCommit";
-import { moveCard, addCards, getCard } from "@/api/card";
-import { fixBoradData } from "@/assets/js/fixBoradData";
-import { fixComments } from "@/assets/js/fixComments";
-import { findTask } from "@/assets/js/findTask";
+import {
+  getIssue
+} from "@/api/getIssue";
+import {
+  getCommit
+} from "@/api/getCommit";
+import {
+  moveCard,
+  addCards,
+  getCard
+} from "@/api/card";
+import {
+  fixBoradData
+} from "@/assets/js/fixBoradData";
+import {
+  fixComments
+} from "@/assets/js/fixComments";
+import {
+  findTask
+} from "@/assets/js/findTask";
 
 function judge(obj, val) {
   for (let key in obj) {
@@ -220,7 +164,7 @@ export default {
       addTaskState: false,
       editDialogState: false,
       createProState: false,
-      editProState:false,
+      editProState: false,
       addComState: false,
       addComData: {}, // 要添加comment的id
       cmtFunc: "add", // 处理comment的类型
@@ -235,10 +179,10 @@ export default {
       searchNaN: false, // 上次搜索是否没有结果
       clickx: 0,
       dropIndex: 0,
-      allCardId: [] ,// 当前sprint所有task的id
-      sprint_title:"",
-      sprint_body:"",
-      sprint_id:""
+      allCardId: [], // 当前sprint所有task的id
+      sprint_title: "",
+      sprint_body: "",
+      sprint_id: ""
     };
   },
   components: {
@@ -262,8 +206,7 @@ export default {
       let temp = this.staticIssue[index].splice(i, 1);
       this.staticIssue[index + num].push(...temp);
       let params = {
-        query:
-          'mutation{moveProjectCard(input:{cardId:"' +
+        query: 'mutation{moveProjectCard(input:{cardId:"' +
           card.id +
           '",columnId:"' +
           this.boxInfo[index + num].id +
@@ -280,17 +223,16 @@ export default {
     },
     getinfo() {
       let params = {
-        query:
-          'query{organization(login:"' +
+        query: 'query{organization(login:"' +
           LOGIN +
           '"){repository(name:"' +
           NAME +
-          '") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name columns(first:4){ nodes{id name cards(first:60){totalCount nodes{ id column { id } state content{ ... on Issue{ id title number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
+          '") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name columns(first:4){ nodes{id name cards(first:60){totalCount nodes{ id column { id } state content{ ... on Issue{ id title state number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
       };
       getIssue(params).then(res => {
         let data = res.data.data.organization.repository,
           nowData = {};
-
+        console.log(data)
         try {
           if (data.projects.nodes.length == 0) {
             this.notState = true;
@@ -303,10 +245,10 @@ export default {
         } catch (error) {
           this.notState = true;
           return;
-        }        
+        }
         this.sprint_title = data.projects.nodes[0].name,
-        this.sprint_body = data.projects.nodes[0].body,
-        this.sprint_id = data.projects.nodes[0].id
+          this.sprint_body = data.projects.nodes[0].body,
+          this.sprint_id = data.projects.nodes[0].id
         nowData = data.projects.nodes.shift();
         this.$store.commit("setAssignees", data.assignableUsers.nodes);
         this.$store.commit("setLabels", data.labels.nodes);
@@ -353,19 +295,21 @@ export default {
     },
     getcommit() {
       let params = {
-        query:
-          'query{organization(login: "' +
+        query: 'query{organization(login: "' +
           LOGIN +
           '") {repository(name: "' +
           NAME +
-          '") {issues(first:100){totalCount nodes{number comments(first:100){nodes{id body}}}}}}}'
+          '") {issues(states:[OPEN] first:100){totalCount nodes{number comments(first:100){nodes{id body}}}}}}}'
       };
       getCommit(params).then(res => {
+         console.log(res)
         let commitData = res.data.data.organization.repository.issues.nodes;
+       
         commitData = fixComments(commitData);
         localStorage.setItem("commit", JSON.stringify(commitData));
         this.commitData = commitData;
         this.state = true;
+        
       });
     },
     clickEdit(list) {
@@ -404,37 +348,70 @@ export default {
       this.addTaskState = !this.addTaskState;
       if (this.staticTask != null) return;
       let params = {
-        query:
-          'query{organization(login:"' +
+        query: 'query{organization(login:"' +
           LOGIN +
           '"){repository(name:"' +
           NAME +
-          '"){id name issues(states:[OPEN],first:100){  totalCount nodes{ id title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
+          '"){id name issues(first:100){  totalCount nodes{ id state title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
       getCard(params).then(res => {
         try {
+          let cardData=res.data.data.organization.repository.issues.nodes
           let temp = this.findAllTask(
-              findTask(res.data.data.organization.repository.issues.nodes)
+              findTask(res.data.data.organization.repository.issues.nodes),
             ),
             result = [],
             idArry = this.allCardId;
           temp.forEach(task => {
             if (!idArry.includes(task.id)) {
-              result.push(task);
+              if (typeof task.labels !== 'undefined') {} else {
+                result.push(task);
+              }
             }
           });
+
           this.staticTask = result;
           this.alltask = result;
+
+          cardData.forEach(i => {
+          if (typeof i.labels !== 'undefined') {
+            i.labels.nodes.forEach(it => {
+              if ((it.name == '功能Bug') || (it.name == '界面Bug')) { 
+                console.log(i)
+                  this.alltask.push(i)
+              }
+            })
+          }
+        })
+        this.staticTask=this.alltask
+      
         } catch (error) {
           this.staticTask = [];
           this.alltask = [];
         }
       });
+      
     },
+    // getBug() {
+    //   let params = {
+    //     query: 'query{organization(login:"' +
+    //       LOGIN +
+    //       '"){repository(name:"' +
+    //       NAME +
+    //       '"){id name issues(states:[OPEN],first:100){  totalCount nodes{ id title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
+    //   };
+    //   getCard(params).then(res => {
+    //     let result = []
+    //     let cardData = res.data.data.organization.repository.issues.nodes
+    //     console.log(cardData)
+        
+
+
+    //   })
+    // },
     addTaskCard(id, index, card) {
       let params = {
-        query:
-          'mutation{ addProjectCard(input:{contentId:"' +
+        query: 'mutation{ addProjectCard(input:{contentId:"' +
           id +
           '",projectColumnId:"' +
           this.boxInfo[1].id +
@@ -657,16 +634,18 @@ export default {
   },
   created() {
     this.getinfo();
+    // this.getBug()
   }
 };
 </script>
 
-<style  scoped>
+<style scoped>
 * {
   border: 0;
   margin: 0;
   padding: 0;
 }
+
 ul {
   margin: 0;
   padding: 0;
@@ -675,11 +654,13 @@ ul {
   background: rgba(255, 255, 255, 1);
   border: 1px solid rgba(234, 236, 238, 1);
 }
+
 li {
   display: inline-block;
   width: 164px;
   height: 31px;
 }
+
 .board-main {
   width: 1526px;
   height: 712px;
@@ -690,6 +671,7 @@ li {
   height: 651px;
   margin-top: 8px;
 }
+
 .not-content {
   width: 100%;
   height: 600px;
@@ -698,9 +680,11 @@ li {
   text-align: center;
   font-size: 25px;
 }
+
 .not-content b {
   cursor: pointer;
 }
+
 .not-content b:hover {
   color: lightcoral;
 }
@@ -717,6 +701,7 @@ li {
   cursor: pointer;
   float: left;
 }
+
 .menu-item {
   width: 130px;
   height: 126px;
@@ -726,6 +711,7 @@ li {
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
   z-index: 999;
 }
+
 .link-item {
   display: block;
   width: auto;
@@ -738,6 +724,7 @@ li {
   opacity: 1;
   margin: 12px 0 0 8.82%;
 }
+
 .link-item:hover {
   color: #2680eb;
 }
@@ -749,6 +736,7 @@ li {
   margin: 9px 7.25% 0 0;
   position: relative;
 }
+
 .add-task {
   width: 104px;
   height: 32px;
@@ -764,6 +752,7 @@ li {
   float: left;
   cursor: pointer;
 }
+
 .card-box {
   width: 300px;
   height: 651px;
@@ -774,9 +763,11 @@ li {
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
   z-index: 1000;
 }
+
 .card-search-box {
   width: auto;
 }
+
 .card-search-box img {
   width: 13px;
   height: 13px;
@@ -789,6 +780,7 @@ li {
   border-bottom-left-radius: 4px;
   float: left;
 }
+
 .card-search-box input {
   width: 245px;
   height: 29px;
@@ -800,15 +792,18 @@ li {
   border-bottom-right-radius: 4px;
   float: left;
 }
+
 .card-search-box input:focus {
   outline: none;
 }
+
 .task-card-box {
   width: 300px;
   height: 500px;
   overflow-y: scroll;
   overflow-x: hidden;
 }
+
 .task-card {
   width: 300px;
   min-height: 31px;
@@ -820,6 +815,7 @@ li {
   margin-bottom: 8px;
   float: left;
 }
+
 .task-card-title {
   display: block;
   width: 210px;
@@ -828,12 +824,14 @@ li {
   color: rgba(112, 112, 112, 1);
   float: left;
 }
+
 a {
   text-decoration: none;
   margin: 4% 0 0 16px;
   color: rgba(38, 128, 235, 1);
   float: left;
 }
+
 .task-card img {
   margin: 4% 16px 0 0;
   float: right;
@@ -846,6 +844,7 @@ a {
   margin: 9px 0 0 12px;
   float: left;
 }
+
 .sub {
   width: 118px;
   height: 32px;
@@ -855,6 +854,7 @@ a {
   cursor: pointer;
   text-align: center;
 }
+
 .createPro {
   line-height: 32px;
   text-align: center;
@@ -865,7 +865,8 @@ a {
   font-family: Source Han Sans CN;
   font-weight: 400;
 }
-.sprint_title{
+
+.sprint_title {
   line-height: 32px;
   text-align: center;
   color: rgba(112, 112, 112, 1);
@@ -875,6 +876,7 @@ a {
   font-style: italic;
   cursor: pointer;
 }
+
 .labels div {
   display: block;
   font-size: 14px;
@@ -885,6 +887,7 @@ a {
   float: left;
   margin: 6px 0 0 28px;
 }
+
 .assignees div {
   display: block;
   font-size: 14px;
@@ -895,23 +898,27 @@ a {
   float: left;
   margin: 6px 0 0 18px;
 }
+
 .labels img {
   width: 16px;
   height: 16px;
   float: left;
   margin: 8px 0 0 12px;
 }
+
 .assignees img {
   width: 16px;
   height: 16px;
   float: left;
   margin: 8px 0 0 8px;
 }
+
 .list {
   position: absolute;
   top: 32px;
   z-index: 9999;
 }
+
 .select {
   width: 14px;
   height: 14px;
@@ -919,10 +926,12 @@ a {
   margin: 13px 0 0 12px;
   cursor: pointer;
 }
+
 .list-name {
   float: left;
   margin: 13px 0 0 7px;
 }
+
 .icon {
   width: 16px;
   height: 16px;
@@ -934,6 +943,7 @@ a {
   border-bottom-left-radius: 4px;
   float: left;
 }
+
 .search {
   width: 299px;
   height: 32px;
@@ -945,6 +955,7 @@ a {
   border-bottom-left-radius: 4px;
   float: left;
 }
+
 .search:focus {
   outline: none;
 }
@@ -958,6 +969,7 @@ a {
   padding-bottom: 15px;
   float: left;
 }
+
 .issue-container {
   width: 298px;
   height: 595px;
@@ -967,6 +979,7 @@ a {
   overflow-y: scroll;
   overflow-x: hidden;
 }
+
 .title {
   width: 91%;
   height: 40px;
@@ -980,18 +993,22 @@ a {
   padding-left: 12px;
   margin: 2% 6% 0 3%;
 }
+
 .sticker {
   width: 263px !important;
   margin-bottom: 12px;
   background: rgba(255, 255, 255, 1);
 }
+
 .edit-dialog {
   z-index: 999;
 }
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 670px;
 }
+
 ::-webkit-scrollbar-thumb {
   width: 6px;
   height: 212px;

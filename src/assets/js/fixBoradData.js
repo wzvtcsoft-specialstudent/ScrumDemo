@@ -18,6 +18,7 @@ export function fixBoradData(data) {
       obj.id = item.id;
       subIssue.title = item.issue.title;
       subIssue.body = item.issue.body;
+      subIssue.state = item.issue.state;
       subIssue.number = item.issue.number;
       subIssue.issueUrl = item.issue.url;
       subIssue.id = item.issue.id;
