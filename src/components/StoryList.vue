@@ -562,7 +562,7 @@ export default {
   cursor: pointer;
 }
 .selected {
-  border: 1px dashed deepskyblue;
+   background: url('~@/assets/img/border.png')   no-repeat;
 }
 
 .line-label {
