@@ -12,6 +12,11 @@ export default new Router({
   routes: [
     {
       path: '/',
+      name: 'login',
+      component: Login
+    },
+    {
+      path: '/board',
       name: 'board',
       component: Board
     },
@@ -19,11 +24,6 @@ export default new Router({
       path: '/storyList',
       name: 'storyList',
       component: StoryList
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: Login
     },
     {
       path: '/history',

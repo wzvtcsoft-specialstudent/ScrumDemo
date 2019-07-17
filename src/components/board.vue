@@ -46,6 +46,7 @@
     </div>
     <img src="@/assets/img/sousuo.png" class="icon" />
     <input type="text" class="search" placeholder="Search all tasks" v-model="word" @keydown.enter="selComplete(3)" />
+    
     <div class="task-container">
       <div class="add-task" @click="showTaskBox">Add Card</div>
       <div class="card-box" v-show="addTaskState" @mouseleave="addTaskState = false">
@@ -62,7 +63,9 @@
         </div>
         <!-- <sticker class="task-card" v-for="addCard in alltask" :key="addCard.number + 'card'" :list="addCard"></sticker> -->
       </div>
+      <div class="loginIn" @click="delRecord">退出</div>
     </div>
+    
   </div>
 
   <div class="board-body" v-if="state" @dragenter="prev" @dragover="prev" key="board">
@@ -452,23 +455,15 @@ export default {
       });
       
     },
-    // getBug() {
-    //   let params = {
-    //     query: 'query{organization(login:"' +
-    //       LOGIN +
-    //       '"){repository(name:"' +
-    //       NAME +
-    //       '"){id name issues(states:[OPEN],first:100){  totalCount nodes{ id title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
-    //   };
-    //   getCard(params).then(res => {
-    //     let result = []
-    //     let cardData = res.data.data.organization.repository.issues.nodes
-    //     console.log(cardData)
-        
-
-
-    //   })
-    // },
+    delRecord(){
+      localStorage.removeItem('LOGIN')
+      localStorage.removeItem('NAME')
+      localStorage.removeItem('XIANGMU_ID')
+      localStorage.removeItem('XIANGMU_OWNERID')
+      localStorage.removeItem('access_token')
+      
+      this.$router.push({path:'/'})
+    },
     addTaskCard(id, index, card) {
       let params = {
         query: 'mutation{ addProjectCard(input:{contentId:"' +
@@ -864,6 +859,22 @@ li {
   font-size: 14px;
   font-family: Source Han Sans CN;
   font-weight: 400;
+  color: rgba(255, 255, 255, 1);
+  background: rgba(38, 128, 235, 1);
+  border-radius: 5px;
+  float: left;
+  cursor: pointer;
+}
+.loginIn{
+  width: 104px;
+  height: 32px;
+  display: block;
+  text-align: center;
+  line-height: 32px;
+  font-size: 14px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  margin-left: 5px;
   color: rgba(255, 255, 255, 1);
   background: rgba(38, 128, 235, 1);
   border-radius: 5px;
