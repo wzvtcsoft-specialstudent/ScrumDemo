@@ -5,10 +5,12 @@ import History from '@/components/history'
 import Board from '@/components/board'
 import Bug from '@/components/Bug'
 
+
 Vue.use(Router)
 
 export default new Router({
-  routes: [{
+  routes: [
+    {
       path: '/',
       name: 'board',
       component: Board

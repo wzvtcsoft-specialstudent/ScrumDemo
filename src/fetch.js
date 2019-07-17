@@ -9,8 +9,8 @@ const service = axios.create({
 });
 
 
-//const tn = ["c1f3b4b22f","9d4cb1b19","df7f6aae2e5","e441c094e9"]//lijie
-const tn = ["2a2c211ce","e7e68750a0","c104493651","80422b95a62"]//wuchao
+const tn = ["c1f3b4b22f","9d4cb1b19","df7f6aae2e5","e441c094e9"]//lijie
+//const tn = ["2a2c211ce","e7e68750a0","c104493651","80422b95a62"]//wuchao
 //const tn = ["4956c02d5","ed235fde09","f691a838cdc","b7ceafa92d"]
 //xiaoji
 
