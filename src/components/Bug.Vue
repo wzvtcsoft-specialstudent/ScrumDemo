@@ -54,6 +54,8 @@
             :id="card.id"
             :isBug="true"
             @state="cgState"
+            @edit="clickEdit"
+           
             class="sticker"
           ></sticker>
         </div>
@@ -70,12 +72,14 @@
             :id="card.id"
             :isBug="true"
             @state="cgState"
+            @edit="clickEdit"
             class="sticker"
           ></sticker>
         </div>
       </div>
     </div>
     <add-bug style="z-index:999" v-if="addBugState" @state="cgState"></add-bug>
+     <edit-dialog class="edit-dialog" v-if="editDialogState" :list="editInfo" @state="cgEditState"></edit-dialog>
   </div>
 </template>
 
@@ -88,7 +92,7 @@ import { moveCard, addCards, getCard } from "@/api/card";
 import { fixBoradData } from "@/assets/js/fixBoradData";
 import { findTask } from "@/assets/js/findTask";
 import { findInterface } from "@/assets/js/findBug";
-
+import editDialog from "./editDialog";
 function judge(obj, val) {
   for (let key in obj) {
     if (obj[key].id == val) return false;
@@ -105,6 +109,7 @@ export default {
       staticIssue: [], // 静态issue集
       screenState: false,
       addBugState: false,
+      editDialogState: false,
       lastIndex: 0, // 上次筛选的索引
       word: "", // 搜索的内容
       menuState: false,
@@ -115,7 +120,8 @@ export default {
   },
   components: {
     sticker,
-    addBug
+    addBug,
+    editDialog
   },
   methods: {
     getInfo() {
@@ -175,6 +181,10 @@ export default {
           break;
       }
     },
+    clickEdit(list) {
+      this.editInfo = list;
+      this.editDialogState = true;
+    },
     screenWord() {
       this.boxIssue = this.staticIssue;
       this.screenBug(this.lastIndex);
@@ -200,11 +210,15 @@ export default {
         window.location.reload();
       }, 2000);
       }
-    }
+    },
+    cgEditState(state) {
+      this.editDialogState = state;
+    },
   },
   created() {
     this.getInfo();
-  }
+  },
+  
 };
 </script>
 
@@ -419,5 +433,8 @@ li:hover {
   background: rgba(210, 210, 210, 1);
   opacity: 1;
   border-radius: 19px;
+}
+.edit-dialog {
+  z-index: 999;
 }
 </style>

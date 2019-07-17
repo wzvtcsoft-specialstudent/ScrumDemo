@@ -41,6 +41,7 @@
           :comments="commentsData[epic.number] || {state: false}"
           :isHome="false"
           @edit="clickEdit"
+          :border_color="(epic_i === epici)?'black':'blue'"
           @click.native="selEpic(epic_i)"
         ></sticker>
         <!-- </transition-group> -->
@@ -63,6 +64,7 @@
           :class="{'sticker':true,'selected':story_i === userstoryi}"
           :key="story.number + 'story'"
           :list="story"
+           :border_color="(story_i === userstoryi)?'black':'blue'"
           :comments="commentsData[story.number] || {state: false}"
           :isHome="false"
           @edit="clickEdit"
@@ -91,6 +93,7 @@
           :key="task.number + 'task'"
           :class="{'sticker':true, 'selected':task_i === taski}"
           :list="task"
+           :border_color="(task_i === taski)?'black':'blue'"
           :comments="commentsData[task.number] || {state: false}"
           :isHome="false"
           @edit="clickEdit"

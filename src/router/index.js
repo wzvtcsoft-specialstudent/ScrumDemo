@@ -4,7 +4,7 @@ import StoryList from '@/components/StoryList'
 import History from '@/components/history'
 import Board from '@/components/board'
 import Bug from '@/components/Bug'
-
+import Login from '@/components/Login'
 
 Vue.use(Router)
 
@@ -19,6 +19,11 @@ export default new Router({
       path: '/storyList',
       name: 'storyList',
       component: StoryList
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login
     },
     {
       path: '/history',
