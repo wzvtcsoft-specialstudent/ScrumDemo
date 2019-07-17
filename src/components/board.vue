@@ -161,6 +161,7 @@ export default {
       staticIssue: [], // 静态issue集
       staticTask: null, // 静态task集
       commitData: [],
+      xiangmu:{},
       alltask: null, // 显示的task
       labelsState: false,
       assigneesState: false,
@@ -231,6 +232,9 @@ export default {
     },
     prev(e) {
       e.preventDefault();
+    },
+    getxiangmu(){
+      
     },
     getinfo() {
       let params = {
@@ -745,7 +749,9 @@ export default {
     }
   },
   created() {
+    this.getxiangmu();
     this.getinfo();
+    
     // this.getBug()
   }
 };

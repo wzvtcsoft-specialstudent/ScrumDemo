@@ -9,7 +9,7 @@ const NAME = "ScrumDemo"; // repository{name: xxx}
 
 /* 项目ID */
 //StoryList
-const XIANGMU_ID = "MDEwOlJlcG9zaXRvcnkxODcxMTgwMTM="; //  respository{id: xxx}
+const XIANGMU_ID = "MDEwOlJlcG9zaXRvcnkxOTYxNjI3MTg="; //  respository{id: xxx}
 /* 
    去github GraphQL API 查询
    Dmsbog: MDEwOlJlcG9zaXRvcnkxOTYxNTIyMTE=

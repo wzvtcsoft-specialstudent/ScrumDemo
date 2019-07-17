@@ -1,5 +1,5 @@
 <template>
-  <el-tooltip effect="light" placement="right" :hide-after="2000" v-model="show" manual enterable>
+  <el-tooltip effect="light" placement="right" :hide-after="2000" v-model="show" popper-class="draw_share_atooltip" manual enterable>
     <div slot="content" class="comments-container" @mouseleave="show = false">
       <div v-if="comments.state">
         <ul>
@@ -21,15 +21,15 @@
       </div>
     </div>
     <div class="sticker-container" @contextmenu.prevent="rightClick">
-      <img
+      <!-- <img
         src="@/assets/img/completed.png"
         width="20"
         height="20"
         class="completed"
         @click="complete"
         v-if="isBug"
-      />
-      <div class="sticker-menu" v-else>
+      /> -->
+      <div class="sticker-menu" >
         <span v-if = "list.state == 'OPEN'">
           <img
           src="@/assets/img/issue_opened.png"
@@ -287,6 +287,12 @@ li {
 }
 li:hover {
   color: red;
+}
+.draw_share_atooltip{
+  width: 200px;
+  height: 800px;
+  background: #515b62 !important;
+  overflow-y: auto;
 }
 .comments-container {
   width: 200px;
