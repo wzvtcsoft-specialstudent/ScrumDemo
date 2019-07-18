@@ -10,9 +10,17 @@
           <router-link to="/bug" tag="span" class="link-item">Bug</router-link>
         </div>
       </div>
-      <div class="container" style="marginLeft:4.19%">
-        <div class="sub addBug" @click="addBugState = true">Add bug</div>
+      <div class="add" style="marginLeft:4.19%"  @click="addState = !addState">
+        <div class="addIssue">
+          <div class="addIssue-title">Add bug</div>
+          <img src="@/assets/img/drop.png" class="drop" />
+        </div>
+        <div class="add-item" v-show="addState" @mouseleave="addState = false">
+          <span @click="create(0)">Interface bug</span>
+          <span @click="create(1)">Functional bug</span>
+        </div>
       </div>
+      
       <div class="container">
         <div class="sub screen" @click="screenState = !screenState">
           <div>{{this.bug_state}}</div>
@@ -79,7 +87,7 @@
         </div>
       </div>
     </div>
-    <add-bug style="z-index:999" v-if="addBugState" @state="cgState"></add-bug>
+    <add-bug style="z-index:999" v-if="addBugState" @state="cgState" :bugType="bugType"></add-bug>
      <edit-dialog class="edit-dialog" v-if="editDialogState" :list="editInfo" @state="cgEditState"></edit-dialog>
   </div>
 </template>
@@ -118,7 +126,9 @@ export default {
       clickx: 0,
       bug_state:"All",
       LOGIN:"",
-      NAME:""
+      NAME:"",
+      addState:"false",
+      bugType:""
     };
   },
   components: {
@@ -127,6 +137,20 @@ export default {
     editDialog
   },
   methods: {
+    create(val) {
+      switch (val) {
+        case 0:
+          this.addBugState = true
+          this.connectIssue = 0;
+          this.bugType = "Interface bug";
+          break;
+        case 1:
+          this.addBugState = true
+          this.connectIssue = this.data[this.epici].number;
+          this.bugType = "Functional bug";
+          break;
+      }
+    },
     delRecord() {
       localStorage.removeItem('LOGIN')
       localStorage.removeItem('NAME')
@@ -472,5 +496,58 @@ li:hover {
   border-radius: 5px;
   float: left;
   cursor: pointer;
+}
+.add {
+  width: 135px;
+  position: relative;
+  margin: 9px 0 0 12px;
+  float: left;
+}
+.addIssue {
+  width: 135px;
+  height: 35px;
+  background: rgba(38, 128, 235, 1);
+  color: white;
+  border-radius: 5px;
+}
+.addIssue-title {
+  width: 65px;
+  font-size: 13px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  margin: 9px 0 0 14px;
+  float: left;
+}
+.drop {
+  width: 16px;
+  height: 16px;
+  float: left;
+  margin: 8px 0 0 12px;
+}
+.add-item {
+  width: 135px;
+  min-height: 82px;
+  max-height: 108px;
+  /* padding-bottom: 18px; */
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+  margin-top: 2px;
+  position: absolute;
+  z-index: 999;
+}
+.add-item span {
+  display: block;
+  width: auto;
+  height: 18px;
+  margin: 10px 0 0 12px;
+  font-size: 16px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  line-height: 27px;
+  color: rgba(112, 112, 112, 1);
+  opacity: 1;
+}
+.add-item span:hover {
+  color: #2680eb;
 }
 </style>

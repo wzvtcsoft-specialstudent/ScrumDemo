@@ -1,27 +1,9 @@
 <template>
   <div class="dialog-container">
     <div class="dialog">
-      <span class="title">Add bug</span>
+      <span class="title">{{bugType}}</span>
       <div class="line"></div>
       <div class="info">
-        <div class="container">
-          <div class="info-sub" @click="labelsState = !labelsState">
-            <div>Labels</div>
-            <img src="@/assets/img/infodrop.png" />
-          </div>
-          <div class="list" v-show="labelsState" @mouseleave="labelsState = false">
-            <ul>
-              <li
-                v-for="(lab,i) in labels"
-                :key="i"
-                v-show="lab.name == 'Interface bug' || lab.name == 'Functional bug'"
-              >
-                <img src="@/assets/img/select.png" class="select" @click="selLab($event,i)" />
-                <div class="list-name">{{ lab.name }}</div>
-              </li>
-            </ul>
-          </div>
-        </div>
       </div>
       <input type="text" v-model="title" placeholder="Bug generated phenomenon" class="issue-title" />
       <textarea class="issue-body" v-model="body" placeholder="Please try to describe the steps to reproduce the bug."></textarea>
@@ -43,12 +25,14 @@ export default {
       labSel: [], // 保存选中的项
       title: "",
       body: "",
-      XIANGMU_ID:""
+      XIANGMU_OWNERID:""
     };
   },
+  props:["bugType"],
   methods: {
     init(){
-     this.XIANGMU_ID = localStorage.getItem('XIANGMU_ID')
+     this.XIANGMU_OWNERID = localStorage.getItem('XIANGMU_OWNERID')
+     console.log(localStorage.getItem('XIANGMU_OWNERID'))
     },
     confirm() {
       if (this.title.trim() == "" || this.body.trim() == "") {
@@ -57,23 +41,22 @@ export default {
           type: "warning"
         });
       }
-      var labelStr = [],
-        body;
-      this.labSel.forEach((state, i) => {
-        if (state) {
-          labelStr.push('"' + this.labels[i].id + '"');
-        }
-      });
+      var labelIds = []
+      if(this.bugType == "Interface bug"){
+          labelIds.push("MDU6TGFiZWwxMzY1MDY4NTYx")
+      }else if(this.bugType == "Functional bug"){
+          labelIds.push("MDU6TGFiZWwxNDQyMTgwMDYw")
+      }
       let params = {
         query:
           'mutation{createIssue(input:{repositoryId:"' +
-          this.XIANGMU_ID +
+          this.XIANGMU_OWNERID +
           '",title:"' +
           this.title +
           '",body:"' +
           this.body +
           '",labelIds:[' +
-          labelStr +
+          labelIds +
           ']}){issue{ body  title}}}'
       };
         console.log(params);
@@ -173,7 +156,7 @@ li {
   left: 13px;
 }
 .line {
-  width: 60px;
+  width: 140px;
   height: 8px;
   background: rgba(231, 231, 231, 1);
   opacity: 1;
@@ -191,33 +174,6 @@ li {
   float: left;
   position: relative;
   margin-right: 12px;
-}
-.info-sub {
-  width: 118px;
-  height: 32px;
-  background: rgba(218, 218, 218, 1);
-  opacity: 1;
-  float: left;
-  margin-right: 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  text-align: center;
-}
-.info-sub div {
-  display: block;
-  width: 70px;
-  height: 20px;
-  font-size: 14px;
-  font-family: Source Han Sans CN;
-  font-weight: 400;
-  color: rgba(112, 112, 112, 1);
-  opacity: 1;
-  float: left;
-  margin: 5px 0 5px 10px;
-}
-.info-sub img {
-  margin: 8px 0 8px 6px;
-  float: left;
 }
 .list {
   position: absolute;

@@ -606,7 +606,7 @@ export default {
   font-family: Source Han Sans CN;
   font-weight: 400;
   margin: 30px 0 0 27.5%;
-  // line-height: 80px;
+  /* // line-height: 80px; */
   color: rgba(112, 112, 112, 1);
 }
 .special {
@@ -655,7 +655,6 @@ export default {
   float: left;
   margin: 1.19% 0px 0px 7%;
   cursor: pointer;
-  border:1px solid black
 }
 .addIssue {
   width: 118px;
@@ -714,8 +713,9 @@ export default {
 }
 .loginIn {
   /* text-align: center; */
-  width: 104px;
-  height: 32px;
+  width: 118px;
+  float: left;
+  height: 35px;
   display: block;
   text-align: center;
   line-height: 32px;
@@ -727,7 +727,6 @@ export default {
   color: rgba(255, 255, 255, 1);
   background: rgba(38, 128, 235, 1);
   border-radius: 5px;
-  float: left;
   cursor: pointer;
 }
 </style>
