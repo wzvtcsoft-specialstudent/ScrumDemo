@@ -141,12 +141,10 @@ export default {
       switch (val) {
         case 0:
           this.addBugState = true
-          this.connectIssue = 0;
           this.bugType = "Interface bug";
           break;
         case 1:
           this.addBugState = true
-          this.connectIssue = this.data[this.epici].number;
           this.bugType = "Functional bug";
           break;
       }
