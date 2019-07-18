@@ -2,15 +2,15 @@
     <div class="main-box">
         <div class="small">
             <div class="text"><p>OrganizationName:</p></div>
-            <div class="input"><input type="text" v-model="organization_name" class="in_css"></div>
+            <div class="input_css"><input type="text" v-model="organization_name" ></div>
         </div>
         <div class="small">
              <div class="text"><p>ProjectName:</p></div>
-            <div class="input"><input type="text" v-model="project_name" class="in_css"></div>
+            <div class="input_css"><input type="text" v-model="project_name" ></div>
         </div>
         <div class="small">
             <div class="text"><p>Token:</p></div>
-            <div class="input"><input type="text" name="" id="" v-model="access_token" class="in_css"></div>
+            <div class="input_css"><input type="text" name="" id="" v-model="access_token" ></div>
         </div>
         <div class="small">
             <div class="button"><input type="button" value="Login" @click="searchParm"></div>
@@ -41,8 +41,7 @@ export default {
             project_id: null,
             access_token: "",
             access_list:["f38fd99f9 ","a891d3cf44c","595fdb66c0","19efca6f49"],
-            a: 0,
-            b: 11
+           
         }
     },
     methods: {
@@ -111,7 +110,7 @@ export default {
     float: left;
     margin: 5px 5px 0 5px;
 }
-.input{
+.input_css{
     width: 170px;
     margin: 0 5px 5px 5px;
     float: left;

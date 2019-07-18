@@ -40,6 +40,7 @@
         v-model="word"
         @keydown.enter="screenWord"
       />
+      <div class="loginIn" @click="delRecord">退出</div>
     </div>
     <div class="board-body">
       <div class="body-container" style="marginLeft:7.25%">
@@ -126,6 +127,19 @@ export default {
     editDialog
   },
   methods: {
+    delRecord() {
+      localStorage.removeItem('LOGIN')
+      localStorage.removeItem('NAME')
+      localStorage.removeItem('XIANGMU_ID')
+      localStorage.removeItem('XIANGMU_OWNERID')
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('history')
+      this.boxIssue.splice(0,this.boxIssue.length)
+      this.staticIssue.splice(0,this.staticIssue.length)
+      this.$router.push({
+        path: '/'
+      })
+    },
     getInfo() {
       this.LOGIN = localStorage.getItem('LOGIN')
       this.NAME = localStorage.getItem('NAME')
@@ -440,5 +454,23 @@ li:hover {
 }
 .edit-dialog {
   z-index: 999;
+}
+.loginIn {
+  text-align: center;
+  width: 104px;
+  height: 32px;
+  display: block;
+  text-align: center;
+  line-height: 32px;
+  font-size: 14px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  margin-left: 12px;
+  margin-top: 9px;
+  color: rgba(255, 255, 255, 1);
+  background: rgba(38, 128, 235, 1);
+  border-radius: 5px;
+  float: left;
+  cursor: pointer;
 }
 </style>

@@ -244,7 +244,7 @@ export default {
       this.NAME = localStorage.getItem('NAME')
       this.XIANGMU_ID = localStorage.getItem('XIANGMU_ID')
       this.XIANGMU_OWNERID = localStorage.getItem('XIANGMU_OWNERID')
-
+     
       let params = {
         query: 'query{organization(login:"' +
           this.LOGIN +
@@ -315,28 +315,8 @@ export default {
         //  this.moveChangedCard();
         this.staticIssue = this.boxIssue;
 
-        // if(index==3){
-        //   console.log("DONE",i)
-        //   i.forEach(it=>{
-        //     if(it.issue.state=='OPEN')
-        //  {
-        //    this.ClosedIssue(it.issue.id)
-        //  }
-        //   })
-        // }
-        // else {
-        //   i.forEach(it=>{
-        //     if(it.issue.state=='CLOSED')
-        //  {
-        //    this.OpenIssue(it.issue.id)
-        //  }
-        //   })
-        // }
-
-
-        // this.staticTask = JSON.parse(localStorage.getItem("allTask"));
-        // this.alltask = this.staticTask;
       });
+      
     },
     getcommit() {
       let params = {
@@ -464,6 +444,8 @@ export default {
       localStorage.removeItem('XIANGMU_OWNERID')
       localStorage.removeItem('access_token')
       localStorage.removeItem('history')
+      this.boxIssue.splice(0,this.boxIssue.length)
+      this.staticIssue.splice(0,this.staticIssue.length)
       this.$router.push({
         path: '/'
       })
@@ -489,47 +471,9 @@ export default {
         this.boxIssue = this.staticIssue;
       });
     },
-    // moveChangedCard(){
-    //   console.log("我被触发了")
-    //   this.boxIssue[0].forEach(i=>{
-
-    //   if(i.issue.state=='CLOSED')
-    //   {
-    //     console.log(i.id)
-    //     console.log("我被移动了0")
-    //     this.movedCard(i.id)
-
-    //   }
-    //   })
-    //    this.boxIssue[1].forEach(i=>{
-    //   if(i.issue.state=='CLOSED')
-    //   {
-    //     console.log(i.id)
-    //     this.movedCard(i.id)
-    //    console.log("我被移动了1")
-    //   }
-    //   })
-    //    this.boxIssue[2].forEach(i=>{
-    //   if(i.issue.state=='CLOSED')
-    //   {
-    //     console.log(i.id)
-    //     console.log("我被移动了2")
-    //     this.movedCard(i.id)
-
-    //   }
-    //   })
-    // },
+    
     movedcard(id) {
-      // let card={}
-      // this.boxIssue.forEach(i=>{
-      //     i.forEach(it=>{
-      //       if(it.issue.id==id)
-      //       {
-      //         card.id=i.id
-      //         console.log("找到id"+id)
-      //       }
-      //     })
-      // })
+
       console.log(id)
       console.log("ID" + this.boxInfo[3].id)
       let params = {

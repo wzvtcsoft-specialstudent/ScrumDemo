@@ -46,6 +46,7 @@
         v-model="word"
         @keydown.enter="sel(3)"
       >
+      <div class="loginIn" @click="delRecord">退出</div>
     </div>
     <div class="his-body" v-if="state">
       <div class="selectbox">
@@ -152,6 +153,17 @@ export default {
     sticker
   },
   methods: {
+    delRecord() {
+      localStorage.removeItem('LOGIN')
+      localStorage.removeItem('NAME')
+      localStorage.removeItem('XIANGMU_ID')
+      localStorage.removeItem('XIANGMU_OWNERID')
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('history')
+      this.$router.push({
+        path: '/'
+      })
+    },
     initData() {
       try {
         this.commentsData = JSON.parse(localStorage.getItem('commit'))
@@ -418,6 +430,24 @@ li {
   border-radius: 5px;
   cursor: pointer;
   text-align: center;
+}
+.loginIn {
+  /* text-align: center; */
+  width: 104px;
+  height: 32px;
+  display: block;
+  text-align: center;
+  line-height: 32px;
+  font-size: 14px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  margin-top:9px;
+  margin-left:12px;
+  color: rgba(255, 255, 255, 1);
+  background: rgba(38, 128, 235, 1);
+  border-radius: 5px;
+  float: left;
+  cursor: pointer;
 }
 .labels div {
   display: block;

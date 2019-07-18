@@ -14,6 +14,7 @@
         <div class="addIssue">
           <div class="addIssue-title">New issue</div>
           <img src="@/assets/img/drop.png" class="drop" />
+          
         </div>
         <!-- 不论鼠标指针离开被选元素还是任何子元素，都会触发 mouseout 事件。
 
@@ -24,7 +25,9 @@
           <span @click="create(3)" v-show="titleState">user story</span>
           <span @click="create(2)">Task</span>
         </div>
+        
       </div>
+     <div class="loginIn" @click="delRecord">退出</div>
     </div>
     <div class="mapbody" v-if="mapState">
       <div class="container epic" ref="epic">
@@ -211,6 +214,18 @@ export default {
     };
   },
   methods: {
+    delRecord() {
+      localStorage.removeItem('LOGIN')
+      localStorage.removeItem('NAME')
+      localStorage.removeItem('XIANGMU_ID')
+      localStorage.removeItem('XIANGMU_OWNERID')
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('history')
+      
+      this.$router.push({
+        path: '/'
+      })
+    },
     init(){
     this.LOGIN = localStorage.getItem('LOGIN')
     this.NAME = localStorage.getItem('NAME')
@@ -640,6 +655,7 @@ export default {
   float: left;
   margin: 1.19% 0px 0px 7%;
   cursor: pointer;
+  border:1px solid black
 }
 .addIssue {
   width: 118px;
@@ -695,6 +711,24 @@ export default {
   margin-top: 100px;
   text-align: center;
   font-size: 30px;
+}
+.loginIn {
+  /* text-align: center; */
+  width: 104px;
+  height: 32px;
+  display: block;
+  text-align: center;
+  line-height: 32px;
+  font-size: 14px;
+  font-family: Source Han Sans CN;
+  font-weight: 400;
+  margin-top:18px;
+  margin-left:12px;
+  color: rgba(255, 255, 255, 1);
+  background: rgba(38, 128, 235, 1);
+  border-radius: 5px;
+  float: left;
+  cursor: pointer;
 }
 </style>
 
