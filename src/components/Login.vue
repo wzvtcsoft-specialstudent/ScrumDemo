@@ -39,8 +39,8 @@ export default {
             organization_id: null,
             project_name:"Single-police-cabinet",
             project_id: null,
-            access_token: "e441c094e9df7f6aae2e59d4cb1b19c1f3b4b22f",
-            access_list: [],
+            access_token: "",
+            access_list: ["2a2c211ce","e7e68750a0","c104493651","80422b95a62"],
             a: 0,
             b: 11
         }
@@ -73,17 +73,19 @@ export default {
             localStorage.setItem('XIANGMU_OWNERID',this.project_id)
         },
         goBoard(){
-           
            if(localStorage.getItem("access_token")!=null)
            {
            this.$router.push({path:'/board'})
            }
         
         },
-      
-    },
+        init(){
+            this.access_token=this.access_list.reverse().join("")
+        }
+    }, 
     created(){
         this.goBoard();
+        this.init()
     }
 
 }

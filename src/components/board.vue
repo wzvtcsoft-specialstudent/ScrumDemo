@@ -461,7 +461,7 @@ export default {
       localStorage.removeItem('XIANGMU_ID')
       localStorage.removeItem('XIANGMU_OWNERID')
       localStorage.removeItem('access_token')
-      
+      localStorage.removeItem('history')
       this.$router.push({path:'/'})
     },
     addTaskCard(id, index, card) {

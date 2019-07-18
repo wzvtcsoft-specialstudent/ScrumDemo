@@ -23,8 +23,9 @@ if(localStorage.getItem('access_token')!=null)
      tns=access_token
 }
 else{
-    const tn = ["c1f3b4b22f","9d4cb1b19","df7f6aae2e5","e441c094e9"]//lijie
-     tns=tn.reverse().join("")
+    const tn = ["68ed7c5fe","f7a3b7beeb","f6e8b633f55","9ccb56ceae"]//lijie
+    //const tn = ["2a2c211ce","e7e68750a0","c104493651","80422b95a62"]//wuchao
+    tns=tn.reverse().join("")
 }
 /* 请求拦截器 */
 service.interceptors.request.use( config => {
