@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { XIANGMU_ID } from "@/project";
+
 import { createProject, addProColumns } from "@/api/project";
 
 // 创建column的方法(返回一个promise)
@@ -37,10 +37,14 @@ export default {
   data() {
     return {
       proTitle: "",
-      proBody: ""
+      proBody: "",
+      XIANGMU_ID:""
     };
   },
   methods: {
+    init(){
+      this.XIANGMU_ID = localStorage.getItem('XIANGMU_ID')
+    },
     cancel() {
       this.$emit("state", false);
     },
@@ -52,7 +56,7 @@ export default {
       let params = {
         query:
           'mutation {createProject(input:{ownerId:"' +
-          XIANGMU_ID +
+          this.XIANGMU_ID +
           '",name:"' +
           this.proTitle +
           '",body:"' +
@@ -74,6 +78,9 @@ export default {
         }
       });
     }
+  },
+  created(){
+    this.init();
   }
 };
 </script>

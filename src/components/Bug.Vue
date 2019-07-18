@@ -84,7 +84,7 @@
 </template>
 
 <script>
-import { LOGIN, NAME } from "@/project";
+// import { LOGIN, NAME } from "@/project";
 import sticker from "./sticker";
 import addBug from "./addBug.vue";
 import { getIssue } from "@/api/getIssue";
@@ -115,7 +115,9 @@ export default {
       menuState: false,
       searchNaN: false, // 上次搜索是否没有结果
       clickx: 0,
-      bug_state:"All"
+      bug_state:"All",
+      LOGIN:"",
+      NAME:""
     };
   },
   components: {
@@ -125,12 +127,14 @@ export default {
   },
   methods: {
     getInfo() {
+      this.LOGIN = localStorage.getItem('LOGIN')
+      this.NAME = localStorage.getItem('NAME')
       let params = {
         query:
           'query{organization(login:"' +
-          LOGIN +
+          this.LOGIN +
           '"){repository(name:"' +
-          NAME +
+          this.NAME +
           '"){id name issues(first:100){  totalCount nodes{ id title state number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
       getIssue(params).then(res => {

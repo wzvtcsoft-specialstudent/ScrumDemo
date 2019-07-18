@@ -178,7 +178,7 @@ function screenData(data) {
 }
 
 
-import { LOGIN, NAME } from "@/project";
+// import { LOGIN, NAME } from "@/project";
 import sticker from "./sticker";
 import addDialog from "./addDialog";
 import editDialog from "./editDialog";
@@ -205,10 +205,16 @@ export default {
       editDialogState: false,
       editInfo: null,
       connectIssue: 0, // 创建issue所关联的issue
-      issueType: "Epic" //创建的issue的类型
+      issueType: "Epic",//创建的issue的类型
+      LOGIN:"",
+      NAME:""
     };
   },
   methods: {
+    init(){
+    this.LOGIN = localStorage.getItem('LOGIN')
+    this.NAME = localStorage.getItem('NAME')
+    },
     /* 判断extends行 是否有issue */
     extendData() {
       try {
@@ -232,9 +238,9 @@ export default {
       let params = {
         query:
           'query{organization(login:"' +
-          LOGIN +
+          this.LOGIN +
           '"){repository(name:"' +
-          NAME +
+          this.NAME +
           '"){assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} id name issues(first:100){  totalCount nodes{ id title state number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
       // this.commentsData = JSON.parse(localStorage.getItem("commit"));
@@ -489,7 +495,9 @@ export default {
     editDialog
   },
   created() {
+    this.init()
     this.getissue();
+    
   }
 };
 </script>

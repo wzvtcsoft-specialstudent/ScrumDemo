@@ -33,7 +33,7 @@
 
 <script>
 import { createIssue } from "@/api/createIssue";
-import { XIANGMU_ID } from "@/project";
+// import { XIANGMU_ID } from "@/project";
 export default {
   name: "addBUg",
   data() {
@@ -42,10 +42,14 @@ export default {
       labelsState: false, // list显示/隐藏
       labSel: [], // 保存选中的项
       title: "",
-      body: ""
+      body: "",
+      XIANGMU_ID:""
     };
   },
   methods: {
+    init(){
+     this.XIANGMU_ID = localStorage.getItem('XIANGMU_ID')
+    },
     confirm() {
       if (this.title.trim() == "" || this.body.trim() == "") {
         this.$message({
@@ -63,7 +67,7 @@ export default {
       let params = {
         query:
           'mutation{createIssue(input:{repositoryId:"' +
-          XIANGMU_ID +
+          this.XIANGMU_ID +
           '",title:"' +
           this.title +
           '",body:"' +
@@ -111,6 +115,9 @@ export default {
       sum = rgbArr[0] * 0.299 + rgbArr[1] * 0.578 + rgbArr[2] * 0.114;
       return sum > 192 ? "#707070" : "#FFFFFF"; // 深色背景，白色文字；浅色背景，黑色文字
     }
+  },
+  created(){
+    this.init()
   },
   mounted() {
     var labLens = this.labels.length;

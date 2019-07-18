@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { XIANGMU_OWNERID } from "@/project";
+// import { XIANGMU_OWNERID } from "@/project";
 import { editProject, editProColumns } from "@/api/project";
 
 // 创建column的方法(返回一个promise)

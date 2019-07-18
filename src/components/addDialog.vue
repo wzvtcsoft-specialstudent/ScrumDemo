@@ -78,7 +78,7 @@
 <script>
 import { moveCard, addCards, getCard } from "@/api/card";
 import { createIssue } from "@/api/createIssue";
-import { XIANGMU_ID } from "@/project"
+// import { XIANGMU_ID } from "@/project"
 export default {
   name: "addDialog",
   data() {
@@ -96,11 +96,15 @@ export default {
       body: "",
       issue_id:"",
       checked:false,
-      projectColumnId:""
+      projectColumnId:"",
+      XIANGMU_ID:""
     };
   },
   props: ["connect","type",],
   methods: {
+  init(){
+  this.XIANGMU_ID = localStorage.getItem('XIANGMU_ID')
+    },
     Add(e){
       this.checked = e.target.checked
       console.log(this.checked)
@@ -136,7 +140,7 @@ export default {
       
       let params = {
         query:
-          'mutation{createIssue(input:{repositoryId:"' + XIANGMU_ID +'",title:"' +
+          'mutation{createIssue(input:{repositoryId:"' + this.XIANGMU_ID +'",title:"' +
           this.title +
           '",body:"' +
           body +
@@ -238,6 +242,9 @@ export default {
     for(let k = 0; k< estiLens; k++) {
       this.estiSel[k] = false;
     }
+  },
+  created(){
+    this.init();
   }
 };
 </script>

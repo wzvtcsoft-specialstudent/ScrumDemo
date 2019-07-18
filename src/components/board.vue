@@ -46,7 +46,7 @@
     </div>
     <img src="@/assets/img/sousuo.png" class="icon" />
     <input type="text" class="search" placeholder="Search all tasks" v-model="word" @keydown.enter="selComplete(3)" />
-    
+
     <div class="task-container">
       <div class="add-task" @click="showTaskBox">Add Card</div>
       <div class="card-box" v-show="addTaskState" @mouseleave="addTaskState = false">
@@ -65,7 +65,7 @@
       </div>
       <div class="loginIn" @click="delRecord">退出</div>
     </div>
-    
+
   </div>
 
   <div class="board-body" v-if="state" @dragenter="prev" @dragover="prev" key="board">
@@ -73,29 +73,29 @@
       <span class="title">Future</span>
       <div class="issue-container">
         <!--@changecard="movedcard"-->
-        <sticker v-for="(card, i) in boxIssue[0]" :key="card.id + 'board'"  :comments="commitData[card.issue.number]" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt"  @edit="clickEdit" draggable="true" @dragstart.native="drop"
-          @dragend.native="dropend($event, card, i, 0)" @dragenter.native="prev"  @dragover.native="prev" class="sticker"></sticker>
+        <sticker v-for="(card, i) in boxIssue[0]" :key="card.id + 'board'" :comments="commitData[card.issue.number]" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt" @edit="clickEdit" draggable="true" @dragstart.native="drop"
+          @dragend.native="dropend($event, card, i, 0)" @dragenter.native="prev" @dragover.native="prev" class="sticker"></sticker>
       </div>
     </div>
     <div class="body-container">
       <span class="title">To do</span>
       <div class="issue-container">
-        <sticker v-for="(card, i) in boxIssue[1]" :comments="commitData[card.issue.number]" :key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt"  @edit="clickEdit" draggable="true" @dragstart.native="drop"
-          @dragend.native="dropend($event, card, i, 1)"   @dragenter.native="prev" @dragover.native="prev" class="sticker"></sticker>
+        <sticker v-for="(card, i) in boxIssue[1]" :comments="commitData[card.issue.number]" :key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt" @edit="clickEdit" draggable="true" @dragstart.native="drop"
+          @dragend.native="dropend($event, card, i, 1)" @dragenter.native="prev" @dragover.native="prev" class="sticker"></sticker>
       </div>
     </div>
     <div class="body-container">
       <span class="title">Doing</span>
       <div class="issue-container">
         <sticker v-for="(card, i) in boxIssue[2]" :comments="commitData[card.issue.number]" :key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt" @edit="clickEdit" draggable="true" @dragstart.native="drop"
-          @dragend.native="dropend($event, card, i, 2)"   @dragenter.native="prev" @dragover.native="prev" class="sticker"></sticker>
+          @dragend.native="dropend($event, card, i, 2)" @dragenter.native="prev" @dragover.native="prev" class="sticker"></sticker>
       </div>
     </div>
     <div class="body-container">
       <span class="title">Done</span>
       <div class="issue-container">
-        <sticker v-for="(card, i) in boxIssue[3]" :comments="commitData[card.issue.number]" :key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt"  @edit="clickEdit" draggable="true" @dragstart.native="drop"
-          @dragend.native="dropend($event, card, i, 3)"  class="sticker"></sticker>
+        <sticker v-for="(card, i) in boxIssue[3]" :comments="commitData[card.issue.number]" :key="card.id + 'board'" :list="card.issue" :isHome="true" :id="card.id" @addcomment="adCmt" @editcomment="edCmt" @edit="clickEdit" draggable="true" @dragstart.native="drop"
+          @dragend.native="dropend($event, card, i, 3)" class="sticker"></sticker>
       </div>
     </div>
     <edit-dialog class="edit-dialog" v-if="editDialogState" :list="editInfo" @state="cgEditState"></edit-dialog>
@@ -111,17 +111,18 @@
 </template>
 
 <script>
-import {
-  LOGIN,
-  NAME
-} from "@/project";
+
 import sticker from "./sticker";
 import editDialog from "./editDialog";
 import createPro from "./createPro";
 import editPro from "./editPro";
 import addComment from "./addComment";
-import { closeIssue } from "@/api/editIssue";
-import { openIssue } from "@/api/editIssue";
+import {
+  closeIssue
+} from "@/api/editIssue";
+import {
+  openIssue
+} from "@/api/editIssue";
 import {
   getIssue
 } from "@/api/getIssue";
@@ -152,7 +153,7 @@ function judge(obj, val) {
 
 export default {
   name: "board",
-   
+
   data() {
     return {
       state: false, // 是否开始渲染issue页面(有内容)
@@ -164,7 +165,7 @@ export default {
       staticIssue: [], // 静态issue集
       staticTask: null, // 静态task集
       commitData: [],
-      xiangmu:{},
+      xiangmu: {},
       alltask: null, // 显示的task
       labelsState: false,
       assigneesState: false,
@@ -189,7 +190,11 @@ export default {
       allCardId: [], // 当前sprint所有task的id
       sprint_title: "",
       sprint_body: "",
-      sprint_id: ""
+      sprint_id: "",
+      LOGIN: "",
+      NAME: "",
+      XIANGMU_ID: "",
+      XIANGMU_OWNERID: ""
     };
   },
   components: {
@@ -212,12 +217,10 @@ export default {
       if (num == 0 || index + num > 3) return;
       let temp = this.staticIssue[index].splice(i, 1);
       this.staticIssue[index + num].push(...temp);
-      if((index+num)==3)
-      {
-        
+      if ((index + num) == 3) {
+
         this.ClosedIssue(card.issue.id)
-      }
-      else {
+      } else {
         this.OpenIssue(card.issue.id)
       }
       let params = {
@@ -236,22 +239,24 @@ export default {
     prev(e) {
       e.preventDefault();
     },
-    getxiangmu(){
-      
-    },
     getinfo() {
+      this.LOGIN = localStorage.getItem('LOGIN')
+      this.NAME = localStorage.getItem('NAME')
+      this.XIANGMU_ID = localStorage.getItem('XIANGMU_ID')
+      this.XIANGMU_OWNERID = localStorage.getItem('XIANGMU_OWNERID')
+
       let params = {
         query: 'query{organization(login:"' +
-          LOGIN +
+          this.LOGIN +
           '"){repository(name:"' +
-          NAME +
+          this.NAME +
           '") {assignableUsers(first:20){totalCount nodes {id name}}labels(first:20){totalCount nodes {color id name}} projects(first:47, orderBy:{field:CREATED_AT,direction:DESC}){ totalCount nodes { id name columns(first:4){ nodes{id name cards(first:60){totalCount nodes{ id column { id } state content{ ... on Issue{ id title state number url body assignees(first:20) {totalCount  nodes {avatarUrl name updatedAt}} labels(first:20) { totalCount nodes {color name}}}}}}}}}}}}}'
       };
       getIssue(params).then(res => {
         console.log("刷新")
         let data = res.data.data.organization.repository,
           nowData = {};
-        
+
         try {
           if (data.projects.nodes.length == 0) {
             this.notState = true;
@@ -306,29 +311,29 @@ export default {
           allData.push(subData);
         });
         this.boxIssue = fixBoradData(allData);
-       this.getcommit();
-      //  this.moveChangedCard();
-       this.staticIssue = this.boxIssue;
-       
-      // if(index==3){
-      //   console.log("DONE",i)
-      //   i.forEach(it=>{
-      //     if(it.issue.state=='OPEN')
-      //  {
-      //    this.ClosedIssue(it.issue.id)
-      //  }
-      //   })
-      // }
-      // else {
-      //   i.forEach(it=>{
-      //     if(it.issue.state=='CLOSED')
-      //  {
-      //    this.OpenIssue(it.issue.id)
-      //  }
-      //   })
-      // }
-      
-      
+        this.getcommit();
+        //  this.moveChangedCard();
+        this.staticIssue = this.boxIssue;
+
+        // if(index==3){
+        //   console.log("DONE",i)
+        //   i.forEach(it=>{
+        //     if(it.issue.state=='OPEN')
+        //  {
+        //    this.ClosedIssue(it.issue.id)
+        //  }
+        //   })
+        // }
+        // else {
+        //   i.forEach(it=>{
+        //     if(it.issue.state=='CLOSED')
+        //  {
+        //    this.OpenIssue(it.issue.id)
+        //  }
+        //   })
+        // }
+
+
         // this.staticTask = JSON.parse(localStorage.getItem("allTask"));
         // this.alltask = this.staticTask;
       });
@@ -336,44 +341,41 @@ export default {
     getcommit() {
       let params = {
         query: 'query{organization(login: "' +
-          LOGIN +
+          this.LOGIN +
           '") {repository(name: "' +
-          NAME +
+          this.NAME +
           '") {issues(states:[OPEN] first:100){totalCount nodes{number comments(first:100){nodes{id body}}}}}}}'
       };
       getCommit(params).then(res => {
-         
+
         let commitData = res.data.data.organization.repository.issues.nodes;
-       
+
         commitData = fixComments(commitData);
         localStorage.setItem("commit", JSON.stringify(commitData));
         this.commitData = commitData;
         this.state = true;
-        
+
       });
     },
-    ClosedIssue(id)
-    {
+    ClosedIssue(id) {
       let params = {
-            query:
-              'mutation{closeIssue(input:{issueId: "' +
-           id +
-              '"}) {clientMutationId}}'
-          };
-          closeIssue(params).then(()=>{
-            window.location.reload();
-          })
+        query: 'mutation{closeIssue(input:{issueId: "' +
+          id +
+          '"}) {clientMutationId}}'
+      };
+      closeIssue(params).then(() => {
+        window.location.reload();
+      })
     },
-    OpenIssue(id){
+    OpenIssue(id) {
       let params = {
-            query:
-              'mutation{reopenIssue(input:{issueId: "' +
-              id +
-              '"}) {clientMutationId}}'
-          };
-          openIssue(params).then(()=>{
-            window.location.reload();
-          })
+        query: 'mutation{reopenIssue(input:{issueId: "' +
+          id +
+          '"}) {clientMutationId}}'
+      };
+      openIssue(params).then(() => {
+        window.location.reload();
+      })
     },
     clickEdit(list) {
       this.editInfo = list;
@@ -412,14 +414,14 @@ export default {
       if (this.staticTask != null) return;
       let params = {
         query: 'query{organization(login:"' +
-          LOGIN +
+          this.LOGIN +
           '"){repository(name:"' +
-          NAME +
+          this.NAME +
           '"){id name issues(first:100){  totalCount nodes{ id state title number url body assignees(first:100){ nodes{  name avatarUrl updatedAt} }labels(first:100){totalCount nodes{  name color} } timelineItems(first:20,itemTypes:[REFERENCED_EVENT,CROSS_REFERENCED_EVENT]){ totalCount nodes{ ...on CrossReferencedEvent{ source{ ...on Issue{  number  title labels(first:100){ totalCount  nodes{  name color } } assignees(first:100){  totalCount  nodes{ name } } } }target{  ...on Issue{ number  author{  avatarUrl }}} }}} } }}}}'
       };
       getCard(params).then(res => {
         try {
-          let cardData=res.data.data.organization.repository.issues.nodes
+          let cardData = res.data.data.organization.repository.issues.nodes
           let temp = this.findAllTask(
               findTask(res.data.data.organization.repository.issues.nodes),
             ),
@@ -437,32 +439,34 @@ export default {
           this.alltask = result;
 
           cardData.forEach(i => {
-          if (typeof i.labels !== 'undefined') {
-            i.labels.nodes.forEach(it => {
-              if ((it.name == '功能Bug') || (it.name == '界面Bug')) { 
-                
+            if (typeof i.labels !== 'undefined') {
+              i.labels.nodes.forEach(it => {
+                if ((it.name == '功能Bug') || (it.name == '界面Bug')) {
+
                   this.alltask.push(i)
-              }
-            })
-          }
-        })
-        this.staticTask=this.alltask
-      
+                }
+              })
+            }
+          })
+          this.staticTask = this.alltask
+
         } catch (error) {
           this.staticTask = [];
           this.alltask = [];
         }
       });
-      
+
     },
-    delRecord(){
+    delRecord() {
       localStorage.removeItem('LOGIN')
       localStorage.removeItem('NAME')
       localStorage.removeItem('XIANGMU_ID')
       localStorage.removeItem('XIANGMU_OWNERID')
       localStorage.removeItem('access_token')
       localStorage.removeItem('history')
-      this.$router.push({path:'/'})
+      this.$router.push({
+        path: '/'
+      })
     },
     addTaskCard(id, index, card) {
       let params = {
@@ -488,13 +492,13 @@ export default {
     // moveChangedCard(){
     //   console.log("我被触发了")
     //   this.boxIssue[0].forEach(i=>{
-         
+
     //   if(i.issue.state=='CLOSED')
     //   {
     //     console.log(i.id)
     //     console.log("我被移动了0")
     //     this.movedCard(i.id)
-        
+
     //   }
     //   })
     //    this.boxIssue[1].forEach(i=>{
@@ -511,11 +515,11 @@ export default {
     //     console.log(i.id)
     //     console.log("我被移动了2")
     //     this.movedCard(i.id)
-        
+
     //   }
     //   })
     // },
-    movedcard(id){
+    movedcard(id) {
       // let card={}
       // this.boxIssue.forEach(i=>{
       //     i.forEach(it=>{
@@ -526,17 +530,17 @@ export default {
       //       }
       //     })
       // })
-       console.log(id)
-       console.log("ID"+this.boxInfo[3].id )
+      console.log(id)
+      console.log("ID" + this.boxInfo[3].id)
       let params = {
         query: 'mutation{moveProjectCard(input:{cardId:"' +
-         id +
+          id +
           '",columnId:"' +
           this.boxInfo[3].id +
           '"}){cardEdge{node{content{... on Issue{body}}}}}}'
       };
-       
-      moveCard(params).then(res=>{
+
+      moveCard(params).then(res => {
         console.log("11124454646")
         window.location.reload();
       })
@@ -744,9 +748,8 @@ export default {
     }
   },
   created() {
-    this.getxiangmu();
     this.getinfo();
-    
+
     // this.getBug()
   }
 };
@@ -865,7 +868,8 @@ li {
   float: left;
   cursor: pointer;
 }
-.loginIn{
+
+.loginIn {
   width: 104px;
   height: 32px;
   display: block;

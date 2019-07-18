@@ -27,7 +27,7 @@ import {
     getIssue
 } from "@/api/getIssue";
 import axios from '@/fetch'
-import { LOGIN, NAME, XIANGMU_ID, XIANGMU_OWNERID} from "@/project";
+
 // import {
 //   setMyParm
 // } from "@/depositAccount";
@@ -40,7 +40,7 @@ export default {
             project_name:"Single-police-cabinet",
             project_id: null,
             access_token: "",
-            access_list: ["2a2c211ce","e7e68750a0","c104493651","80422b95a62"],
+            access_list:["f38fd99f9 ","a891d3cf44c","595fdb66c0","19efca6f49"],
             a: 0,
             b: 11
         }
@@ -48,6 +48,8 @@ export default {
     methods: {
        
         searchParm() {
+            localStorage.setItem('LOGIN',this.organization_name)
+            localStorage.setItem('NAME',this.project_name)
             localStorage.setItem("access_token",this.access_token)
             let params = {
                 query: 'query{organization(login:"' +
@@ -57,18 +59,17 @@ export default {
                     '") {id}}}'
             };
             getIssue(params).then(res => {
-
                 this.project_id = res.data.data.organization.repository.id;
                 this.organization_id = res.data.data.organization.id;
-        
-                this.setParm()
                 
+            }).then(()=>{
+              this.setParm()
             })
+            
             this.$router.push({path:'/board'})
         },
         setParm() {
-            localStorage.setItem('LOGIN',this.organization_name)
-            localStorage.setItem('NAME',this.project_name)
+            console.log("执行到我")
             localStorage.setItem('XIANGMU_ID',this.organization_id)
             localStorage.setItem('XIANGMU_OWNERID',this.project_id)
         },

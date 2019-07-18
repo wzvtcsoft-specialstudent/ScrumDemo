@@ -23,8 +23,9 @@ if(localStorage.getItem('access_token')!=null)
      tns=access_token
 }
 else{
-    const tn = ["68ed7c5fe","f7a3b7beeb","f6e8b633f55","9ccb56ceae"]//lijie
-    //const tn = ["2a2c211ce","e7e68750a0","c104493651","80422b95a62"]//wuchao
+    //const tn = ["68ed7c5fe","f7a3b7beeb","f6e8b633f55","9ccb56ceae"]//lijie
+    const tn = ["2a2c211ce","e7e68750a0","c104493651","80422b95a62"]//wuchao
+    //const tn =["f38fd99f9 ","a891d3cf44c","595fdb66c0","19efca6f49"]
     tns=tn.reverse().join("")
 }
 /* 请求拦截器 */
